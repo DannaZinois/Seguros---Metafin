@@ -119,7 +119,7 @@ function CarteraPage() {
                   <td className="px-6 py-4">
                     <Link
                       to="/cliente/$clienteId"
-                      params={{ clienteId: r.id.replace(/[^a-zA-Z0-9]/g, "") }}
+                      params={{ clienteId: r.clienteId }}
                       className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
                     >
                       {r.name}
@@ -128,10 +128,7 @@ function CarteraPage() {
                   <td className="px-6 py-4">
                     <Link
                       to="/cliente/$clienteId/poliza/$polizaId"
-                      params={{
-                        clienteId: r.id.replace(/[^a-zA-Z0-9]/g, ""),
-                        polizaId: r.id.replace(/[^a-zA-Z0-9]/g, ""),
-                      }}
+                      params={{ clienteId: r.clienteId, polizaId: r.id }}
                       className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
                     >
                       {r.poliza}
