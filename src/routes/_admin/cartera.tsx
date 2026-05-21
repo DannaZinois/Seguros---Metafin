@@ -1,7 +1,8 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { Search, Download, Plus, ChevronLeft, ChevronRight, X, User, Building2 } from "lucide-react";
-import { useMemo, useState } from "react";
-import { CLIENTES, type ClienteStatus } from "@/lib/clientes-data";
+import { useEffect, useMemo, useState } from "react";
+import { CLIENTES, buildEmpresaSeeds, type ClienteStatus, type TipoCliente } from "@/lib/clientes-data";
+import { seedEmpresasIfEmpty } from "@/lib/empresa-store";
 
 export const Route = createFileRoute("/_admin/cartera")({
   component: CarteraPage,
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/_admin/cartera")({
 interface Row {
   id: string;
   clienteId: string;
+  tipo: TipoCliente;
   name: string;
   poliza: string;
   renovacion: string;
@@ -26,6 +28,7 @@ const ROWS: Row[] = CLIENTES.flatMap((c) =>
   c.polizas.map((p) => ({
     id: p.id,
     clienteId: c.clienteId,
+    tipo: c.tipo,
     name: c.profile.nombre,
     poliza: p.tipoSeguro,
     renovacion: p.renovacion,
