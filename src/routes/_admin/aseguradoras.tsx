@@ -22,6 +22,39 @@ const SEED: Aseguradora[] = [
     appUrl: "https://apps.apple.com/mx/app/axa-mexico",
     usuario: "agente_axa01",
     contrasena: "Demo$2025",
+    claveAgente: "AXA-AG-44218",
+    polizas: [
+      {
+        id: "axa-auto",
+        tipo: "Auto",
+        variantes: [
+          { id: "axa-auto-1", nombre: "Amplia Plus", pdfName: "axa-auto-amplia.pdf", wordName: "axa-auto-amplia.docx" },
+          { id: "axa-auto-2", nombre: "Limitada", pdfName: "axa-auto-limitada.pdf", wordName: "axa-auto-limitada.docx" },
+        ],
+      },
+      {
+        id: "axa-vida",
+        tipo: "Vida",
+        variantes: [
+          { id: "axa-vida-1", nombre: "Vida Temporal", pdfName: "axa-vida-temporal.pdf", wordName: "axa-vida-temporal.docx" },
+        ],
+      },
+      {
+        id: "axa-gmm",
+        tipo: "Gastos médicos mayores",
+        variantes: [
+          { id: "axa-gmm-1", nombre: "Versátil", pdfName: "axa-gmm-versatil.pdf", wordName: "axa-gmm-versatil.docx" },
+          { id: "axa-gmm-2", nombre: "Flex Plus", pdfName: "axa-gmm-flex.pdf", wordName: "axa-gmm-flex.docx" },
+        ],
+      },
+      {
+        id: "axa-exceso",
+        tipo: "Exceso",
+        variantes: [
+          { id: "axa-exceso-1", nombre: "Exceso RC", pdfName: "axa-exceso-rc.pdf", wordName: "axa-exceso-rc.docx" },
+        ],
+      },
+    ],
   },
   {
     id: "seed-gnp",
@@ -36,6 +69,39 @@ const SEED: Aseguradora[] = [
     appUrl: "https://play.google.com/store/apps/details?id=mx.gnp",
     usuario: "agente_gnp22",
     contrasena: "Gnp#Demo99",
+    claveAgente: "GNP-AG-90821",
+    polizas: [
+      {
+        id: "gnp-auto",
+        tipo: "Auto",
+        variantes: [
+          { id: "gnp-auto-1", nombre: "Auto Total", pdfName: "gnp-auto-total.pdf", wordName: "gnp-auto-total.docx" },
+        ],
+      },
+      {
+        id: "gnp-vida",
+        tipo: "Vida",
+        variantes: [
+          { id: "gnp-vida-1", nombre: "Vida Plus", pdfName: "gnp-vida-plus.pdf", wordName: "gnp-vida-plus.docx" },
+          { id: "gnp-vida-2", nombre: "Vida Inversión", pdfName: "gnp-vida-inv.pdf", wordName: "gnp-vida-inv.docx" },
+        ],
+      },
+      {
+        id: "gnp-gmm",
+        tipo: "Gastos médicos mayores",
+        variantes: [
+          { id: "gnp-gmm-1", nombre: "Médica Plus", pdfName: "gnp-gmm-plus.pdf", wordName: "gnp-gmm-plus.docx" },
+        ],
+      },
+      {
+        id: "gnp-exceso",
+        tipo: "Exceso",
+        variantes: [
+          { id: "gnp-exceso-1", nombre: "Exceso Auto", pdfName: "gnp-exceso-auto.pdf", wordName: "gnp-exceso-auto.docx" },
+          { id: "gnp-exceso-2", nombre: "Exceso RC Empresarial", pdfName: "gnp-exceso-rc.pdf", wordName: "gnp-exceso-rc.docx" },
+        ],
+      },
+    ],
   },
 ];
 
