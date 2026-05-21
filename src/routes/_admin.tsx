@@ -1,11 +1,6 @@
 import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
-import {
-  LayoutDashboard,
-  Users,
-  FileText,
-  ShieldCheck,
-} from "lucide-react";
+import { Users, FileText, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { HeaderProfile } from "@/components/layout/header-profile";
 import { AppShell } from "@/components/layout/app-shell";
@@ -31,7 +26,6 @@ function AdminLayout() {
   }, [ready, user, router]);
 
   const navItems = [
-    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/cartera", label: "Cartera", icon: Users },
     { to: "/cotizadores", label: "Cotizadores", icon: FileText },
     { to: "/aseguradoras", label: "Aseguradoras", icon: ShieldCheck },
