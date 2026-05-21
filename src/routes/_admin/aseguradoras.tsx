@@ -608,6 +608,7 @@ function EditDialog({
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <Field label="Usuario" value={form.usuario ?? ""} onChange={(v) => set("usuario", v)} />
             <Field label="Contraseña" value={form.contrasena ?? ""} onChange={(v) => set("contrasena", v)} type="password" />
+            <Field label="Clave agente en la aseguradora" value={form.claveAgente ?? ""} onChange={(v) => set("claveAgente", v)} className="sm:col-span-2" />
           </div>
         </div>
 
