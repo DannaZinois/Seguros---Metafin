@@ -508,7 +508,7 @@ function PolizasForm({
           >
             {TIPOS_SEGURO.map((t) => (
               <option key={t} value={t}>
-                {t}
+                {tipoLabel(t)}
               </option>
             ))}
           </select>
