@@ -1,7 +1,8 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { Search, Download, Plus, ChevronLeft, ChevronRight, X, User, Building2 } from "lucide-react";
-import { useMemo, useState } from "react";
-import { CLIENTES, type ClienteStatus } from "@/lib/clientes-data";
+import { useEffect, useMemo, useState } from "react";
+import { CLIENTES, buildEmpresaSeeds, type ClienteStatus, type TipoCliente } from "@/lib/clientes-data";
+import { seedEmpresasIfEmpty } from "@/lib/empresa-store";
 
 export const Route = createFileRoute("/_admin/cartera")({
   component: CarteraPage,
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/_admin/cartera")({
 interface Row {
   id: string;
   clienteId: string;
+  tipo: TipoCliente;
   name: string;
   poliza: string;
   renovacion: string;
@@ -26,6 +28,7 @@ const ROWS: Row[] = CLIENTES.flatMap((c) =>
   c.polizas.map((p) => ({
     id: p.id,
     clienteId: c.clienteId,
+    tipo: c.tipo,
     name: c.profile.nombre,
     poliza: p.tipoSeguro,
     renovacion: p.renovacion,
@@ -48,6 +51,12 @@ const STATUS_STYLES: Record<ClienteStatus, string> = {
 function CarteraPage() {
   const [query, setQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Seed empresa store with dummy companies so empresa profile pages
+  // show coherent data when opened from this table.
+  useEffect(() => {
+    seedEmpresasIfEmpty(buildEmpresaSeeds());
+  }, []);
 
   const rows = useMemo(() => {
     if (!query.trim()) return ROWS;
@@ -117,22 +126,43 @@ function CarteraPage() {
                   className="border-b border-border/60 last:border-0 hover:bg-muted/40"
                 >
                   <td className="px-6 py-4">
-                    <Link
-                      to="/cliente/$clienteId"
-                      params={{ clienteId: r.clienteId }}
-                      className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
-                    >
-                      {r.name}
-                    </Link>
+                    {r.tipo === "Empresa" ? (
+                      <Link
+                        to="/empresa/nueva"
+                        search={{ empresaId: r.clienteId }}
+                        className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
+                      >
+                        {r.name}
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/cliente/$clienteId"
+                        params={{ clienteId: r.clienteId }}
+                        className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
+                      >
+                        {r.name}
+                      </Link>
+                    )}
                   </td>
                   <td className="px-6 py-4">
-                    <Link
-                      to="/cliente/$clienteId/poliza/$polizaId"
-                      params={{ clienteId: r.clienteId, polizaId: r.id }}
-                      className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
-                    >
-                      {r.poliza}
-                    </Link>
+                    {r.tipo === "Empresa" ? (
+                      <Link
+                        to="/empresa/poliza/$polizaId"
+                        params={{ polizaId: r.id }}
+                        search={{ empresaId: r.clienteId }}
+                        className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
+                      >
+                        {r.poliza}
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/cliente/$clienteId/poliza/$polizaId"
+                        params={{ clienteId: r.clienteId, polizaId: r.id }}
+                        className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
+                      >
+                        {r.poliza}
+                      </Link>
+                    )}
                   </td>
                   <td className="px-6 py-4 text-foreground/80">{r.renovacion}</td>
                   <td className="px-6 py-4 text-foreground/80">{r.proximoPago}</td>
