@@ -41,8 +41,10 @@ const SEED: Aseguradora[] = [
 
 function AseguradorasPage() {
   const [list, setList] = useAseguradoras();
-  const [name, setName] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const imgRef = useRef<HTMLInputElement>(null);
+  const empty: Aseguradora = { id: "", name: "" };
+  const [draft, setDraft] = useState<Aseguradora>(empty);
   const [pendingFile, setPendingFile] = useState<string>("");
   const [editing, setEditing] = useState<Aseguradora | null>(null);
 
@@ -51,17 +53,29 @@ function AseguradorasPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const setField = <K extends keyof Aseguradora>(k: K, v: Aseguradora[K]) =>
+    setDraft((p) => ({ ...p, [k]: v }));
+
+  const onImageFile = (file: File | undefined) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setField("imageDataUrl", reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
   const add = () => {
-    if (!name.trim()) return;
+    if (!draft.name.trim()) return;
     const item: Aseguradora = {
+      ...draft,
       id: crypto.randomUUID(),
-      name: name.trim(),
+      name: draft.name.trim(),
       pdfName: pendingFile || undefined,
     };
     setList([...list, item]);
-    setName("");
+    setDraft(empty);
     setPendingFile("");
     if (fileRef.current) fileRef.current.value = "";
+    if (imgRef.current) imgRef.current.value = "";
   };
 
   const remove = (id: string) => setList(list.filter((a) => a.id !== id));
@@ -80,36 +94,64 @@ function AseguradorasPage() {
       </p>
 
       <div className="mt-6 rounded-3xl border border-border bg-white p-6 shadow-sm">
-        <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
-          <div>
-            <label className="text-xs font-medium text-foreground">
-              Nombre de aseguradora
-            </label>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ej. AXA"
-              className="mt-1 w-full rounded-full border border-border px-4 py-2 text-sm outline-none focus:border-[color:var(--brand-blue)]"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-foreground">
-              PDF base (opcional)
-            </label>
-            <label className="mt-1 flex w-full cursor-pointer items-center gap-2 rounded-full border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:bg-muted/40">
-              <Upload className="h-4 w-4" />
-              {pendingFile || "Subir archivo PDF"}
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+          <div className="flex flex-col items-center gap-2">
+            {draft.imageDataUrl ? (
+              <img src={draft.imageDataUrl} alt="" className="h-24 w-24 rounded-2xl object-cover" />
+            ) : (
+              <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+                <ImageIcon className="h-7 w-7" />
+              </div>
+            )}
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted/40">
+              <Upload className="h-3.5 w-3.5" /> Imagen
               <input
-                ref={fileRef}
+                ref={imgRef}
                 type="file"
-                accept="application/pdf"
+                accept="image/*"
                 className="hidden"
-                onChange={(e) =>
-                  setPendingFile(e.target.files?.[0]?.name ?? "")
-                }
+                onChange={(e) => onImageFile(e.target.files?.[0])}
               />
             </label>
           </div>
+
+          <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <Field label="Nombre de aseguradora" value={draft.name} onChange={(v) => setField("name", v)} placeholder="Ej. AXA" />
+            <Field label="Abreviación" value={draft.abreviacion ?? ""} onChange={(v) => setField("abreviacion", v)} />
+            <Field label="RFC" value={draft.rfc ?? ""} onChange={(v) => setField("rfc", v)} />
+            <Field label="Ejecutivo" value={draft.ejecutivo ?? ""} onChange={(v) => setField("ejecutivo", v)} />
+            <Field label="Número de contacto" value={draft.contactoTel ?? ""} onChange={(v) => setField("contactoTel", v)} />
+            <Field label="Correo de contacto" value={draft.contactoEmail ?? ""} onChange={(v) => setField("contactoEmail", v)} />
+            <Field label="Link a página web" value={draft.webUrl ?? ""} onChange={(v) => setField("webUrl", v)} />
+            <Field label="Link para pago" value={draft.pagoUrl ?? ""} onChange={(v) => setField("pagoUrl", v)} />
+            <Field label="Link para descargar aplicación" value={draft.appUrl ?? ""} onChange={(v) => setField("appUrl", v)} />
+
+            <div>
+              <label className="text-xs font-medium text-foreground">PDF base (opcional)</label>
+              <label className="mt-1 flex w-full cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border px-3 py-2 text-sm text-muted-foreground hover:bg-muted/40">
+                <Upload className="h-4 w-4" />
+                <span className="truncate">{pendingFile || "Subir archivo PDF"}</span>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="application/pdf"
+                  className="hidden"
+                  onChange={(e) => setPendingFile(e.target.files?.[0]?.name ?? "")}
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 border-t border-border pt-6">
+          <h3 className="text-sm font-semibold text-foreground">Datos personales</h3>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <Field label="Usuario" value={draft.usuario ?? ""} onChange={(v) => setField("usuario", v)} />
+            <Field label="Contraseña" value={draft.contrasena ?? ""} onChange={(v) => setField("contrasena", v)} type="password" />
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-end">
           <button
             onClick={add}
             className="inline-flex h-10 items-center gap-2 rounded-full bg-[color:var(--brand-blue)] px-5 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
