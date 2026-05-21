@@ -145,7 +145,7 @@ function CarteraPage() {
                   key={idx}
                   className="border-b border-border/60 last:border-0"
                 >
-                  <td className="px-5 py-3.5 align-middle whitespace-nowrap">
+                  <td className="px-3 py-3 align-middle">
                     {r.tipo === "Empresa" ? (
                       <Link
                         to="/empresa/nueva"
@@ -164,7 +164,7 @@ function CarteraPage() {
                       </Link>
                     )}
                   </td>
-                  <td className="px-5 py-3.5 align-middle whitespace-nowrap">
+                  <td className="px-3 py-3 align-middle">
                     {r.tipo === "Empresa" ? (
                       <Link
                         to="/empresa/poliza/$polizaId"
@@ -184,12 +184,12 @@ function CarteraPage() {
                       </Link>
                     )}
                   </td>
-                  <td className="px-5 py-3.5 align-middle whitespace-nowrap text-foreground/80">{r.renovacion}</td>
-                  <td className="px-5 py-3.5 align-middle whitespace-nowrap text-foreground/80">{r.proximoPago}</td>
-                  <td className="px-5 py-3.5 align-middle whitespace-nowrap text-foreground/80">{r.cantidad}</td>
-                  <td className="px-5 py-3.5 align-middle whitespace-nowrap text-foreground/80">{r.correo}</td>
-                  <td className="px-5 py-3.5 align-middle whitespace-nowrap text-foreground/80">{r.telefono}</td>
-                  <td className="px-5 py-3.5 align-middle whitespace-nowrap">
+                  <td className="px-3 py-3 align-middle text-foreground/80">{r.renovacion}</td>
+                  <td className="px-3 py-3 align-middle text-foreground/80">{r.proximoPago}</td>
+                  <td className="px-3 py-3 align-middle text-foreground/80">{r.cantidad}</td>
+                  <td className="px-3 py-3 align-middle text-foreground/80">{r.correo}</td>
+                  <td className="px-3 py-3 align-middle text-foreground/80">{r.telefono}</td>
+                  <td className="px-3 py-3 align-middle">
                     {r.hasComprobante ? (
                       <button className="inline-flex items-center gap-1 text-[color:var(--brand-blue)] underline-offset-4 hover:underline">
                         <Download className="h-4 w-4" /> Descargar
@@ -200,7 +200,7 @@ function CarteraPage() {
                       </span>
                     )}
                   </td>
-                  <td className="px-5 py-3.5 align-middle whitespace-nowrap">
+                  <td className="px-3 py-3 align-middle">
                     <span
                       className={`inline-flex rounded-full px-4 py-1 text-xs font-medium ${STATUS_STYLES[r.status]}`}
                     >
