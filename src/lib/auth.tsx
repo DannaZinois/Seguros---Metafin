@@ -35,6 +35,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     try {
@@ -44,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore
     }
+    setReady(true);
   }, []);
 
   const login = (email: string, password: string, remember: boolean) => {
@@ -64,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, ready, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
