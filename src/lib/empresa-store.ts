@@ -136,6 +136,9 @@ export function seedEmpresasIfEmpty(seeds: Empresa[]) {
     const cur = existing.find((e) => e.id === s.id);
     return (
       !cur ||
+      cur.nombre !== s.nombre ||
+      cur.direccion !== s.direccion ||
+      cur.codigoPostal !== s.codigoPostal ||
       cur.polizas.length !== s.polizas.length ||
       cur.polizas.some((p) => p.asegurados.length === 0)
     );

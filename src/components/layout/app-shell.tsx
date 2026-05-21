@@ -11,6 +11,7 @@ export interface NavItem {
 interface AppShellProps {
   brandTitle: string;
   brandSubtitle: string;
+  brandLogo?: string;
   navItems: readonly NavItem[];
   onLogout: () => void;
   header: ReactNode;
@@ -21,6 +22,7 @@ interface AppShellProps {
 export function AppShell({
   brandTitle,
   brandSubtitle,
+  brandLogo,
   navItems,
   onLogout,
   header,
@@ -34,8 +36,16 @@ export function AppShell({
         style={{ background: "var(--gradient-brand)" }}
       >
         <div className="mb-8 flex items-center gap-3 px-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15 backdrop-blur">
-            <Shield className="h-5 w-5 text-white" />
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white ring-1 ring-white/15 backdrop-blur">
+            {brandLogo ? (
+              <img
+                src={brandLogo}
+                alt={brandTitle}
+                className="h-full w-full object-contain p-1"
+              />
+            ) : (
+              <Shield className="h-5 w-5 text-[color:var(--brand-navy-deep)]" />
+            )}
           </div>
           <div className="min-w-0">
             <p className="truncate font-display text-sm font-semibold text-white">
