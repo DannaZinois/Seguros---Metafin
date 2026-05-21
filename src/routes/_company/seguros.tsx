@@ -1,8 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Pencil, Trash2 } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { Section, Popup, type PopupState } from "@/components/cotizador/shared";
 import { useCompanyEmpresa } from "@/lib/company-context";
+import type { Poliza } from "@/lib/empresa-store";
 
 export const Route = createFileRoute("/_company/seguros")({
   component: SegurosPage,
@@ -11,8 +12,8 @@ export const Route = createFileRoute("/_company/seguros")({
 
 function SegurosPage() {
   const empresa = useCompanyEmpresa();
-  const navigate = useNavigate();
   const [popup, setPopup] = useState<PopupState>(null);
+  const [detail, setDetail] = useState<Poliza | null>(null);
 
   if (!empresa) {
     return (
@@ -21,9 +22,6 @@ function SegurosPage() {
       </div>
     );
   }
-
-  const goToPoliza = (polizaId: string) =>
-    navigate({ to: "/seguros/$polizaId", params: { polizaId } });
 
   const handleBaja = (tipo: string) => {
     setPopup({
@@ -70,10 +68,7 @@ function SegurosPage() {
             <tbody>
               {empresa.polizas.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={7}
-                    className="py-6 text-center text-sm text-muted-foreground"
-                  >
+                  <td colSpan={7} className="py-6 text-center text-sm text-muted-foreground">
                     Sin pólizas registradas.
                   </td>
                 </tr>
@@ -82,7 +77,7 @@ function SegurosPage() {
                   <tr
                     key={p.id}
                     className="cursor-pointer border-t border-border/60 hover:bg-muted/40"
-                    onClick={() => goToPoliza(p.id)}
+                    onClick={() => setDetail(p)}
                   >
                     <td className="py-3">{p.tipo || "—"}</td>
                     <td className="py-3 text-foreground/80">{p.aseguradora}</td>
@@ -101,24 +96,14 @@ function SegurosPage() {
                       </span>
                     </td>
                     <td className="py-3" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => goToPoliza(p.id)}
-                          title="Editar"
-                          aria-label="Editar"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--brand-blue)] text-white hover:bg-[color:var(--brand-blue-dark)]"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleBaja(p.tipo || "")}
-                          title="Dar de baja"
-                          aria-label="Dar de baja"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--status-cancelled)] text-[color:var(--status-cancelled-fg)] hover:opacity-90"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleBaja(p.tipo || "")}
+                        title="Dar de baja"
+                        aria-label="Dar de baja"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--status-cancelled)] text-[color:var(--status-cancelled-fg)] hover:opacity-90"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -127,6 +112,60 @@ function SegurosPage() {
           </table>
         </div>
       </Section>
+
+      {detail && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-md"
+          onClick={() => setDetail(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl"
+          >
+            <button
+              onClick={() => setDetail(null)}
+              className="absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground hover:bg-muted"
+              aria-label="Cerrar"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <h3 className="text-lg font-bold text-foreground">
+              Póliza {detail.tipo}
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Datos generales de la póliza con {detail.aseguradora}.
+            </p>
+            <dl className="mt-5 grid grid-cols-1 gap-x-6 gap-y-3 text-sm md:grid-cols-2">
+              {[
+                ["Tipo de póliza", detail.tipo],
+                ["Aseguradora", detail.aseguradora],
+                ["Contratante", detail.contratante],
+                ["Número de contacto", detail.contacto],
+                ["Código postal", detail.codigoPostal],
+                ["Tipo de pago", detail.tipoPago],
+                ["Número de asegurados", detail.numAsegurados],
+                ["RFC", detail.rfc],
+                ["Vigencia", detail.vigencia || "—"],
+                ["Estatus", detail.estatus || "Vigente"],
+              ].map(([label, value]) => (
+                <div key={label} className="flex flex-col">
+                  <dt className="text-xs font-medium text-muted-foreground">{label}</dt>
+                  <dd className="text-foreground">{value || "—"}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setDetail(null)}
+                className="rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {popup && <Popup state={popup} onClose={() => setPopup(null)} />}
     </div>
   );
