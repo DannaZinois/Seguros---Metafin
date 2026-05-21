@@ -454,6 +454,52 @@ function SegurosPage() {
                 </button>
               </div>
             </div>
+            <div className="mt-4 rounded-2xl border border-dashed border-border p-4">
+              <div className="mb-3 text-sm font-semibold text-foreground">
+                Documentos de la póliza
+              </div>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                <button
+                  onClick={() => handleDownload("cuestionario")}
+                  className="flex items-start gap-3 rounded-2xl border border-border p-4 text-left hover:border-[color:var(--brand-blue)] hover:bg-muted/40"
+                >
+                  <FileText className="h-5 w-5 shrink-0 text-[color:var(--brand-blue)]" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-semibold">Cuestionario</span>
+                      <Download className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                    <p className="text-xs text-muted-foreground">PDF del cuestionario.</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleDownload("condiciones generales")}
+                  className="flex items-start gap-3 rounded-2xl border border-border p-4 text-left hover:border-[color:var(--brand-blue)] hover:bg-muted/40"
+                >
+                  <FileText className="h-5 w-5 shrink-0 text-[color:var(--brand-blue)]" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-semibold">Condiciones generales</span>
+                      <Download className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                    <p className="text-xs text-muted-foreground">PDF de condiciones.</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleDownload("certificados de asegurados")}
+                  className="flex items-start gap-3 rounded-2xl border border-border p-4 text-left hover:border-[color:var(--brand-blue)] hover:bg-muted/40"
+                >
+                  <FileBadge className="h-5 w-5 shrink-0 text-[color:var(--brand-blue)]" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-semibold">Certificados</span>
+                      <Download className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                    <p className="text-xs text-muted-foreground">PDF de todos los asegurados.</p>
+                  </div>
+                </button>
+              </div>
+            </div>
             <div className="mt-6 flex justify-end gap-2">
               <button
                 onClick={closeNuevo}
