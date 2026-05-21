@@ -1,11 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { UserPlus } from "lucide-react";
 import {
   Section,
   Grid,
   Field,
   TextInput,
+  Popup,
+  type PopupState,
 } from "@/components/cotizador/shared";
 import { useCompanyEmpresa } from "@/lib/company-context";
+import {
+  saveEmpresa,
+  newEncargado,
+  type AccessType,
+} from "@/lib/empresa-store";
 
 export const Route = createFileRoute("/_company/perfil")({
   component: PerfilEmpresaPage,
@@ -14,6 +23,14 @@ export const Route = createFileRoute("/_company/perfil")({
 
 function PerfilEmpresaPage() {
   const empresa = useCompanyEmpresa();
+  const [open, setOpen] = useState(false);
+  const [popup, setPopup] = useState<PopupState>(null);
+  const [form, setForm] = useState({
+    nombre: "",
+    contacto: "",
+    email: "",
+    acceso: "Lectura" as AccessType,
+  });
 
   if (!empresa) {
     return (
@@ -22,6 +39,36 @@ function PerfilEmpresaPage() {
       </div>
     );
   }
+
+  const resetForm = () =>
+    setForm({ nombre: "", contacto: "", email: "", acceso: "Lectura" });
+
+  const handleRegister = () => {
+    if (!form.nombre.trim() || !form.email.trim()) {
+      setPopup({
+        kind: "error",
+        title: "Datos incompletos",
+        message: "Nombre y correo son obligatorios para registrar un encargado.",
+      });
+      return;
+    }
+    const enc = {
+      ...newEncargado(),
+      nombre: form.nombre.trim(),
+      contacto: form.contacto.trim(),
+      email: form.email.trim(),
+      acceso: form.acceso,
+      invited: false,
+    };
+    saveEmpresa({ ...empresa, encargados: [...empresa.encargados, enc] });
+    setOpen(false);
+    resetForm();
+    setPopup({
+      kind: "info",
+      title: "Encargado registrado",
+      message: `Se envió una invitación a ${enc.email}.`,
+    });
+  };
 
   return (
     <div className="pb-12">
@@ -58,6 +105,14 @@ function PerfilEmpresaPage() {
         title="Encargados"
         subtitle="Personas con acceso a la plataforma por parte de tu empresa."
       >
+        <div className="mb-4 flex justify-end">
+          <button
+            onClick={() => setOpen(true)}
+            className="inline-flex items-center gap-2 rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+          >
+            <UserPlus className="h-4 w-4" /> Registrar encargado
+          </button>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="text-xs text-muted-foreground">
@@ -109,6 +164,80 @@ function PerfilEmpresaPage() {
         Copyrights ©{" "}
         <span className="text-[color:var(--brand-blue)]">Zinois</span>
       </p>
+
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 p-4 backdrop-blur-md"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl"
+          >
+            <h3 className="text-lg font-bold text-foreground">
+              Registrar encargado
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Agrega una persona con acceso a la plataforma.
+            </p>
+            <div className="mt-4 space-y-3">
+              <Field label="Nombre completo">
+                <TextInput
+                  value={form.nombre}
+                  onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                />
+              </Field>
+              <Field label="Número de contacto">
+                <TextInput
+                  value={form.contacto}
+                  onChange={(e) =>
+                    setForm({ ...form, contacto: e.target.value })
+                  }
+                />
+              </Field>
+              <Field label="Correo electrónico">
+                <TextInput
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                />
+              </Field>
+              <Field label="Tipo de acceso">
+                <select
+                  value={form.acceso}
+                  onChange={(e) =>
+                    setForm({ ...form, acceso: e.target.value as AccessType })
+                  }
+                  className="w-full rounded-xl border border-border bg-white px-3 py-2 text-sm"
+                >
+                  <option value="Admin">Admin</option>
+                  <option value="RRHH">RRHH</option>
+                  <option value="Lectura">Lectura</option>
+                </select>
+              </Field>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  resetForm();
+                }}
+                className="rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleRegister}
+                className="rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-sm text-white hover:bg-[color:var(--brand-blue-dark)]"
+              >
+                Registrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {popup && <Popup state={popup} onClose={() => setPopup(null)} />}
     </div>
   );
 }
