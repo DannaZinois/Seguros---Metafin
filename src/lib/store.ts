@@ -86,10 +86,13 @@ function useStore<T>(key: string, fallback: T) {
 
 export function useAseguradoras() {
   const result = useStore<Aseguradora[]>(AS_KEY, DUMMY_ASEGURADORAS);
-  const [list] = result;
-  if (typeof window !== "undefined" && Array.isArray(list) && list.length === 0) {
-    write(AS_KEY, DUMMY_ASEGURADORAS);
-  }
+  const [list, setList] = result;
+  useEffect(() => {
+    if (Array.isArray(list) && list.length === 0) {
+      setList(DUMMY_ASEGURADORAS);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [list.length]);
   return result;
 }
 
