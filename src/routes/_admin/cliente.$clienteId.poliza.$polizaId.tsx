@@ -2,6 +2,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Pencil, Trash2, CloudDownload } from "lucide-react";
 import { Section } from "@/components/cotizador/shared";
 import { DatosGeneralesReadonly } from "@/components/cotizador/datos-generales-readonly";
+import { emptyDraft, saveDraft } from "@/lib/cotizador-draft";
 
 export const Route = createFileRoute("/_admin/cliente/$clienteId/poliza/$polizaId")({
   component: VerPolizaCliente,
@@ -20,6 +21,34 @@ const DOCS: { nombre: string; encargado: string; fecha: string; estatus: Estatus
 
 function VerPolizaCliente() {
   const router = useRouter();
+  const { clienteId, polizaId } = Route.useParams();
+
+  // Sample client data prefill — mirrors the row in cliente.$clienteId.tsx
+  const prefillDraft = () => {
+    saveDraft({
+      ...emptyDraft(),
+      nombre: "John Doe",
+      contacto: "+000 000 000",
+      correoContacto: "johndoe@correo.com",
+      tipoAsegurado: "Individual",
+      sexo: "Masculino",
+      codigoPostal: "00000",
+      fechaNacimiento: "1990-01-01",
+      fechaAntiguedad: "2024-01-01",
+      tipoSeguro: "Gastos Médicos Mayores",
+      tipoPersona: "Persona Física",
+    });
+  };
+
+  const goToCotizacion = () => {
+    prefillDraft();
+    router.navigate({ to: "/cotizadores" });
+  };
+
+  const goToCuestionario = () => {
+    prefillDraft();
+    router.navigate({ to: "/cuestionario" });
+  };
 
   return (
     <div>
@@ -42,21 +71,21 @@ function VerPolizaCliente() {
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
         {[
-          { title: "Cotización de póliza", subtitle: "Última edición el 00/00/0000 a las 00:00:00 por John Doe" },
-          { title: "Cuestionario de póliza", subtitle: "Última edición el 00/00/0000 a las 00:00:00 por John Doe" },
+          { title: "Cotización de póliza", subtitle: "Última edición el 00/00/0000 a las 00:00:00 por John Doe", onOpen: goToCotizacion },
+          { title: "Cuestionario de póliza", subtitle: "Última edición el 00/00/0000 a las 00:00:00 por John Doe", onOpen: goToCuestionario },
         ].map((c) => (
-          <div key={c.title} className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+          <div key={c.title} className="rounded-2xl border border-border bg-white p-5 shadow-sm transition hover:border-[color:var(--brand-blue)]/40 hover:shadow-md">
             <div className="flex items-start justify-between gap-4">
-              <div>
-                <h3 className="font-bold text-foreground">{c.title}</h3>
+              <button onClick={c.onOpen} className="text-left">
+                <h3 className="font-bold text-foreground hover:text-[color:var(--brand-blue)]">{c.title}</h3>
                 <p className="mt-1 text-xs text-muted-foreground">{c.subtitle}</p>
-              </div>
+              </button>
               <div className="text-right">
                 <p className="text-xs text-muted-foreground">Acciones</p>
                 <div className="mt-1 flex items-center gap-2">
-                  <button className="rounded-full p-1.5 text-amber-500 hover:bg-amber-50"><Pencil className="h-4 w-4" /></button>
-                  <button className="rounded-full p-1.5 text-destructive hover:bg-destructive/10"><Trash2 className="h-4 w-4" /></button>
-                  <button className="rounded-full p-1.5 text-[color:var(--brand-blue)] hover:bg-muted"><CloudDownload className="h-4 w-4" /></button>
+                  <button onClick={c.onOpen} className="rounded-full p-1.5 text-amber-500 hover:bg-amber-50" aria-label="Editar"><Pencil className="h-4 w-4" /></button>
+                  <button className="rounded-full p-1.5 text-destructive hover:bg-destructive/10" aria-label="Borrar"><Trash2 className="h-4 w-4" /></button>
+                  <button className="rounded-full p-1.5 text-[color:var(--brand-blue)] hover:bg-muted" aria-label="Descargar"><CloudDownload className="h-4 w-4" /></button>
                 </div>
               </div>
             </div>
