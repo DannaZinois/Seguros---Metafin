@@ -35,8 +35,8 @@ function AdminLayout() {
   useEffect(() => {
     if (!ready) return;
     if (!user) router.navigate({ to: "/login" });
-    else if (user.role === "company")
-      router.navigate({ to: "/perfil" });
+    else if (user.role === "company") router.navigate({ to: "/perfil" });
+    else if (user.role === "client") router.navigate({ to: "/mi-perfil" });
   }, [ready, user, router]);
 
   const navItems = [

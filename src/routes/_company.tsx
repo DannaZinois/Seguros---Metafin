@@ -29,8 +29,8 @@ function CompanyLayout() {
   useEffect(() => {
     if (!ready) return;
     if (!user) router.navigate({ to: "/login" });
-    else if (user.role !== "company")
-      router.navigate({ to: "/cartera" });
+    else if (user.role === "admin") router.navigate({ to: "/cartera" });
+    else if (user.role === "client") router.navigate({ to: "/mi-perfil" });
   }, [ready, user, router]);
 
   const onLogout = () => {

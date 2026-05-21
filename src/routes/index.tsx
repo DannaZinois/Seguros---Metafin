@@ -12,8 +12,11 @@ function Index() {
   const router = useRouter();
   useEffect(() => {
     if (!ready) return;
-    if (user) router.navigate({ to: "/cartera" });
-    else router.navigate({ to: "/login" });
+    if (user) {
+      if (user.role === "company") router.navigate({ to: "/perfil" });
+      else if (user.role === "client") router.navigate({ to: "/mi-perfil" });
+      else router.navigate({ to: "/cartera" });
+    } else router.navigate({ to: "/login" });
   }, [ready, user, router]);
   return null;
 }
