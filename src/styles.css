@@ -65,6 +65,18 @@
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
+  /* Brand */
+  --brand-blue: oklch(0.38 0.16 264);
+  --brand-blue-dark: oklch(0.30 0.16 264);
+  --brand-bg-soft: oklch(0.985 0.012 230);
+  --status-active: oklch(0.86 0.14 155);
+  --status-active-fg: oklch(0.32 0.10 155);
+  --status-cancelled: oklch(0.84 0.10 25);
+  --status-cancelled-fg: oklch(0.35 0.14 25);
+  --status-review: oklch(0.92 0.14 90);
+  --status-review-fg: oklch(0.42 0.10 75);
+  --status-renew: oklch(0.84 0.10 300);
+  --status-renew-fg: oklch(0.38 0.14 300);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
