@@ -1,7 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Trash2, X } from "lucide-react";
+import { Trash2, X, Plus } from "lucide-react";
 import { useState } from "react";
-import { Section, Popup, type PopupState } from "@/components/cotizador/shared";
+import {
+  Section,
+  Popup,
+  Field,
+  TextInput,
+  type PopupState,
+} from "@/components/cotizador/shared";
 import { useCompanyEmpresa } from "@/lib/company-context";
 import type { Poliza } from "@/lib/empresa-store";
 
@@ -14,6 +20,20 @@ function SegurosPage() {
   const empresa = useCompanyEmpresa();
   const [popup, setPopup] = useState<PopupState>(null);
   const [detail, setDetail] = useState<Poliza | null>(null);
+  const [nuevoOpen, setNuevoOpen] = useState(false);
+  const initialNuevo = {
+    tipo: "",
+    aseguradora: "",
+    contratante: empresa?.nombre ?? "",
+    contacto: "",
+    codigoPostal: empresa?.codigoPostal ?? "",
+    tipoPago: "",
+    numAsegurados: "",
+    rfc: empresa?.rfc ?? "",
+    vigencia: "",
+    comentarios: "",
+  };
+  const [nuevo, setNuevo] = useState(initialNuevo);
 
   if (!empresa) {
     return (
@@ -40,15 +60,45 @@ function SegurosPage() {
     });
   };
 
+  const closeNuevo = () => {
+    setNuevoOpen(false);
+    setNuevo(initialNuevo);
+  };
+
+  const handleSolicitar = () => {
+    if (!nuevo.tipo.trim() || !nuevo.aseguradora.trim()) {
+      setPopup({
+        kind: "error",
+        title: "Datos incompletos",
+        message: "Tipo de póliza y aseguradora son obligatorios.",
+      });
+      return;
+    }
+    closeNuevo();
+    setPopup({
+      kind: "info",
+      title: "Solicitud enviada",
+      message: `Se envió tu solicitud de una nueva póliza ${nuevo.tipo} con ${nuevo.aseguradora}. Te contactaremos a la brevedad.`,
+    });
+  };
+
   return (
     <div className="pb-12">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Mis seguros
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Consulta las pólizas activas de {empresa.nombre}.
-        </p>
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            Mis seguros
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Consulta las pólizas activas de {empresa.nombre}.
+          </p>
+        </div>
+        <button
+          onClick={() => setNuevoOpen(true)}
+          className="inline-flex items-center gap-2 rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+        >
+          <Plus className="h-4 w-4" /> Nuevo seguro
+        </button>
       </div>
 
       <Section title="Pólizas activas">
@@ -167,6 +217,128 @@ function SegurosPage() {
       )}
 
       {popup && <Popup state={popup} onClose={() => setPopup(null)} />}
+
+      {nuevoOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-md"
+          onClick={closeNuevo}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl"
+          >
+            <button
+              onClick={closeNuevo}
+              className="absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground hover:bg-muted"
+              aria-label="Cerrar"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <h3 className="text-lg font-bold text-foreground">
+              Solicitar nuevo seguro
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Captura los datos generales de la nueva póliza a contratar.
+            </p>
+            <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
+              <Field label="Tipo de póliza">
+                <select
+                  value={nuevo.tipo}
+                  onChange={(e) => setNuevo({ ...nuevo, tipo: e.target.value })}
+                  className="w-full rounded-full border border-border bg-white px-4 py-2 text-sm"
+                >
+                  <option value="">Selecciona...</option>
+                  <option value="GMM">GMM</option>
+                  <option value="Vida">Vida</option>
+                  <option value="Auto">Auto</option>
+                  <option value="Exceso">Exceso</option>
+                </select>
+              </Field>
+              <Field label="Aseguradora">
+                <TextInput
+                  value={nuevo.aseguradora}
+                  onChange={(v) => setNuevo({ ...nuevo, aseguradora: v })}
+                />
+              </Field>
+              <Field label="Contratante">
+                <TextInput
+                  value={nuevo.contratante}
+                  onChange={(v) => setNuevo({ ...nuevo, contratante: v })}
+                />
+              </Field>
+              <Field label="Número de contacto">
+                <TextInput
+                  value={nuevo.contacto}
+                  onChange={(v) => setNuevo({ ...nuevo, contacto: v })}
+                />
+              </Field>
+              <Field label="Código postal">
+                <TextInput
+                  value={nuevo.codigoPostal}
+                  onChange={(v) => setNuevo({ ...nuevo, codigoPostal: v })}
+                />
+              </Field>
+              <Field label="Tipo de pago">
+                <select
+                  value={nuevo.tipoPago}
+                  onChange={(e) => setNuevo({ ...nuevo, tipoPago: e.target.value })}
+                  className="w-full rounded-full border border-border bg-white px-4 py-2 text-sm"
+                >
+                  <option value="">Selecciona...</option>
+                  <option value="Anual">Anual</option>
+                  <option value="Semestral">Semestral</option>
+                  <option value="Trimestral">Trimestral</option>
+                  <option value="Mensual">Mensual</option>
+                </select>
+              </Field>
+              <Field label="Número de asegurados">
+                <TextInput
+                  value={nuevo.numAsegurados}
+                  onChange={(v) => setNuevo({ ...nuevo, numAsegurados: v })}
+                />
+              </Field>
+              <Field label="RFC">
+                <TextInput
+                  value={nuevo.rfc}
+                  onChange={(v) => setNuevo({ ...nuevo, rfc: v })}
+                />
+              </Field>
+              <Field label="Vigencia deseada">
+                <TextInput
+                  placeholder="DD/MM/AAAA"
+                  value={nuevo.vigencia}
+                  onChange={(v) => setNuevo({ ...nuevo, vigencia: v })}
+                />
+              </Field>
+            </div>
+            <div className="mt-3">
+              <Field label="Comentarios">
+                <textarea
+                  value={nuevo.comentarios}
+                  onChange={(e) => setNuevo({ ...nuevo, comentarios: e.target.value })}
+                  rows={3}
+                  placeholder="Describe coberturas o necesidades específicas."
+                  className="w-full rounded-2xl border border-border bg-white px-4 py-2 text-sm outline-none focus:border-[color:var(--brand-blue)]"
+                />
+              </Field>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={closeNuevo}
+                className="rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSolicitar}
+                className="rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+              >
+                Enviar solicitud
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
