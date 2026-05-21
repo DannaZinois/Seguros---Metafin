@@ -125,7 +125,18 @@ function CarteraPage() {
                       {r.name}
                     </Link>
                   </td>
-                  <td className="px-6 py-4 text-foreground/80">{r.poliza}</td>
+                  <td className="px-6 py-4">
+                    <Link
+                      to="/cliente/$clienteId/poliza/$polizaId"
+                      params={{
+                        clienteId: r.id.replace(/[^a-zA-Z0-9]/g, ""),
+                        polizaId: r.id.replace(/[^a-zA-Z0-9]/g, ""),
+                      }}
+                      className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
+                    >
+                      {r.poliza}
+                    </Link>
+                  </td>
                   <td className="px-6 py-4 text-foreground/80">{r.renovacion}</td>
                   <td className="px-6 py-4 text-foreground/80">{r.proximoPago}</td>
                   <td className="px-6 py-4 text-foreground/80">{r.cantidad}</td>
