@@ -248,8 +248,8 @@ function RegistroEmpresaPage() {
                 placeholder="Nombre aquí"
               />
               <TextInput
-                value={e.contacto ?? ""}
-                onChange={(v) => updateEncargado(e.id, { contacto: v } as Partial<Encargado>)}
+                value={e.contacto}
+                onChange={(v) => updateEncargado(e.id, { contacto: v })}
                 placeholder="+00 0000 0000 00"
               />
               <TextInput

@@ -5,6 +5,7 @@ export type AccessType = "Admin" | "RRHH" | "Lectura";
 export interface Encargado {
   id: string;
   nombre: string;
+  contacto: string;
   email: string;
   acceso: AccessType;
   invited?: boolean;
@@ -118,6 +119,7 @@ export function newEncargado(): Encargado {
   return {
     id: crypto.randomUUID(),
     nombre: "",
+    contacto: "",
     email: "",
     acceso: "Lectura",
     invited: false,

@@ -29,7 +29,7 @@ import {
 import {
   AseguradosSection,
   ComprobantesSection,
-} from "./empresa.nueva";
+} from "@/components/empresa/poliza-sections";
 
 const searchSchema = z.object({
   empresaId: z.string().optional(),
