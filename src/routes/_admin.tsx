@@ -13,9 +13,9 @@ import {
   Settings,
   HelpCircle,
   LogOut,
-  Bell,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { HeaderProfile } from "@/components/layout/header-profile";
 import cityBg from "@/assets/city-skyline.png";
 
 export const Route = createFileRoute("/_admin")({
@@ -102,25 +102,15 @@ function AdminLayout() {
       {/* Main */}
       <div className="flex flex-1 flex-col bg-white">
         <header className="flex items-center justify-end gap-4 border-b border-border bg-[color:var(--brand-bg-soft)]/60 px-10 py-4">
-          <button className="relative rounded-full p-2 text-muted-foreground hover:bg-white">
-            <Bell className="h-5 w-5" />
-            <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" />
-          </button>
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-muted" />
-            <div className="text-right">
-              <p className="text-sm font-semibold text-foreground">
-                {user?.name ?? "Invitado"}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {user?.role === "admin"
-                  ? "Perfil Broker"
-                  : user?.role === "company"
-                    ? "Perfil Compañía"
-                    : "Perfil Cliente"}
-              </p>
-            </div>
-          </div>
+          <HeaderProfile
+            name={user?.name ?? "Invitado"}
+            role="Perfil Broker"
+            fields={[
+              { label: "Nombre", value: user?.name ?? "" },
+              { label: "Correo", value: user?.email ?? "" },
+              { label: "Rol", value: "Administrador" },
+            ]}
+          />
         </header>
         <main className="flex-1 px-10 py-8">
           <Outlet />

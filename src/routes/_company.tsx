@@ -13,6 +13,8 @@ import {
   LogOut,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useCompanyEmpresa } from "@/lib/company-context";
+import { HeaderProfile } from "@/components/layout/header-profile";
 import cityBg from "@/assets/city-skyline.png";
 
 export const Route = createFileRoute("/_company")({
@@ -22,6 +24,7 @@ export const Route = createFileRoute("/_company")({
 function CompanyLayout() {
   const { user, ready, logout } = useAuth();
   const router = useRouter();
+  const empresa = useCompanyEmpresa();
 
   useEffect(() => {
     if (!ready) return;
@@ -85,15 +88,18 @@ function CompanyLayout() {
 
       <div className="flex flex-1 flex-col bg-white">
         <header className="flex items-center justify-end gap-4 border-b border-border bg-[color:var(--brand-bg-soft)]/60 px-10 py-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-muted" />
-            <div className="text-right">
-              <p className="text-sm font-semibold text-foreground">
-                {user?.name ?? "Invitado"}
-              </p>
-              <p className="text-xs text-muted-foreground">Perfil Compañía</p>
-            </div>
-          </div>
+          <HeaderProfile
+            name={empresa?.nombre ?? user?.name ?? "Invitado"}
+            role="Perfil Compañía"
+            fields={[
+              { label: "Empresa", value: empresa?.nombre ?? "" },
+              { label: "RFC", value: empresa?.rfc ?? "" },
+              { label: "Giro", value: empresa?.giro ?? "" },
+              { label: "Dirección", value: empresa?.direccion ?? "" },
+              { label: "Código postal", value: empresa?.codigoPostal ?? "" },
+              { label: "Correo de acceso", value: user?.email ?? "" },
+            ]}
+          />
         </header>
         <main className="flex-1 px-10 py-8">
           <Outlet />
