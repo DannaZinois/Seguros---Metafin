@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
-import { Search, Download, Upload, UserPlus, FileText, ClipboardList } from "lucide-react";
+import { Search, Download, Upload, UserPlus, FileText, ClipboardList, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Section,
   Field,
@@ -32,6 +32,8 @@ function EmpleadosPage() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("choose");
   const [popup, setPopup] = useState<PopupState>(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 15;
   const bulkRef = useRef<HTMLInputElement | null>(null);
   const cotizRef = useRef<HTMLInputElement | null>(null);
   const cuestRef = useRef<HTMLInputElement | null>(null);
@@ -70,6 +72,13 @@ function EmpleadosPage() {
         e.nombre.toLowerCase().includes(q),
     );
   }, [empleados, query]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pageRows = useMemo(
+    () => filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [filtered, currentPage],
+  );
 
   if (!empresa) {
     return (
@@ -196,14 +205,14 @@ function EmpleadosPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 ? (
+              {pageRows.length === 0 ? (
                 <tr>
                   <td colSpan={colCount} className="py-8 text-center text-sm text-muted-foreground">
                     Sin resultados.
                   </td>
                 </tr>
               ) : (
-                filtered.map((e) => (
+                pageRows.map((e) => (
                   <tr key={e.id} className="border-t border-border/60">
                     <td className="py-3 text-foreground/80">{e.trabajadorId}</td>
                     <td className="py-3">{e.nombre}</td>
@@ -256,6 +265,45 @@ function EmpleadosPage() {
             </tbody>
           </table>
         </div>
+        {filtered.length > 0 && (
+          <div className="mt-4 flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">
+              Mostrando {(currentPage - 1) * pageSize + 1}–
+              {Math.min(currentPage * pageSize, filtered.length)} de {filtered.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="rounded-full border border-border p-1.5 text-muted-foreground hover:bg-muted disabled:opacity-40"
+                aria-label="Anterior"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                <button
+                  key={n}
+                  onClick={() => setPage(n)}
+                  className={`min-w-8 rounded-full px-3 py-1 text-xs font-medium ${
+                    n === currentPage
+                      ? "bg-[color:var(--brand-blue)] text-white"
+                      : "text-foreground/80 hover:bg-muted"
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="rounded-full border border-border p-1.5 text-muted-foreground hover:bg-muted disabled:opacity-40"
+                aria-label="Siguiente"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </Section>
 
       {open && (
