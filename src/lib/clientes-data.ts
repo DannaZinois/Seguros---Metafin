@@ -123,6 +123,7 @@ export const CLIENTES: Cliente[] = [
       { id: "E880101", tipoSeguro: "GMM", aseguradora: "GNP", vigencia: "02/28/2024", renovacion: "02/28/2025", proximoPago: "02/28/2025", cantidad: "$48,200", hasComprobante: true, consentimiento: true, certificado: true, status: "Por renovar" },
       { id: "E880102", tipoSeguro: "Auto", aseguradora: "Qualitas", vigencia: "07/14/2024", renovacion: "07/14/2025", proximoPago: "03/14/2025", cantidad: "$22,750", hasComprobante: true, consentimiento: true, certificado: true, status: "Activa" },
       { id: "E880103", tipoSeguro: "Exceso", aseguradora: "Chubb", vigencia: "10/30/2024", renovacion: "10/30/2025", proximoPago: "04/30/2025", cantidad: "$35,600", hasComprobante: true, consentimiento: false, certificado: true, status: "En revisión" },
+      { id: "E880104", tipoSeguro: "Vida", aseguradora: "MetLife", vigencia: "06/15/2024", renovacion: "06/15/2025", proximoPago: "03/15/2025", cantidad: "$31,900", hasComprobante: true, consentimiento: true, certificado: true, status: "Activa" },
     ],
   },
   {
