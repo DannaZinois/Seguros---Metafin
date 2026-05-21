@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
+import { Route as AdminCuestionarioRouteImport } from './routes/_admin/cuestionario'
 import { Route as AdminCotizadoresRouteImport } from './routes/_admin/cotizadores'
 import { Route as AdminCarteraRouteImport } from './routes/_admin/cartera'
 import { Route as AdminAseguradorasRouteImport } from './routes/_admin/aseguradoras'
@@ -34,6 +35,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCuestionarioRoute = AdminCuestionarioRouteImport.update({
+  id: '/cuestionario',
+  path: '/cuestionario',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminCotizadoresRoute = AdminCotizadoresRouteImport.update({
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/aseguradoras': typeof AdminAseguradorasRoute
   '/cartera': typeof AdminCarteraRoute
   '/cotizadores': typeof AdminCotizadoresRoute
+  '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
 }
 export interface FileRoutesByTo {
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/aseguradoras': typeof AdminAseguradorasRoute
   '/cartera': typeof AdminCarteraRoute
   '/cotizadores': typeof AdminCotizadoresRoute
+  '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
 }
 export interface FileRoutesById {
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/_admin/aseguradoras': typeof AdminAseguradorasRoute
   '/_admin/cartera': typeof AdminCarteraRoute
   '/_admin/cotizadores': typeof AdminCotizadoresRoute
+  '/_admin/cuestionario': typeof AdminCuestionarioRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
 }
 export interface FileRouteTypes {
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
     | '/aseguradoras'
     | '/cartera'
     | '/cotizadores'
+    | '/cuestionario'
     | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
     | '/aseguradoras'
     | '/cartera'
     | '/cotizadores'
+    | '/cuestionario'
     | '/dashboard'
   id:
     | '__root__'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
     | '/_admin/aseguradoras'
     | '/_admin/cartera'
     | '/_admin/cotizadores'
+    | '/_admin/cuestionario'
     | '/_admin/dashboard'
   fileRoutesById: FileRoutesById
 }
@@ -142,6 +154,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/cuestionario': {
+      id: '/_admin/cuestionario'
+      path: '/cuestionario'
+      fullPath: '/cuestionario'
+      preLoaderRoute: typeof AdminCuestionarioRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/cotizadores': {
       id: '/_admin/cotizadores'
       path: '/cotizadores'
@@ -170,6 +189,7 @@ interface AdminRouteChildren {
   AdminAseguradorasRoute: typeof AdminAseguradorasRoute
   AdminCarteraRoute: typeof AdminCarteraRoute
   AdminCotizadoresRoute: typeof AdminCotizadoresRoute
+  AdminCuestionarioRoute: typeof AdminCuestionarioRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
 }
 
@@ -177,6 +197,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAseguradorasRoute: AdminAseguradorasRoute,
   AdminCarteraRoute: AdminCarteraRoute,
   AdminCotizadoresRoute: AdminCotizadoresRoute,
+  AdminCuestionarioRoute: AdminCuestionarioRoute,
   AdminDashboardRoute: AdminDashboardRoute,
 }
 
