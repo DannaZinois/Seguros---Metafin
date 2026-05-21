@@ -39,10 +39,10 @@ function CompanyLayout() {
   };
 
   const navItems = [
-    { to: "/empresa-portal/perfil", label: "Mi empresa", icon: Building2 },
-    { to: "/empresa-portal/seguros", label: "Seguros", icon: Shield },
-    { to: "/empresa-portal/empleados", label: "Empleados", icon: Users },
-    { to: "/empresa-portal/pagos", label: "Pagos", icon: Receipt },
+    { to: "/perfil", label: "Mi empresa", icon: Building2 },
+    { to: "/seguros", label: "Seguros", icon: Shield },
+    { to: "/empleados", label: "Empleados", icon: Users },
+    { to: "/pagos", label: "Pagos", icon: Receipt },
   ] as const;
 
   return (

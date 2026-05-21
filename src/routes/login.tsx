@@ -23,7 +23,7 @@ function LoginPage() {
     try {
       const u = login(email, password, remember);
       if (u.role === "company")
-        router.navigate({ to: "/empresa-portal/perfil" });
+        router.navigate({ to: "/perfil" });
       else router.navigate({ to: "/cartera" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al ingresar");

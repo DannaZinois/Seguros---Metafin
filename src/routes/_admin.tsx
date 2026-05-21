@@ -36,7 +36,7 @@ function AdminLayout() {
     if (!ready) return;
     if (!user) router.navigate({ to: "/login" });
     else if (user.role === "company")
-      router.navigate({ to: "/empresa-portal/perfil" });
+      router.navigate({ to: "/perfil" });
   }, [ready, user, router]);
 
   const navItems = [

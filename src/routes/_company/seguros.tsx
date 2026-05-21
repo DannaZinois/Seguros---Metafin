@@ -83,7 +83,7 @@ function SegurosPage() {
                     </td>
                     <td className="py-3">
                       <Link
-                        to="/empresa-portal/seguros/$polizaId"
+                        to="/seguros/$polizaId"
                         params={{ polizaId: p.id }}
                         className="inline-flex items-center gap-1 rounded-full bg-[color:var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
                       >
