@@ -4,6 +4,17 @@ export interface Aseguradora {
   id: string;
   name: string;
   pdfName?: string;
+  imageDataUrl?: string;
+  rfc?: string;
+  abreviacion?: string;
+  ejecutivo?: string;
+  contactoTel?: string;
+  contactoEmail?: string;
+  webUrl?: string;
+  pagoUrl?: string;
+  appUrl?: string;
+  usuario?: string;
+  contrasena?: string;
 }
 
 const AS_KEY = "zinois.aseguradoras";
