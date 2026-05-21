@@ -300,13 +300,15 @@ function SegurosPage() {
               <X className="h-4 w-4" />
             </button>
             <h3 className="text-lg font-bold text-foreground">
-              {step === "form" && "Solicitar nuevo seguro"}
+              {step === "form" && (editingId ? "Editar póliza" : "Solicitar nuevo seguro")}
               {step === "reviewing" && "Revisando solicitud"}
               {step === "approved" && "Solicitud aprobada"}
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
               {step === "form" &&
-                "Captura los datos generales de la nueva póliza a contratar."}
+                (editingId
+                  ? "Actualiza los datos generales y administra a los asegurados de esta póliza."
+                  : "Captura los datos generales de la nueva póliza a contratar.")}
               {step === "reviewing" &&
                 "Tu solicitud está siendo revisada por nuestro equipo."}
               {step === "approved" &&
@@ -407,6 +409,43 @@ function SegurosPage() {
                 />
               </Field>
             </div>
+            <div className="mt-6 rounded-2xl border border-dashed border-border p-4">
+              <div className="mb-3 text-sm font-semibold text-foreground">
+                Asegurados
+              </div>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <button
+                  onClick={() => bulkRef.current?.click()}
+                  className="rounded-2xl border border-border p-4 text-left hover:border-[color:var(--brand-blue)] hover:bg-muted/40"
+                >
+                  <Upload className="mb-2 h-5 w-5 text-[color:var(--brand-blue)]" />
+                  <div className="text-sm font-semibold">Carga masiva</div>
+                  <p className="text-xs text-muted-foreground">
+                    Sube un CSV o Excel con los datos de tus asegurados.
+                  </p>
+                  <input
+                    ref={bulkRef}
+                    type="file"
+                    accept=".csv,.xlsx,.xls"
+                    hidden
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handleBulk(f);
+                    }}
+                  />
+                </button>
+                <button
+                  onClick={handleIndividual}
+                  className="rounded-2xl border border-border p-4 text-left hover:border-[color:var(--brand-blue)] hover:bg-muted/40"
+                >
+                  <UserPlus className="mb-2 h-5 w-5 text-[color:var(--brand-blue)]" />
+                  <div className="text-sm font-semibold">Registro individual</div>
+                  <p className="text-xs text-muted-foreground">
+                    Captura los datos de cada asegurado uno por uno.
+                  </p>
+                </button>
+              </div>
+            </div>
             <div className="mt-6 flex justify-end gap-2">
               <button
                 onClick={closeNuevo}
@@ -418,7 +457,7 @@ function SegurosPage() {
                 onClick={handleSolicitar}
                 className="rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
               >
-                Enviar solicitud
+                {editingId ? "Guardar cambios" : "Enviar solicitud"}
               </button>
             </div>
             </>
