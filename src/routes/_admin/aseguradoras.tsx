@@ -113,6 +113,7 @@ function AseguradorasPage() {
   const [editing, setEditing] = useState<Aseguradora | null>(null);
   const [open, setOpen] = useState(false);
   const [polizasMode, setPolizasMode] = useState(false);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [polizaDraft, setPolizaDraft] = useState<PolizaTipo>({
     id: "",
     tipo: "Auto",
