@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Section, Grid, Field, TextInput } from "@/components/cotizador/shared";
 import { useCurrentClient } from "@/lib/client-context";
 
-export const Route = createFileRoute("/_client/perfil")({
+export const Route = createFileRoute("/_client/mi-perfil")({
   component: MiPerfilPage,
   head: () => ({ meta: [{ title: "Mi perfil" }] }),
 });
