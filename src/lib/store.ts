@@ -15,6 +15,7 @@ export interface Aseguradora {
   appUrl?: string;
   usuario?: string;
   contrasena?: string;
+  claveAgente?: string;
   polizas?: PolizaTipo[];
 }
 
