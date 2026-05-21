@@ -126,22 +126,43 @@ function CarteraPage() {
                   className="border-b border-border/60 last:border-0 hover:bg-muted/40"
                 >
                   <td className="px-6 py-4">
-                    <Link
-                      to="/cliente/$clienteId"
-                      params={{ clienteId: r.clienteId }}
-                      className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
-                    >
-                      {r.name}
-                    </Link>
+                    {r.tipo === "Empresa" ? (
+                      <Link
+                        to="/empresa/nueva"
+                        search={{ empresaId: r.clienteId }}
+                        className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
+                      >
+                        {r.name}
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/cliente/$clienteId"
+                        params={{ clienteId: r.clienteId }}
+                        className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
+                      >
+                        {r.name}
+                      </Link>
+                    )}
                   </td>
                   <td className="px-6 py-4">
-                    <Link
-                      to="/cliente/$clienteId/poliza/$polizaId"
-                      params={{ clienteId: r.clienteId, polizaId: r.id }}
-                      className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
-                    >
-                      {r.poliza}
-                    </Link>
+                    {r.tipo === "Empresa" ? (
+                      <Link
+                        to="/empresa/poliza/$polizaId"
+                        params={{ polizaId: r.id }}
+                        search={{ empresaId: r.clienteId }}
+                        className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
+                      >
+                        {r.poliza}
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/cliente/$clienteId/poliza/$polizaId"
+                        params={{ clienteId: r.clienteId, polizaId: r.id }}
+                        className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
+                      >
+                        {r.poliza}
+                      </Link>
+                    )}
                   </td>
                   <td className="px-6 py-4 text-foreground/80">{r.renovacion}</td>
                   <td className="px-6 py-4 text-foreground/80">{r.proximoPago}</td>
