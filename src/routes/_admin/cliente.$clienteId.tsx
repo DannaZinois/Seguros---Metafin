@@ -2,56 +2,39 @@ import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { ArrowLeft, Download } from "lucide-react";
 import { DatosGeneralesReadonly } from "@/components/cotizador/datos-generales-readonly";
 import { emptyDraft, saveDraft } from "@/lib/cotizador-draft";
+import { findClienteByAnyId, type ClienteStatus } from "@/lib/clientes-data";
 
 export const Route = createFileRoute("/_admin/cliente/$clienteId")({
   component: PerfilCliente,
   head: () => ({ meta: [{ title: "Perfil de cliente" }] }),
 });
 
-type Status = "Activa" | "Cancelada" | "En revisión" | "Por renovar";
-const STATUS_STYLES: Record<Status, string> = {
+const STATUS_STYLES: Record<ClienteStatus, string> = {
   Activa: "bg-[color:var(--status-active)] text-[color:var(--status-active-fg)]",
   Cancelada: "bg-[color:var(--status-cancelled)] text-[color:var(--status-cancelled-fg)]",
   "En revisión": "bg-[color:var(--status-review)] text-[color:var(--status-review-fg)]",
   "Por renovar": "bg-[color:var(--status-renew)] text-[color:var(--status-renew-fg)]",
 };
 
-interface PolizaRow {
-  id: string;
-  contratante: string;
-  asegurado: string;
-  poliza: string;
-  vigencia: string;
-  renovacion: string;
-  correo: string;
-  telefono: string;
-  consentimiento: boolean;
-  certificado: boolean;
-  status: Status;
-}
-
-const POLIZAS: PolizaRow[] = [
-  { id: "F990234", contratante: "John Doe", asegurado: "John Doe", poliza: "GMM", vigencia: "01/01/2024", renovacion: "01/01/2024", correo: "johndoe@correo.com", telefono: "+000 000 000", consentimiento: true, certificado: true, status: "Activa" },
-  { id: "F990233", contratante: "John Doe", asegurado: "John Doe", poliza: "Auto", vigencia: "12/01/2023", renovacion: "12/01/2023", correo: "johndoe@correo.com", telefono: "+000 000 000", consentimiento: false, certificado: false, status: "Cancelada" },
-  { id: "F990232", contratante: "John Doe", asegurado: "John Doe", poliza: "Vida", vigencia: "11/01/2023", renovacion: "11/01/2023", correo: "johndoe@correo.com", telefono: "+000 000 000", consentimiento: true, certificado: true, status: "En revisión" },
-];
-
 function PerfilCliente() {
   const router = useRouter();
   const { clienteId } = Route.useParams();
+  const cliente = findClienteByAnyId(clienteId);
+  const profile = cliente?.profile;
+  const polizas = cliente?.polizas ?? [];
 
   const nuevaPoliza = () => {
     saveDraft({
       ...emptyDraft(),
-      nombre: "John Doe",
-      contacto: "+000 000 000",
-      correoContacto: "johndoe@correo.com",
-      tipoAsegurado: "Individual",
-      sexo: "Masculino",
-      codigoPostal: "00000",
-      fechaNacimiento: "1990-01-01",
-      fechaAntiguedad: "2024-01-01",
-      tipoPersona: "Persona Física",
+      nombre: profile?.nombre ?? "",
+      contacto: profile?.contacto ?? "",
+      correoContacto: profile?.correo ?? "",
+      tipoAsegurado: profile?.tipoAsegurado ?? "",
+      sexo: profile?.sexo ?? "",
+      codigoPostal: profile?.codigoPostal ?? "",
+      fechaNacimiento: profile?.fechaNacimiento ?? "",
+      fechaAntiguedad: profile?.fechaAntiguedad ?? "",
+      tipoPersona: profile?.tipoPersona ?? "",
     });
     router.navigate({ to: "/cotizadores" });
   };
@@ -75,7 +58,7 @@ function PerfilCliente() {
         </div>
       </div>
 
-      <DatosGeneralesReadonly />
+      <DatosGeneralesReadonly profile={profile} />
 
       <section className="mt-6 rounded-3xl border border-border bg-white p-6 shadow-sm">
         <div className="flex items-center gap-4">
@@ -95,23 +78,23 @@ function PerfilCliente() {
               </tr>
             </thead>
             <tbody>
-              {POLIZAS.map((p) => (
+              {polizas.map((p) => (
                 <tr key={p.id} className="border-t border-border/60 hover:bg-muted/40">
-                  <td className="py-3 text-foreground/80">{p.contratante}</td>
-                  <td className="py-3 text-foreground/80">{p.asegurado}</td>
+                  <td className="py-3 text-foreground/80">{profile?.nombre}</td>
+                  <td className="py-3 text-foreground/80">{profile?.nombre}</td>
                   <td className="py-3">
                     <Link
                       to="/cliente/$clienteId/poliza/$polizaId"
                       params={{ clienteId, polizaId: p.id }}
                       className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
                     >
-                      {p.poliza}
+                      {p.tipoSeguro}
                     </Link>
                   </td>
                   <td className="py-3 text-foreground/80">{p.vigencia}</td>
                   <td className="py-3 text-foreground/80">{p.renovacion}</td>
-                  <td className="py-3 text-foreground/80">{p.correo}</td>
-                  <td className="py-3 text-foreground/80">{p.telefono}</td>
+                  <td className="py-3 text-foreground/80">{profile?.correo}</td>
+                  <td className="py-3 text-foreground/80">{profile?.contacto}</td>
                   <td className="py-3">
                     <button className="inline-flex items-center gap-1 text-[color:var(--brand-blue)] underline-offset-4 hover:underline">
                       <Download className="h-3.5 w-3.5" />
