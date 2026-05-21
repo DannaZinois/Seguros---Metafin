@@ -23,19 +23,32 @@ interface Row {
 }
 
 const ROWS: Row[] = [
-  { id: "F-#990234", name: "John Doe", poliza: "Póliza aquí", renovacion: "01/01/2024", proximoPago: "01/01/2024", cantidad: "$165", correo: "johndoe@correo.com", telefono: "+000 000 000", hasComprobante: true, status: "Activa" },
-  { id: "F-#990233", name: "John Doe", poliza: "Póliza aquí", renovacion: "12/01/2023", proximoPago: "12/01/2023", cantidad: "$165", correo: "johndoe@correo.com", telefono: "+000 000 000", hasComprobante: false, status: "Cancelada" },
-  { id: "F-#990232", name: "John Doe", poliza: "Póliza aquí", renovacion: "11/01/2023", proximoPago: "11/01/2023", cantidad: "$165", correo: "johndoe@correo.com", telefono: "+000 000 000", hasComprobante: true, status: "En revisión" },
-  { id: "C-#982427", name: "John Doe", poliza: "Póliza aquí", renovacion: "10/01/2023", proximoPago: "10/01/2023", cantidad: "$120", correo: "johndoe@correo.com", telefono: "+000 000 000", hasComprobante: true, status: "Por renovar" },
-  { id: "T-#956533", name: "John Doe", poliza: "Póliza aquí", renovacion: "09/01/2023", proximoPago: "09/01/2023", cantidad: "$80", correo: "johndoe@correo.com", telefono: "+000 000 000", hasComprobante: true, status: "Activa" },
-  { id: "I-#8193168", name: "John Doe", poliza: "Póliza aquí", renovacion: "08/15/2023", proximoPago: "08/15/2023", cantidad: "$120", correo: "johndoe@correo.com", telefono: "+000 000 000", hasComprobante: true, status: "En revisión" },
-  { id: "F-#990234", name: "John Doe", poliza: "Póliza aquí", renovacion: "01/01/2024", proximoPago: "01/01/2024", cantidad: "$165", correo: "johndoe@correo.com", telefono: "+000 000 000", hasComprobante: true, status: "Por renovar" },
-  { id: "F-#990233", name: "John Doe", poliza: "Póliza aquí", renovacion: "12/01/2023", proximoPago: "12/01/2023", cantidad: "$165", correo: "johndoe@correo.com", telefono: "+000 000 000", hasComprobante: false, status: "Cancelada" },
-  { id: "F-#990232", name: "John Doe", poliza: "Póliza aquí", renovacion: "11/01/2023", proximoPago: "11/01/2023", cantidad: "$165", correo: "johndoe@correo.com", telefono: "+000 000 000", hasComprobante: true, status: "Activa" },
-  { id: "C-#982427", name: "John Doe", poliza: "Póliza aquí", renovacion: "10/01/2023", proximoPago: "10/01/2023", cantidad: "$120", correo: "johndoe@correo.com", telefono: "+000 000 000", hasComprobante: true, status: "Por renovar" },
-  { id: "T-#956533", name: "John Doe", poliza: "Póliza aquí", renovacion: "09/01/2023", proximoPago: "09/01/2023", cantidad: "$80", correo: "johndoe@correo.com", telefono: "+000 000 000", hasComprobante: true, status: "En revisión" },
-  { id: "I-#8193168", name: "John Doe", poliza: "Póliza aquí", renovacion: "08/15/2023", proximoPago: "08/15/2023", cantidad: "$120", correo: "johndoe@correo.com", telefono: "+000 000 000", hasComprobante: true, status: "Activa" },
-  { id: "T-#956533", name: "John Doe", poliza: "Póliza aquí", renovacion: "09/01/2023", proximoPago: "09/01/2023", cantidad: "$80", correo: "johndoe@correo.com", telefono: "+000 000 000", hasComprobante: true, status: "Activa" },
+const ROWS: Row[] = [
+  // María González (Personal) — 2 pólizas
+  { id: "P-990234", name: "María González", poliza: "GMM", renovacion: "01/15/2025", proximoPago: "02/01/2025", cantidad: "$8,450", correo: "maria.gonzalez@correo.com", telefono: "+52 555 102 3344", hasComprobante: true, status: "Activa" },
+  { id: "P-990235", name: "María González", poliza: "Auto", renovacion: "03/22/2025", proximoPago: "02/22/2025", cantidad: "$3,200", correo: "maria.gonzalez@correo.com", telefono: "+52 555 102 3344", hasComprobante: true, status: "Por renovar" },
+
+  // Carlos Ramírez (Personal) — 3 pólizas
+  { id: "P-990236", name: "Carlos Ramírez", poliza: "Vida", renovacion: "05/10/2025", proximoPago: "03/10/2025", cantidad: "$1,800", correo: "carlos.ramirez@correo.com", telefono: "+52 555 204 5566", hasComprobante: true, status: "Activa" },
+  { id: "P-990237", name: "Carlos Ramírez", poliza: "GMM", renovacion: "06/01/2025", proximoPago: "03/01/2025", cantidad: "$7,950", correo: "carlos.ramirez@correo.com", telefono: "+52 555 204 5566", hasComprobante: false, status: "En revisión" },
+  { id: "P-990238", name: "Carlos Ramírez", poliza: "Auto", renovacion: "11/15/2024", proximoPago: "12/15/2024", cantidad: "$2,650", correo: "carlos.ramirez@correo.com", telefono: "+52 555 204 5566", hasComprobante: true, status: "Cancelada" },
+
+  // Ana López (Personal) — 2 pólizas
+  { id: "P-990239", name: "Ana López", poliza: "Auto", renovacion: "04/20/2025", proximoPago: "03/20/2025", cantidad: "$2,980", correo: "ana.lopez@correo.com", telefono: "+52 555 318 7788", hasComprobante: true, status: "Activa" },
+  { id: "P-990240", name: "Ana López", poliza: "Exceso", renovacion: "09/05/2025", proximoPago: "04/05/2025", cantidad: "$4,500", correo: "ana.lopez@correo.com", telefono: "+52 555 318 7788", hasComprobante: true, status: "Activa" },
+
+  // Grupo Industrial Aztlán (Empresa) — 3 pólizas
+  { id: "E-880101", name: "Grupo Industrial Aztlán", poliza: "GMM", renovacion: "02/28/2025", proximoPago: "02/28/2025", cantidad: "$48,200", correo: "contacto@aztlan.com.mx", telefono: "+52 55 4422 1100", hasComprobante: true, status: "Por renovar" },
+  { id: "E-880102", name: "Grupo Industrial Aztlán", poliza: "Auto", renovacion: "07/14/2025", proximoPago: "03/14/2025", cantidad: "$22,750", correo: "contacto@aztlan.com.mx", telefono: "+52 55 4422 1100", hasComprobante: true, status: "Activa" },
+  { id: "E-880103", name: "Grupo Industrial Aztlán", poliza: "Exceso", renovacion: "10/30/2025", proximoPago: "04/30/2025", cantidad: "$35,600", correo: "contacto@aztlan.com.mx", telefono: "+52 55 4422 1100", hasComprobante: true, status: "En revisión" },
+
+  // Constructora Pacífico (Empresa) — 2 pólizas
+  { id: "E-880201", name: "Constructora Pacífico", poliza: "Vida", renovacion: "08/12/2025", proximoPago: "03/12/2025", cantidad: "$18,400", correo: "rh@pacifico.mx", telefono: "+52 33 8899 5544", hasComprobante: false, status: "Activa" },
+  { id: "E-880202", name: "Constructora Pacífico", poliza: "GMM", renovacion: "01/05/2025", proximoPago: "02/05/2025", cantidad: "$26,150", correo: "rh@pacifico.mx", telefono: "+52 33 8899 5544", hasComprobante: true, status: "Cancelada" },
+
+  // Tecnologías Vértice (Empresa) — 2 pólizas
+  { id: "E-880301", name: "Tecnologías Vértice", poliza: "Auto", renovacion: "06/18/2025", proximoPago: "03/18/2025", cantidad: "$14,300", correo: "admin@vertice.io", telefono: "+52 81 2233 4455", hasComprobante: true, status: "Activa" },
+  { id: "E-880302", name: "Tecnologías Vértice", poliza: "Exceso", renovacion: "12/01/2024", proximoPago: "12/01/2024", cantidad: "$9,720", correo: "admin@vertice.io", telefono: "+52 81 2233 4455", hasComprobante: true, status: "Por renovar" },
 ];
 
 const STATUS_STYLES: Record<Status, string> = {
