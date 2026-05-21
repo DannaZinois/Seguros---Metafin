@@ -333,8 +333,8 @@ function AseguradorasPage() {
               </tr>
             )}
             {list.map((a) => (
-              <>
-              <tr key={a.id} className="border-b border-border/60 last:border-0">
+              <RowGroup key={a.id}>
+              <tr className="border-b border-border/60 last:border-0">
                 <td className="px-6 py-4 font-medium text-foreground">
                   <button
                     type="button"
@@ -381,13 +381,13 @@ function AseguradorasPage() {
                 </td>
               </tr>
               {expanded[a.id] && (
-                <tr key={a.id + "-exp"} className="border-b border-border/60 bg-muted/20">
+                <tr className="border-b border-border/60 bg-muted/20">
                   <td colSpan={5} className="px-6 py-4">
                     <PolizasResumen polizas={a.polizas ?? []} />
                   </td>
                 </tr>
               )}
-              </>
+              </RowGroup>
             ))}
           </tbody>
         </table>
