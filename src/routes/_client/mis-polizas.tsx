@@ -5,7 +5,7 @@ import { Section, Grid, Field, TextInput } from "@/components/cotizador/shared";
 import { useCurrentClient, ASEGURADORA_LINKS } from "@/lib/client-context";
 import type { PolizaData } from "@/lib/clientes-data";
 
-export const Route = createFileRoute("/_client/polizas")({
+export const Route = createFileRoute("/_client/mis-polizas")({
   component: MisPolizasPage,
   head: () => ({ meta: [{ title: "Mis pólizas" }] }),
 });
