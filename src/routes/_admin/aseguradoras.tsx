@@ -333,9 +333,19 @@ function AseguradorasPage() {
               </tr>
             )}
             {list.map((a) => (
+              <>
               <tr key={a.id} className="border-b border-border/60 last:border-0">
                 <td className="px-6 py-4 font-medium text-foreground">
-                  <span className="inline-flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setExpanded((e) => ({ ...e, [a.id]: !e[a.id] }))}
+                    className="inline-flex items-center gap-3 text-left hover:underline"
+                  >
+                    {expanded[a.id] ? (
+                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    )}
                     {a.imageDataUrl ? (
                       <img src={a.imageDataUrl} alt={a.name} className="h-9 w-9 rounded-full object-cover" />
                     ) : (
@@ -344,7 +354,7 @@ function AseguradorasPage() {
                       </span>
                     )}
                     {a.name}
-                  </span>
+                  </button>
                 </td>
                 <td className="px-6 py-4 text-foreground/80">{a.abreviacion || "—"}</td>
                 <td className="px-6 py-4 text-foreground/80">{a.ejecutivo || "—"}</td>
@@ -370,6 +380,14 @@ function AseguradorasPage() {
                   </div>
                 </td>
               </tr>
+              {expanded[a.id] && (
+                <tr key={a.id + "-exp"} className="border-b border-border/60 bg-muted/20">
+                  <td colSpan={5} className="px-6 py-4">
+                    <PolizasResumen polizas={a.polizas ?? []} />
+                  </td>
+                </tr>
+              )}
+              </>
             ))}
           </tbody>
         </table>
