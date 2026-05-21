@@ -55,7 +55,7 @@ export function AppShell({
               className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/75 transition-all hover:bg-white/10 hover:text-white"
               activeProps={{
                 className:
-                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold bg-white text-[color:var(--brand-navy-deep)] shadow-[0_8px_24px_-12px_rgba(0,0,0,0.4)]",
+                  "!bg-white !text-[color:var(--brand-navy-deep)] !font-semibold shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)]",
               }}
             >
               <item.icon className="h-[18px] w-[18px]" />
