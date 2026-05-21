@@ -11,12 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CompanyRouteImport } from './routes/_company'
+import { Route as ClientRouteImport } from './routes/_client'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CompanySegurosRouteImport } from './routes/_company/seguros'
 import { Route as CompanyPerfilRouteImport } from './routes/_company/perfil'
 import { Route as CompanyPagosRouteImport } from './routes/_company/pagos'
 import { Route as CompanyEmpleadosRouteImport } from './routes/_company/empleados'
+import { Route as ClientMisPolizasRouteImport } from './routes/_client/mis-polizas'
+import { Route as ClientMisPagosRouteImport } from './routes/_client/mis-pagos'
+import { Route as ClientMiPerfilRouteImport } from './routes/_client/mi-perfil'
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
 import { Route as AdminCuestionarioRouteImport } from './routes/_admin/cuestionario'
 import { Route as AdminCotizadoresRouteImport } from './routes/_admin/cotizadores'
@@ -37,6 +41,10 @@ const LoginRoute = LoginRouteImport.update({
 } as any)
 const CompanyRoute = CompanyRouteImport.update({
   id: '/_company',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientRoute = ClientRouteImport.update({
+  id: '/_client',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -67,6 +75,21 @@ const CompanyEmpleadosRoute = CompanyEmpleadosRouteImport.update({
   id: '/empleados',
   path: '/empleados',
   getParentRoute: () => CompanyRoute,
+} as any)
+const ClientMisPolizasRoute = ClientMisPolizasRouteImport.update({
+  id: '/mis-polizas',
+  path: '/mis-polizas',
+  getParentRoute: () => ClientRoute,
+} as any)
+const ClientMisPagosRoute = ClientMisPagosRouteImport.update({
+  id: '/mis-pagos',
+  path: '/mis-pagos',
+  getParentRoute: () => ClientRoute,
+} as any)
+const ClientMiPerfilRoute = ClientMiPerfilRouteImport.update({
+  id: '/mi-perfil',
+  path: '/mi-perfil',
+  getParentRoute: () => ClientRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
@@ -140,6 +163,9 @@ export interface FileRoutesByFullPath {
   '/cotizadores': typeof AdminCotizadoresRoute
   '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/mi-perfil': typeof ClientMiPerfilRoute
+  '/mis-pagos': typeof ClientMisPagosRoute
+  '/mis-polizas': typeof ClientMisPolizasRoute
   '/empleados': typeof CompanyEmpleadosRoute
   '/pagos': typeof CompanyPagosRoute
   '/perfil': typeof CompanyPerfilRoute
@@ -160,6 +186,9 @@ export interface FileRoutesByTo {
   '/cotizadores': typeof AdminCotizadoresRoute
   '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/mi-perfil': typeof ClientMiPerfilRoute
+  '/mis-pagos': typeof ClientMisPagosRoute
+  '/mis-polizas': typeof ClientMisPolizasRoute
   '/empleados': typeof CompanyEmpleadosRoute
   '/pagos': typeof CompanyPagosRoute
   '/perfil': typeof CompanyPerfilRoute
@@ -176,6 +205,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_admin': typeof AdminRouteWithChildren
+  '/_client': typeof ClientRouteWithChildren
   '/_company': typeof CompanyRouteWithChildren
   '/login': typeof LoginRoute
   '/_admin/aseguradoras': typeof AdminAseguradorasRoute
@@ -183,6 +213,9 @@ export interface FileRoutesById {
   '/_admin/cotizadores': typeof AdminCotizadoresRoute
   '/_admin/cuestionario': typeof AdminCuestionarioRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
+  '/_client/mi-perfil': typeof ClientMiPerfilRoute
+  '/_client/mis-pagos': typeof ClientMisPagosRoute
+  '/_client/mis-polizas': typeof ClientMisPolizasRoute
   '/_company/empleados': typeof CompanyEmpleadosRoute
   '/_company/pagos': typeof CompanyPagosRoute
   '/_company/perfil': typeof CompanyPerfilRoute
@@ -205,6 +238,9 @@ export interface FileRouteTypes {
     | '/cotizadores'
     | '/cuestionario'
     | '/dashboard'
+    | '/mi-perfil'
+    | '/mis-pagos'
+    | '/mis-polizas'
     | '/empleados'
     | '/pagos'
     | '/perfil'
@@ -225,6 +261,9 @@ export interface FileRouteTypes {
     | '/cotizadores'
     | '/cuestionario'
     | '/dashboard'
+    | '/mi-perfil'
+    | '/mis-pagos'
+    | '/mis-polizas'
     | '/empleados'
     | '/pagos'
     | '/perfil'
@@ -240,6 +279,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_admin'
+    | '/_client'
     | '/_company'
     | '/login'
     | '/_admin/aseguradoras'
@@ -247,6 +287,9 @@ export interface FileRouteTypes {
     | '/_admin/cotizadores'
     | '/_admin/cuestionario'
     | '/_admin/dashboard'
+    | '/_client/mi-perfil'
+    | '/_client/mis-pagos'
+    | '/_client/mis-polizas'
     | '/_company/empleados'
     | '/_company/pagos'
     | '/_company/perfil'
@@ -263,6 +306,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  ClientRoute: typeof ClientRouteWithChildren
   CompanyRoute: typeof CompanyRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
@@ -281,6 +325,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof CompanyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_client': {
+      id: '/_client'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof ClientRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_admin': {
@@ -324,6 +375,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/empleados'
       preLoaderRoute: typeof CompanyEmpleadosRouteImport
       parentRoute: typeof CompanyRoute
+    }
+    '/_client/mis-polizas': {
+      id: '/_client/mis-polizas'
+      path: '/mis-polizas'
+      fullPath: '/mis-polizas'
+      preLoaderRoute: typeof ClientMisPolizasRouteImport
+      parentRoute: typeof ClientRoute
+    }
+    '/_client/mis-pagos': {
+      id: '/_client/mis-pagos'
+      path: '/mis-pagos'
+      fullPath: '/mis-pagos'
+      preLoaderRoute: typeof ClientMisPagosRouteImport
+      parentRoute: typeof ClientRoute
+    }
+    '/_client/mi-perfil': {
+      id: '/_client/mi-perfil'
+      path: '/mi-perfil'
+      fullPath: '/mi-perfil'
+      preLoaderRoute: typeof ClientMiPerfilRouteImport
+      parentRoute: typeof ClientRoute
     }
     '/_admin/dashboard': {
       id: '/_admin/dashboard'
@@ -455,6 +527,21 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface ClientRouteChildren {
+  ClientMiPerfilRoute: typeof ClientMiPerfilRoute
+  ClientMisPagosRoute: typeof ClientMisPagosRoute
+  ClientMisPolizasRoute: typeof ClientMisPolizasRoute
+}
+
+const ClientRouteChildren: ClientRouteChildren = {
+  ClientMiPerfilRoute: ClientMiPerfilRoute,
+  ClientMisPagosRoute: ClientMisPagosRoute,
+  ClientMisPolizasRoute: ClientMisPolizasRoute,
+}
+
+const ClientRouteWithChildren =
+  ClientRoute._addFileChildren(ClientRouteChildren)
+
 interface CompanySegurosRouteChildren {
   CompanySegurosPolizaIdRoute: typeof CompanySegurosPolizaIdRoute
 }
@@ -487,6 +574,7 @@ const CompanyRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  ClientRoute: ClientRouteWithChildren,
   CompanyRoute: CompanyRouteWithChildren,
   LoginRoute: LoginRoute,
 }

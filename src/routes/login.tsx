@@ -22,8 +22,8 @@ function LoginPage() {
     setError(null);
     try {
       const u = login(email, password, remember);
-      if (u.role === "company")
-        router.navigate({ to: "/perfil" });
+      if (u.role === "company") router.navigate({ to: "/perfil" });
+      else if (u.role === "client") router.navigate({ to: "/mi-perfil" });
       else router.navigate({ to: "/cartera" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al ingresar");

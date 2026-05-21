@@ -6,52 +6,56 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 import {
-  LayoutDashboard,
-  Users,
-  FileText,
-  ShieldCheck,
-  Settings,
-  HelpCircle,
+  User,
+  Shield,
+  Receipt,
   LogOut,
   Bell,
+  Settings,
+  HelpCircle,
+  MessageCircle,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useCurrentClient, ADMIN_WHATSAPP } from "@/lib/client-context";
 import cityBg from "@/assets/city-skyline.png";
 
-export const Route = createFileRoute("/_admin")({
-  component: AdminLayout,
+export const Route = createFileRoute("/_client")({
+  component: ClientLayout,
 });
 
-function AdminLayout() {
+function ClientLayout() {
   const { user, ready, logout } = useAuth();
   const router = useRouter();
+  const cliente = useCurrentClient();
+
+  useEffect(() => {
+    if (!ready) return;
+    if (!user) router.navigate({ to: "/login" });
+    else if (user.role === "company") router.navigate({ to: "/perfil" });
+    else if (user.role === "admin") router.navigate({ to: "/cartera" });
+  }, [ready, user, router]);
 
   const onLogout = () => {
     logout();
     router.navigate({ to: "/login" });
   };
 
-  // Client-side guard
-  useEffect(() => {
-    if (!ready) return;
-    if (!user) router.navigate({ to: "/login" });
-    else if (user.role === "company") router.navigate({ to: "/perfil" });
-    else if (user.role === "client") router.navigate({ to: "/mi-perfil" });
-  }, [ready, user, router]);
-
   const navItems = [
-    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/cartera", label: "Cartera", icon: Users },
-    { to: "/cotizadores", label: "Cotizadores", icon: FileText },
-    { to: "/aseguradoras", label: "Aseguradoras", icon: ShieldCheck },
+    { to: "/mi-perfil", label: "Mi perfil", icon: User },
+    { to: "/mis-polizas", label: "Mis pólizas", icon: Shield },
+    { to: "/mis-pagos", label: "Pagos", icon: Receipt },
   ] as const;
+
+  const waMessage = encodeURIComponent(
+    `Hola, soy ${cliente?.profile.nombre ?? user?.name ?? "cliente"} y necesito ayuda con mi cuenta.`,
+  );
+  const waUrl = `https://wa.me/${ADMIN_WHATSAPP}?text=${waMessage}`;
 
   return (
     <div className="flex min-h-screen bg-[color:var(--brand-bg-soft)]">
-      {/* Sidebar */}
       <aside className="relative flex w-64 flex-col bg-[color:var(--brand-bg-soft)] px-6 py-8">
         <div className="mb-10 text-lg font-medium text-foreground/80">
-          Nombre aquí
+          {cliente?.profile.nombre ?? user?.name ?? "Mi cuenta"}
         </div>
 
         <nav className="flex-1 space-y-2">
@@ -76,6 +80,14 @@ function AdminLayout() {
             Otros
           </p>
           <div className="mt-3 space-y-2">
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full items-center gap-3 rounded-xl bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-sm hover:brightness-95"
+            >
+              <MessageCircle className="h-5 w-5" /> Contactar al admin
+            </a>
             <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-foreground/80 hover:bg-white">
               <Settings className="h-5 w-5" /> Settings
             </button>
@@ -99,7 +111,6 @@ function AdminLayout() {
         />
       </aside>
 
-      {/* Main */}
       <div className="flex flex-1 flex-col bg-white">
         <header className="flex items-center justify-end gap-4 border-b border-border bg-[color:var(--brand-bg-soft)]/60 px-10 py-4">
           <button className="relative rounded-full p-2 text-muted-foreground hover:bg-white">
@@ -110,21 +121,27 @@ function AdminLayout() {
             <div className="h-10 w-10 rounded-full bg-muted" />
             <div className="text-right">
               <p className="text-sm font-semibold text-foreground">
-                {user?.name ?? "Invitado"}
+                {cliente?.profile.nombre ?? user?.name ?? "Invitado"}
               </p>
-              <p className="text-xs text-muted-foreground">
-                {user?.role === "admin"
-                  ? "Perfil Broker"
-                  : user?.role === "company"
-                    ? "Perfil Compañía"
-                    : "Perfil Cliente"}
-              </p>
+              <p className="text-xs text-muted-foreground">Perfil Cliente</p>
             </div>
           </div>
         </header>
         <main className="flex-1 px-10 py-8">
           <Outlet />
         </main>
+
+        {/* Floating WhatsApp button */}
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Contactar al admin por WhatsApp"
+          className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-semibold text-white shadow-lg hover:brightness-95"
+        >
+          <MessageCircle className="h-5 w-5" />
+          WhatsApp
+        </a>
       </div>
     </div>
   );
