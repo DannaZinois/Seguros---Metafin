@@ -405,6 +405,10 @@ function AseguradorasPage() {
 
 const TIPOS_SEGURO: TipoSeguro[] = ["Auto", "Vida", "Gastos médicos mayores", "Exceso"];
 
+function tipoLabel(t: TipoSeguro): string {
+  return t === "Gastos médicos mayores" ? "GMM" : t;
+}
+
 function RowGroup({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
