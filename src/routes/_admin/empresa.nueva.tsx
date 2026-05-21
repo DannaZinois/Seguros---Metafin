@@ -173,7 +173,7 @@ function RegistroEmpresaPage() {
         </button>
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Registro Empresa
+            {existing ? "Perfil de Empresa" : "Registro Empresa"}
           </h1>
           <p className="text-sm text-muted-foreground">
             Registra una nueva empresa para obtener sus cotizaciones
