@@ -1,16 +1,16 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { Search, Download, Plus, ChevronLeft, ChevronRight, X, User, Building2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { CLIENTES, type ClienteStatus } from "@/lib/clientes-data";
 
 export const Route = createFileRoute("/_admin/cartera")({
   component: CarteraPage,
   head: () => ({ meta: [{ title: "Cartera de clientes" }] }),
 });
 
-type Status = "Activa" | "Cancelada" | "En revisión" | "Por renovar";
-
 interface Row {
   id: string;
+  clienteId: string;
   name: string;
   poliza: string;
   renovacion: string;
@@ -19,38 +19,26 @@ interface Row {
   correo: string;
   telefono: string;
   hasComprobante: boolean;
-  status: Status;
+  status: ClienteStatus;
 }
 
-const ROWS: Row[] = [
-  // María González (Personal) — 2 pólizas
-  { id: "P-990234", name: "María González", poliza: "GMM", renovacion: "01/15/2025", proximoPago: "02/01/2025", cantidad: "$8,450", correo: "maria.gonzalez@correo.com", telefono: "+52 555 102 3344", hasComprobante: true, status: "Activa" },
-  { id: "P-990235", name: "María González", poliza: "Auto", renovacion: "03/22/2025", proximoPago: "02/22/2025", cantidad: "$3,200", correo: "maria.gonzalez@correo.com", telefono: "+52 555 102 3344", hasComprobante: true, status: "Por renovar" },
+const ROWS: Row[] = CLIENTES.flatMap((c) =>
+  c.polizas.map((p) => ({
+    id: p.id,
+    clienteId: c.clienteId,
+    name: c.profile.nombre,
+    poliza: p.tipoSeguro,
+    renovacion: p.renovacion,
+    proximoPago: p.proximoPago,
+    cantidad: p.cantidad,
+    correo: c.profile.correo,
+    telefono: c.profile.contacto,
+    hasComprobante: p.hasComprobante,
+    status: p.status,
+  })),
+);
 
-  // Carlos Ramírez (Personal) — 3 pólizas
-  { id: "P-990236", name: "Carlos Ramírez", poliza: "Vida", renovacion: "05/10/2025", proximoPago: "03/10/2025", cantidad: "$1,800", correo: "carlos.ramirez@correo.com", telefono: "+52 555 204 5566", hasComprobante: true, status: "Activa" },
-  { id: "P-990237", name: "Carlos Ramírez", poliza: "GMM", renovacion: "06/01/2025", proximoPago: "03/01/2025", cantidad: "$7,950", correo: "carlos.ramirez@correo.com", telefono: "+52 555 204 5566", hasComprobante: false, status: "En revisión" },
-  { id: "P-990238", name: "Carlos Ramírez", poliza: "Auto", renovacion: "11/15/2024", proximoPago: "12/15/2024", cantidad: "$2,650", correo: "carlos.ramirez@correo.com", telefono: "+52 555 204 5566", hasComprobante: true, status: "Cancelada" },
-
-  // Ana López (Personal) — 2 pólizas
-  { id: "P-990239", name: "Ana López", poliza: "Auto", renovacion: "04/20/2025", proximoPago: "03/20/2025", cantidad: "$2,980", correo: "ana.lopez@correo.com", telefono: "+52 555 318 7788", hasComprobante: true, status: "Activa" },
-  { id: "P-990240", name: "Ana López", poliza: "Exceso", renovacion: "09/05/2025", proximoPago: "04/05/2025", cantidad: "$4,500", correo: "ana.lopez@correo.com", telefono: "+52 555 318 7788", hasComprobante: true, status: "Activa" },
-
-  // Grupo Industrial Aztlán (Empresa) — 3 pólizas
-  { id: "E-880101", name: "Grupo Industrial Aztlán", poliza: "GMM", renovacion: "02/28/2025", proximoPago: "02/28/2025", cantidad: "$48,200", correo: "contacto@aztlan.com.mx", telefono: "+52 55 4422 1100", hasComprobante: true, status: "Por renovar" },
-  { id: "E-880102", name: "Grupo Industrial Aztlán", poliza: "Auto", renovacion: "07/14/2025", proximoPago: "03/14/2025", cantidad: "$22,750", correo: "contacto@aztlan.com.mx", telefono: "+52 55 4422 1100", hasComprobante: true, status: "Activa" },
-  { id: "E-880103", name: "Grupo Industrial Aztlán", poliza: "Exceso", renovacion: "10/30/2025", proximoPago: "04/30/2025", cantidad: "$35,600", correo: "contacto@aztlan.com.mx", telefono: "+52 55 4422 1100", hasComprobante: true, status: "En revisión" },
-
-  // Constructora Pacífico (Empresa) — 2 pólizas
-  { id: "E-880201", name: "Constructora Pacífico", poliza: "Vida", renovacion: "08/12/2025", proximoPago: "03/12/2025", cantidad: "$18,400", correo: "rh@pacifico.mx", telefono: "+52 33 8899 5544", hasComprobante: false, status: "Activa" },
-  { id: "E-880202", name: "Constructora Pacífico", poliza: "GMM", renovacion: "01/05/2025", proximoPago: "02/05/2025", cantidad: "$26,150", correo: "rh@pacifico.mx", telefono: "+52 33 8899 5544", hasComprobante: true, status: "Cancelada" },
-
-  // Tecnologías Vértice (Empresa) — 2 pólizas
-  { id: "E-880301", name: "Tecnologías Vértice", poliza: "Auto", renovacion: "06/18/2025", proximoPago: "03/18/2025", cantidad: "$14,300", correo: "admin@vertice.io", telefono: "+52 81 2233 4455", hasComprobante: true, status: "Activa" },
-  { id: "E-880302", name: "Tecnologías Vértice", poliza: "Exceso", renovacion: "12/01/2024", proximoPago: "12/01/2024", cantidad: "$9,720", correo: "admin@vertice.io", telefono: "+52 81 2233 4455", hasComprobante: true, status: "Por renovar" },
-];
-
-const STATUS_STYLES: Record<Status, string> = {
+const STATUS_STYLES: Record<ClienteStatus, string> = {
   Activa: "bg-[color:var(--status-active)] text-[color:var(--status-active-fg)]",
   Cancelada: "bg-[color:var(--status-cancelled)] text-[color:var(--status-cancelled-fg)]",
   "En revisión": "bg-[color:var(--status-review)] text-[color:var(--status-review-fg)]",
