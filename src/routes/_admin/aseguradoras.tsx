@@ -405,6 +405,61 @@ function AseguradorasPage() {
 
 const TIPOS_SEGURO: TipoSeguro[] = ["Auto", "Vida", "Gastos médicos mayores", "Exceso"];
 
+function RowGroup({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}
+
+function PolizasResumen({ polizas }: { polizas: PolizaTipo[] }) {
+  if (polizas.length === 0) {
+    return <p className="text-sm text-muted-foreground">Sin pólizas registradas.</p>;
+  }
+  return (
+    <div className="space-y-4">
+      {TIPOS_SEGURO.map((tipo) => {
+        const grupo = polizas.find((p) => p.tipo === tipo);
+        const variantes = grupo?.variantes ?? [];
+        return (
+          <div key={tipo} className="overflow-hidden rounded-2xl border border-border bg-white">
+            <div className="border-b border-border bg-muted/40 px-4 py-2 text-xs font-semibold text-foreground">
+              {tipo} {variantes.length > 0 && <span className="text-muted-foreground">({variantes.length})</span>}
+            </div>
+            {variantes.length === 0 ? (
+              <div className="px-4 py-3 text-xs text-muted-foreground">Sin variantes registradas.</div>
+            ) : (
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-border text-xs text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-2 font-medium">Nombre</th>
+                    <th className="px-4 py-2 font-medium">PDF</th>
+                    <th className="px-4 py-2 font-medium">Word</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {variantes.map((v, idx) => (
+                    <tr key={v.id} className="border-b border-border/60 last:border-0">
+                      <td className="px-4 py-2 text-foreground">{v.nombre || `Variante ${idx + 1}`}</td>
+                      <td className="px-4 py-2 text-foreground/80">
+                        {v.pdfName ? (
+                          <span className="inline-flex items-center gap-1.5"><FileText className="h-3.5 w-3.5" />{v.pdfName}</span>
+                        ) : "—"}
+                      </td>
+                      <td className="px-4 py-2 text-foreground/80">
+                        {v.wordName ? (
+                          <span className="inline-flex items-center gap-1.5"><FileSpreadsheet className="h-3.5 w-3.5" />{v.wordName}</span>
+                        ) : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function PolizasForm({
   draft,
   setTipo,
