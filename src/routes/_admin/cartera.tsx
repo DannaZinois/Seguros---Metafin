@@ -119,7 +119,7 @@ function CarteraPage() {
 
       <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-white shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1280px] text-left text-sm">
+          <table className="w-full text-left text-sm">
             <thead className="border-b border-border bg-white text-muted-foreground">
               <tr>
                 {[
@@ -133,7 +133,7 @@ function CarteraPage() {
                   "Comprobante",
                   "Status",
                 ].map((h) => (
-                <th key={h} className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide whitespace-nowrap">
+                <th key={h} className="px-3 py-3 text-xs font-semibold uppercase tracking-wide">
                     {h}
                   </th>
                 ))}
