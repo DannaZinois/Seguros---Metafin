@@ -139,7 +139,7 @@ function CarteraPage() {
                 ))}
               </tr>
             </thead>
-            <tbody>
+            <tbody className="bg-white">
               {pageRows.map((r, idx) => (
                 <tr
                   key={idx}
