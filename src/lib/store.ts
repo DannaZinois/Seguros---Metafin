@@ -15,6 +15,22 @@ export interface Aseguradora {
   appUrl?: string;
   usuario?: string;
   contrasena?: string;
+  polizas?: PolizaTipo[];
+}
+
+export type TipoSeguro = "Auto" | "Vida" | "Gastos médicos mayores" | "Exceso";
+
+export interface VariantePoliza {
+  id: string;
+  nombre: string;
+  pdfName?: string;
+  wordName?: string;
+}
+
+export interface PolizaTipo {
+  id: string;
+  tipo: TipoSeguro;
+  variantes: VariantePoliza[];
 }
 
 const AS_KEY = "zinois.aseguradoras";
