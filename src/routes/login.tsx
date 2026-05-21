@@ -1,7 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/lib/auth";
-import cityBg from "@/assets/city-skyline.png";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -49,19 +48,19 @@ function LoginPage() {
       </div>
 
       {/* Hero copy */}
-      <main className="relative mx-auto flex max-w-3xl flex-col items-center px-6 pt-16 text-center">
-        <h1 className="text-4xl font-semibold leading-tight tracking-tight text-foreground md:text-5xl">
+      <main className="relative mx-auto flex max-w-2xl flex-col items-center px-6 pt-10 pb-16 text-center">
+        <h1 className="text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-4xl">
           Bienvenido a tu plataforma
           <br /> de seguros
         </h1>
-        <p className="mt-5 max-w-sm text-sm text-muted-foreground">
+        <p className="mt-3 max-w-sm text-sm text-muted-foreground">
           Ingresa tus datos para continuar a la plataforma.
         </p>
 
         {/* Card */}
         <form
           onSubmit={onSubmit}
-          className="mt-10 w-full max-w-md rounded-3xl bg-[color:var(--muted)]/70 p-8 shadow-sm backdrop-blur"
+          className="mt-8 w-full max-w-sm rounded-3xl bg-[color:var(--muted)]/70 p-6 shadow-sm backdrop-blur"
         >
           <label className="block text-sm font-semibold text-foreground">
             Correo:
@@ -72,10 +71,10 @@ function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Correo..."
-            className="mt-2 w-full rounded-full bg-white px-5 py-3 text-sm shadow-sm outline-none ring-1 ring-transparent focus:ring-[color:var(--brand-blue)]"
+            className="mt-2 w-full rounded-full bg-white px-4 py-2.5 text-sm shadow-sm outline-none ring-1 ring-transparent focus:ring-[color:var(--brand-blue)]"
           />
 
-          <label className="mt-5 block text-sm font-semibold text-foreground">
+          <label className="mt-4 block text-sm font-semibold text-foreground">
             Contraseña:
           </label>
           <input
@@ -84,10 +83,10 @@ function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Contraseña..."
-            className="mt-2 w-full rounded-full bg-white px-5 py-3 text-sm shadow-sm outline-none ring-1 ring-transparent focus:ring-[color:var(--brand-blue)]"
+            className="mt-2 w-full rounded-full bg-white px-4 py-2.5 text-sm shadow-sm outline-none ring-1 ring-transparent focus:ring-[color:var(--brand-blue)]"
           />
 
-          <label className="mt-4 flex items-center justify-center gap-2 text-sm text-foreground">
+          <label className="mt-4 flex items-center justify-center gap-2 text-xs text-foreground">
             Recordarme en este equipo
             <input
               type="checkbox"
@@ -98,27 +97,19 @@ function LoginPage() {
           </label>
 
           {error && (
-            <p className="mt-4 text-center text-sm text-destructive">{error}</p>
+            <p className="mt-3 text-center text-xs text-destructive">{error}</p>
           )}
 
-          <div className="mt-6 flex justify-center">
+          <div className="mt-5 flex justify-center">
             <button
               type="submit"
-              className="rounded-full bg-[color:var(--brand-blue)] px-10 py-3 text-sm font-medium text-white shadow-md transition-colors hover:bg-[color:var(--brand-blue-dark)]"
+              className="rounded-full bg-[color:var(--brand-blue)] px-8 py-2.5 text-sm font-medium text-white shadow-md transition-colors hover:bg-[color:var(--brand-blue-dark)]"
             >
               Ingresar
             </button>
           </div>
         </form>
       </main>
-
-      {/* City illustration */}
-      <img
-        src={cityBg}
-        alt=""
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-12 mx-auto w-full max-w-[1600px] select-none opacity-90"
-      />
 
       {/* Footer */}
       <footer className="absolute inset-x-0 bottom-0 border-t border-border bg-white/60 backdrop-blur">

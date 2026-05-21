@@ -192,9 +192,12 @@ function NewRegistroModal({ onClose }: { onClose: () => void }) {
   const router = useRouter();
 
   const confirm = () => {
-    // Placeholder — would navigate to a creation flow
     onClose();
-    router.navigate({ to: "/cartera" });
+    if (selected === "personal") {
+      router.navigate({ to: "/cotizadores" });
+    } else {
+      router.navigate({ to: "/cartera" });
+    }
   };
 
   return (
