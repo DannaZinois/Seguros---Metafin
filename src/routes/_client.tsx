@@ -11,8 +11,6 @@ import {
   Receipt,
   LogOut,
   Bell,
-  Settings,
-  HelpCircle,
   MessageCircle,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
@@ -76,23 +74,12 @@ function ClientLayout() {
         </nav>
 
         <div className="mt-6">
-          <p className="px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Otros
-          </p>
-          <div className="mt-3 space-y-2">
-            <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-foreground/80 hover:bg-white">
-              <Settings className="h-5 w-5" /> Settings
-            </button>
-            <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-foreground/80 hover:bg-white">
-              <HelpCircle className="h-5 w-5" /> Ayuda
-            </button>
-            <button
-              onClick={onLogout}
-              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-destructive hover:bg-white"
-            >
-              <LogOut className="h-5 w-5" /> Cerrar sesión
-            </button>
-          </div>
+          <button
+            onClick={onLogout}
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-destructive hover:bg-white"
+          >
+            <LogOut className="h-5 w-5" /> Cerrar sesión
+          </button>
         </div>
 
         <img
