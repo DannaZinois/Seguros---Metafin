@@ -40,6 +40,7 @@ function CotizadorPage() {
 
   const [draft, setDraft] = useState<CotizadorDraft>(() => emptyDraft());
   const [popup, setPopup] = useState<PopupState>(null);
+  const [showErrors, setShowErrors] = useState(false);
 
   // Hydrate from sessionStorage so user can come back from /cuestionario
   useEffect(() => {
@@ -60,11 +61,22 @@ function CotizadorPage() {
       asegurados: p.asegurados.map((a) => (a.id === id ? { ...a, ...patch } : a)),
     }));
 
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.correoContacto.trim());
+  const errors = {
+    nombre: !draft.nombre.trim(),
+    contacto: !draft.contacto.trim(),
+    correoContacto: !draft.correoContacto.trim() || !emailValid,
+    tipoAsegurado: !draft.tipoAsegurado,
+    sexo: !draft.sexo,
+    codigoPostal: !draft.codigoPostal.trim(),
+    fechaNacimiento: !draft.fechaNacimiento,
+    tipoSeguro: !draft.tipoSeguro,
+    aseguradora: !draft.aseguradora,
+    tipoPlan: !draft.tipoPlan,
+    tipoPersona: !draft.tipoPersona,
+  };
   const requiredFilled = useMemo(() => {
-    if (!draft.nombre.trim() || !draft.contacto.trim() || !draft.rfc.trim())
-      return false;
-    if (!draft.direccion.trim() || !draft.codigoPostal.trim()) return false;
-    if (!draft.tipoSeguro) return false;
+    if (Object.values(errors).some(Boolean)) return false;
     if (!draft.envio) return false;
     if (showAsegurados) {
       return draft.asegurados.every(
@@ -72,7 +84,23 @@ function CotizadorPage() {
       );
     }
     return true;
-  }, [draft, showAsegurados]);
+  }, [errors, draft, showAsegurados]);
+
+  // Tipo de plan options from selected aseguradora + tipo de seguro
+  const tipoSeguroToPolizaTipo: Record<string, string> = {
+    Auto: "Auto",
+    "Gastos Médicos Mayores": "Gastos médicos mayores",
+    Vida: "Vida",
+    Exceso: "Exceso",
+  };
+  const planOptions = useMemo(() => {
+    const a = aseguradoras.find((x) => x.name === draft.aseguradora);
+    if (!a || !draft.tipoSeguro) return [] as string[];
+    const tipo = tipoSeguroToPolizaTipo[draft.tipoSeguro];
+    const p = a.polizas?.find((pp) => pp.tipo === tipo);
+    return p?.variantes.map((v) => v.nombre).filter(Boolean) ?? [];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aseguradoras, draft.aseguradora, draft.tipoSeguro]);
 
   const handleEnvio = (type: Exclude<EnvioType, null>) => {
     if (type === "whatsapp" || type === "pdf") {
@@ -114,11 +142,12 @@ function CotizadorPage() {
 
   const onEnviar = () => {
     if (!requiredFilled) {
+      setShowErrors(true);
       setPopup({
         kind: "error",
         title: "Faltan datos",
         message:
-          "Captura los datos generales obligatorios, el tipo de seguro y selecciona el tipo de envío antes de continuar.",
+          "Captura todos los datos obligatorios marcados en rojo y selecciona el tipo de envío antes de continuar.",
       });
       return;
     }
@@ -163,65 +192,94 @@ function CotizadorPage() {
       <Section title="Datos generales">
         <Grid>
           <Field label="Nombre completo del contratante*">
-            <TextInput value={draft.nombre} onChange={(v) => update("nombre", v)} placeholder="Nombre aquí" />
+            <TextInput value={draft.nombre} onChange={(v) => update("nombre", v)} placeholder="Nombre aquí" error={showErrors && errors.nombre} />
           </Field>
           <Field label="Número de contacto*">
-            <TextInput value={draft.contacto} onChange={(v) => update("contacto", v)} placeholder="+00 0000 0000 00" />
+            <TextInput value={draft.contacto} onChange={(v) => update("contacto", v)} placeholder="+00 0000 0000 00" error={showErrors && errors.contacto} />
           </Field>
-          <Field label="Tipo de asegurado">
+          <Field label="Tipo de asegurado*">
             <Select
               value={draft.tipoAsegurado}
               onChange={(v) => update("tipoAsegurado", v)}
               options={["Individual", "Familiar", "Otro asegurado"]}
               placeholder="Selecciona"
+              error={showErrors && errors.tipoAsegurado}
             />
           </Field>
-          <Field label="RFC*">
-            <TextInput value={draft.rfc} onChange={(v) => update("rfc", v)} placeholder="Lore ipsum dolor est" />
+          <Field label="Correo de contacto*">
+            <TextInput
+              type="email"
+              value={draft.correoContacto}
+              onChange={(v) => update("correoContacto", v)}
+              placeholder="correo@ejemplo.com"
+              error={showErrors && errors.correoContacto}
+            />
           </Field>
 
-          <Field label="Sexo">
-            <Select value={draft.sexo} onChange={(v) => update("sexo", v)} options={["Masculino", "Femenino"]} placeholder="Selecciona" />
-          </Field>
-          <Field label="Dirección*">
-            <TextInput value={draft.direccion} onChange={(v) => update("direccion", v)} placeholder="Lore ipsum dolor est" />
+          <Field label="Sexo*">
+            <Select value={draft.sexo} onChange={(v) => update("sexo", v)} options={["Masculino", "Femenino"]} placeholder="Selecciona" error={showErrors && errors.sexo} />
           </Field>
           <Field label="Código postal*">
-            <TextInput value={draft.codigoPostal} onChange={(v) => update("codigoPostal", v)} placeholder="Lore ipsum dolor est" />
+            <TextInput value={draft.codigoPostal} onChange={(v) => update("codigoPostal", v)} placeholder="Lore ipsum dolor est" error={showErrors && errors.codigoPostal} />
           </Field>
-          <Field label="Fecha de nacimiento">
-            <DateInput value={draft.fechaNacimiento} onChange={(v) => update("fechaNacimiento", v)} />
+          <Field label="Fecha de nacimiento*">
+            <DateInput value={draft.fechaNacimiento} onChange={(v) => update("fechaNacimiento", v)} error={showErrors && errors.fechaNacimiento} />
           </Field>
-
           <Field label="Fecha de antiguedad">
             <DateInput value={draft.fechaAntiguedad} onChange={(v) => update("fechaAntiguedad", v)} />
           </Field>
+
           <Field label="Tipo de seguro*">
             <Select
               value={draft.tipoSeguro}
-              onChange={(v) => update("tipoSeguro", v)}
+              onChange={(v) => {
+                update("tipoSeguro", v);
+                update("tipoPlan", "");
+              }}
               options={["Auto", "Gastos Médicos Mayores", "Vida", "Exceso"]}
               placeholder="Selecciona"
+              error={showErrors && errors.tipoSeguro}
             />
           </Field>
-          <Field label="Aseguradora">
+          <Field label="Aseguradora*">
             <Select
               value={draft.aseguradora}
-              onChange={(v) => update("aseguradora", v)}
+              onChange={(v) => {
+                update("aseguradora", v);
+                update("tipoPlan", "");
+              }}
               options={aseguradoras.map((a) => a.name)}
               placeholder={
                 aseguradoras.length === 0
                   ? "Registra aseguradoras primero"
                   : "Selecciona"
               }
+              error={showErrors && errors.aseguradora}
             />
           </Field>
-          <Field label="Tipo de persona">
+          <Field label="Tipo de plan*">
+            <Select
+              value={draft.tipoPlan}
+              onChange={(v) => update("tipoPlan", v)}
+              options={planOptions}
+              placeholder={
+                !draft.aseguradora || !draft.tipoSeguro
+                  ? "Selecciona aseguradora y tipo de seguro"
+                  : planOptions.length === 0
+                    ? "Sin variantes registradas"
+                    : "Selecciona"
+              }
+              disabled={planOptions.length === 0}
+              error={showErrors && errors.tipoPlan}
+            />
+          </Field>
+          <Field label="Tipo de persona*">
             <Select
               value={draft.tipoPersona}
               onChange={(v) => update("tipoPersona", v)}
               options={["Persona Física", "Persona Moral"]}
               placeholder="Selecciona"
+              error={showErrors && errors.tipoPersona}
             />
           </Field>
         </Grid>

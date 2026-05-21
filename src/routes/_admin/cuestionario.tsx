@@ -173,14 +173,11 @@ function CuestionarioPage() {
           <Field label="Tipo de asegurado">
             <TextInput value={draft.tipoAsegurado} readOnly />
           </Field>
-          <Field label="RFC">
-            <TextInput value={draft.rfc} readOnly />
+          <Field label="Correo de contacto">
+            <TextInput value={draft.correoContacto} readOnly />
           </Field>
           <Field label="Sexo">
             <TextInput value={draft.sexo} readOnly />
-          </Field>
-          <Field label="Dirección">
-            <TextInput value={draft.direccion} readOnly />
           </Field>
           <Field label="Código postal">
             <TextInput value={draft.codigoPostal} readOnly />
