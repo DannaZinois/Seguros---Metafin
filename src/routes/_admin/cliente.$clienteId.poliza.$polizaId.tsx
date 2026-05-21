@@ -3,6 +3,7 @@ import { ArrowLeft, Pencil, Trash2, CloudDownload } from "lucide-react";
 import { Section } from "@/components/cotizador/shared";
 import { DatosGeneralesReadonly } from "@/components/cotizador/datos-generales-readonly";
 import { emptyDraft, saveDraft } from "@/lib/cotizador-draft";
+import { findPoliza } from "@/lib/clientes-data";
 
 export const Route = createFileRoute("/_admin/cliente/$clienteId/poliza/$polizaId")({
   component: VerPolizaCliente,
@@ -22,21 +23,23 @@ const DOCS: { nombre: string; encargado: string; fecha: string; estatus: Estatus
 function VerPolizaCliente() {
   const router = useRouter();
   const { clienteId, polizaId } = Route.useParams();
+  const found = findPoliza(clienteId, polizaId);
+  const profile = found?.cliente.profile;
+  const poliza = found?.poliza;
 
-  // Sample client data prefill — mirrors the row in cliente.$clienteId.tsx
   const prefillDraft = () => {
     saveDraft({
       ...emptyDraft(),
-      nombre: "John Doe",
-      contacto: "+000 000 000",
-      correoContacto: "johndoe@correo.com",
-      tipoAsegurado: "Individual",
-      sexo: "Masculino",
-      codigoPostal: "00000",
-      fechaNacimiento: "1990-01-01",
-      fechaAntiguedad: "2024-01-01",
-      tipoSeguro: "Gastos Médicos Mayores",
-      tipoPersona: "Persona Física",
+      nombre: profile?.nombre ?? "",
+      contacto: profile?.contacto ?? "",
+      correoContacto: profile?.correo ?? "",
+      tipoAsegurado: profile?.tipoAsegurado ?? "",
+      sexo: profile?.sexo ?? "",
+      codigoPostal: profile?.codigoPostal ?? "",
+      fechaNacimiento: profile?.fechaNacimiento ?? "",
+      fechaAntiguedad: profile?.fechaAntiguedad ?? "",
+      tipoSeguro: poliza?.tipoSeguro ?? "",
+      tipoPersona: profile?.tipoPersona ?? "",
     });
   };
 
@@ -67,7 +70,7 @@ function VerPolizaCliente() {
         </div>
       </div>
 
-      <DatosGeneralesReadonly />
+      <DatosGeneralesReadonly profile={profile} tipoSeguro={poliza?.tipoSeguro} aseguradora={poliza?.aseguradora} />
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
         {[
