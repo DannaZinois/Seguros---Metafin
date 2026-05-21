@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Trash2, X, Plus, Upload, UserPlus, Loader2, CheckCircle2, Pencil } from "lucide-react";
+import { Trash2, X, Plus, Upload, UserPlus, Loader2, CheckCircle2, Pencil, FileText, FileBadge, Download } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   Section,
@@ -134,6 +134,14 @@ function SegurosPage() {
       title: "Registro individual",
       message:
         "Te llevaremos al alta individual de asegurados para esta nueva póliza.",
+    });
+  };
+
+  const handleDownload = (doc: string) => {
+    setPopup({
+      kind: "info",
+      title: "Descarga iniciada",
+      message: `Se está preparando el PDF de ${doc} para la póliza ${nuevo.tipo || ""}.`,
     });
   };
 
