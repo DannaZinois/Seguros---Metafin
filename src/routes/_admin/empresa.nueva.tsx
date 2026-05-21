@@ -16,9 +16,11 @@ import {
   saveEmpresa,
   newEmpresa,
   newEncargado,
+  seedEmpresasIfEmpty,
   type Empresa,
   type Encargado,
 } from "@/lib/empresa-store";
+import { buildEmpresaSeeds } from "@/lib/clientes-data";
 
 const searchSchema = z.object({
   empresaId: z.string().optional(),
@@ -33,6 +35,9 @@ export const Route = createFileRoute("/_admin/empresa/nueva")({
 function RegistroEmpresaPage() {
   const router = useRouter();
   const { empresaId } = Route.useSearch();
+  useEffect(() => {
+    seedEmpresasIfEmpty(buildEmpresaSeeds());
+  }, []);
   const list = useEmpresas();
 
   const existing = useMemo(
