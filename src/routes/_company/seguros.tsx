@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Trash2, X, Plus } from "lucide-react";
-import { useState } from "react";
+import { Trash2, X, Plus, Upload, UserPlus, Loader2, CheckCircle2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import {
   Section,
   Popup,
@@ -10,6 +10,7 @@ import {
 } from "@/components/cotizador/shared";
 import { useCompanyEmpresa } from "@/lib/company-context";
 import type { Poliza } from "@/lib/empresa-store";
+import { useAseguradoras } from "@/lib/store";
 
 export const Route = createFileRoute("/_company/seguros")({
   component: SegurosPage,
@@ -18,9 +19,13 @@ export const Route = createFileRoute("/_company/seguros")({
 
 function SegurosPage() {
   const empresa = useCompanyEmpresa();
+  const [aseguradorasList] = useAseguradoras();
   const [popup, setPopup] = useState<PopupState>(null);
   const [detail, setDetail] = useState<Poliza | null>(null);
   const [nuevoOpen, setNuevoOpen] = useState(false);
+  type NuevoStep = "form" | "reviewing" | "approved";
+  const [step, setStep] = useState<NuevoStep>("form");
+  const bulkRef = useRef<HTMLInputElement | null>(null);
   const initialNuevo = {
     tipo: "",
     aseguradora: "",
@@ -34,6 +39,12 @@ function SegurosPage() {
     comentarios: "",
   };
   const [nuevo, setNuevo] = useState(initialNuevo);
+
+  useEffect(() => {
+    if (step !== "reviewing") return;
+    const t = setTimeout(() => setStep("approved"), 1800);
+    return () => clearTimeout(t);
+  }, [step]);
 
   if (!empresa) {
     return (
@@ -63,6 +74,7 @@ function SegurosPage() {
   const closeNuevo = () => {
     setNuevoOpen(false);
     setNuevo(initialNuevo);
+    setStep("form");
   };
 
   const handleSolicitar = () => {
@@ -74,11 +86,25 @@ function SegurosPage() {
       });
       return;
     }
+    setStep("reviewing");
+  };
+
+  const handleBulk = (file: File) => {
     closeNuevo();
     setPopup({
       kind: "info",
-      title: "Solicitud enviada",
-      message: `Se envió tu solicitud de una nueva póliza ${nuevo.tipo} con ${nuevo.aseguradora}. Te contactaremos a la brevedad.`,
+      title: "Asegurados cargados",
+      message: `Procesaremos "${file.name}" y asociaremos los asegurados a la nueva póliza ${nuevo.tipo}.`,
+    });
+  };
+
+  const handleIndividual = () => {
+    closeNuevo();
+    setPopup({
+      kind: "info",
+      title: "Registro individual",
+      message:
+        "Te llevaremos al alta individual de asegurados para esta nueva póliza.",
     });
   };
 
@@ -235,11 +261,21 @@ function SegurosPage() {
               <X className="h-4 w-4" />
             </button>
             <h3 className="text-lg font-bold text-foreground">
-              Solicitar nuevo seguro
+              {step === "form" && "Solicitar nuevo seguro"}
+              {step === "reviewing" && "Revisando solicitud"}
+              {step === "approved" && "Solicitud aprobada"}
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Captura los datos generales de la nueva póliza a contratar.
+              {step === "form" &&
+                "Captura los datos generales de la nueva póliza a contratar."}
+              {step === "reviewing" &&
+                "Tu solicitud está siendo revisada por nuestro equipo."}
+              {step === "approved" &&
+                `Tu póliza ${nuevo.tipo} con ${nuevo.aseguradora} fue aprobada. Ahora carga o registra a los asegurados.`}
             </p>
+
+            {step === "form" && (
+            <>
             <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
               <Field label="Tipo de póliza">
                 <select
@@ -255,10 +291,20 @@ function SegurosPage() {
                 </select>
               </Field>
               <Field label="Aseguradora">
-                <TextInput
+                <select
                   value={nuevo.aseguradora}
-                  onChange={(v) => setNuevo({ ...nuevo, aseguradora: v })}
-                />
+                  onChange={(e) =>
+                    setNuevo({ ...nuevo, aseguradora: e.target.value })
+                  }
+                  className="w-full rounded-full border border-border bg-white px-4 py-2 text-sm"
+                >
+                  <option value="">Selecciona...</option>
+                  {aseguradorasList.map((a) => (
+                    <option key={a.id} value={a.name}>
+                      {a.name}
+                    </option>
+                  ))}
+                </select>
               </Field>
               <Field label="Contratante">
                 <TextInput
@@ -336,6 +382,69 @@ function SegurosPage() {
                 Enviar solicitud
               </button>
             </div>
+            </>
+            )}
+
+            {step === "reviewing" && (
+              <div className="mt-8 flex flex-col items-center gap-3 py-8 text-center">
+                <Loader2 className="h-10 w-10 animate-spin text-[color:var(--brand-blue)]" />
+                <p className="text-sm font-medium text-foreground">
+                  Tu solicitud está en revisión...
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Esto puede tomar unos segundos.
+                </p>
+              </div>
+            )}
+
+            {step === "approved" && (
+              <div className="mt-6 space-y-5">
+                <div className="flex items-center gap-2 rounded-2xl bg-[color:var(--status-active)]/40 p-3 text-sm text-foreground">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                  Solicitud aprobada. Carga o registra a los asegurados que estarán bajo esta póliza.
+                </div>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  <button
+                    onClick={() => bulkRef.current?.click()}
+                    className="rounded-2xl border border-border p-5 text-left hover:border-[color:var(--brand-blue)] hover:bg-muted/40"
+                  >
+                    <Upload className="mb-2 h-5 w-5 text-[color:var(--brand-blue)]" />
+                    <div className="font-semibold">Carga masiva</div>
+                    <p className="text-xs text-muted-foreground">
+                      Sube un CSV o Excel con los datos de tus asegurados.
+                    </p>
+                    <input
+                      ref={bulkRef}
+                      type="file"
+                      accept=".csv,.xlsx,.xls"
+                      hidden
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleBulk(f);
+                      }}
+                    />
+                  </button>
+                  <button
+                    onClick={handleIndividual}
+                    className="rounded-2xl border border-border p-5 text-left hover:border-[color:var(--brand-blue)] hover:bg-muted/40"
+                  >
+                    <UserPlus className="mb-2 h-5 w-5 text-[color:var(--brand-blue)]" />
+                    <div className="font-semibold">Registro individual</div>
+                    <p className="text-xs text-muted-foreground">
+                      Captura los datos de cada asegurado uno por uno.
+                    </p>
+                  </button>
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    onClick={closeNuevo}
+                    className="rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+                  >
+                    Hacerlo más tarde
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
