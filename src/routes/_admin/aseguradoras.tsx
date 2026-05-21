@@ -283,6 +283,7 @@ function AseguradorasPage() {
           <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Field label="Usuario" value={draft.usuario ?? ""} onChange={(v) => setField("usuario", v)} />
             <Field label="Contraseña" value={draft.contrasena ?? ""} onChange={(v) => setField("contrasena", v)} type="password" />
+            <Field label="Clave agente en la aseguradora" value={draft.claveAgente ?? ""} onChange={(v) => setField("claveAgente", v)} />
           </div>
         </div>
 
