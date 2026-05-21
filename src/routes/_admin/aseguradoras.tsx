@@ -360,7 +360,7 @@ function AseguradorasPage() {
                 <td className="px-6 py-4 text-foreground/80">{a.ejecutivo || "—"}</td>
                 <td className="px-6 py-4 text-foreground/80">
                   {a.polizas && a.polizas.length > 0
-                    ? a.polizas.map((p) => `${p.tipo} (${p.variantes.length})`).join(", ")
+                    ? a.polizas.map((p) => `${tipoLabel(p.tipo)} (${p.variantes.length})`).join(", ")
                     : "—"}
                 </td>
                 <td className="px-6 py-4 text-right">
@@ -405,6 +405,150 @@ function AseguradorasPage() {
 
 const TIPOS_SEGURO: TipoSeguro[] = ["Auto", "Vida", "Gastos médicos mayores", "Exceso"];
 
+function tipoLabel(t: TipoSeguro): string {
+  return t === "Gastos médicos mayores" ? "GMM" : t;
+}
+
+function PolizasEditor({
+  polizas,
+  onChange,
+}: {
+  polizas: PolizaTipo[];
+  onChange: (next: PolizaTipo[]) => void;
+}) {
+  const ensureTipo = (tipo: TipoSeguro): PolizaTipo[] => {
+    if (polizas.find((p) => p.tipo === tipo)) return polizas;
+    return [...polizas, { id: crypto.randomUUID(), tipo, variantes: [] }];
+  };
+
+  const updateVariante = (tipo: TipoSeguro, vid: string, patch: Partial<VariantePoliza>) => {
+    onChange(
+      polizas.map((p) =>
+        p.tipo === tipo
+          ? { ...p, variantes: p.variantes.map((v) => (v.id === vid ? { ...v, ...patch } : v)) }
+          : p,
+      ),
+    );
+  };
+
+  const removeVariante = (tipo: TipoSeguro, vid: string) => {
+    onChange(
+      polizas.map((p) =>
+        p.tipo === tipo ? { ...p, variantes: p.variantes.filter((v) => v.id !== vid) } : p,
+      ),
+    );
+  };
+
+  const addVariante = (tipo: TipoSeguro) => {
+    const base = ensureTipo(tipo);
+    onChange(
+      base.map((p) =>
+        p.tipo === tipo
+          ? { ...p, variantes: [...p.variantes, { id: crypto.randomUUID(), nombre: "" }] }
+          : p,
+      ),
+    );
+  };
+
+  const onFile = (
+    tipo: TipoSeguro,
+    vid: string,
+    field: "pdfName" | "wordName",
+    file: File | undefined,
+  ) => {
+    if (!file) return;
+    updateVariante(tipo, vid, { [field]: file.name } as Partial<VariantePoliza>);
+  };
+
+  return (
+    <div className="mt-4 space-y-4">
+      {TIPOS_SEGURO.map((tipo) => {
+        const grupo = polizas.find((p) => p.tipo === tipo);
+        const variantes = grupo?.variantes ?? [];
+        return (
+          <div key={tipo} className="overflow-hidden rounded-2xl border border-border">
+            <div className="flex items-center justify-between border-b border-border bg-muted/40 px-4 py-2">
+              <span className="text-xs font-semibold text-foreground">
+                {tipoLabel(tipo)}{" "}
+                {variantes.length > 0 && (
+                  <span className="text-muted-foreground">({variantes.length})</span>
+                )}
+              </span>
+              <button
+                type="button"
+                onClick={() => addVariante(tipo)}
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-3 py-1 text-xs font-medium text-foreground hover:bg-muted"
+              >
+                <Plus className="h-3 w-3" /> Variante
+              </button>
+            </div>
+            {variantes.length === 0 ? (
+              <div className="px-4 py-3 text-xs text-muted-foreground">Sin variantes.</div>
+            ) : (
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-border text-xs text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-2 font-medium">Nombre</th>
+                    <th className="px-4 py-2 font-medium">PDF</th>
+                    <th className="px-4 py-2 font-medium">Word</th>
+                    <th className="px-4 py-2 font-medium text-right">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {variantes.map((v, idx) => (
+                    <tr key={v.id} className="border-b border-border/60 last:border-0">
+                      <td className="px-4 py-2">
+                        <input
+                          value={v.nombre}
+                          placeholder={`Variante ${idx + 1}`}
+                          onChange={(e) => updateVariante(tipo, v.id, { nombre: e.target.value })}
+                          className="w-full rounded-md border border-border px-2 py-1 text-sm outline-none focus:border-[color:var(--brand-blue)]"
+                        />
+                      </td>
+                      <td className="px-4 py-2">
+                        <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted/40">
+                          <FileText className="h-3.5 w-3.5" />
+                          <span className="truncate max-w-[140px]">{v.pdfName || "Subir PDF"}</span>
+                          <input
+                            type="file"
+                            accept="application/pdf"
+                            className="hidden"
+                            onChange={(e) => onFile(tipo, v.id, "pdfName", e.target.files?.[0])}
+                          />
+                        </label>
+                      </td>
+                      <td className="px-4 py-2">
+                        <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted/40">
+                          <FileSpreadsheet className="h-3.5 w-3.5" />
+                          <span className="truncate max-w-[140px]">{v.wordName || "Subir Word"}</span>
+                          <input
+                            type="file"
+                            accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                            className="hidden"
+                            onChange={(e) => onFile(tipo, v.id, "wordName", e.target.files?.[0])}
+                          />
+                        </label>
+                      </td>
+                      <td className="px-4 py-2 text-right">
+                        <button
+                          onClick={() => removeVariante(tipo, v.id)}
+                          className="rounded-full p-2 text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function RowGroup({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
@@ -421,7 +565,7 @@ function PolizasResumen({ polizas }: { polizas: PolizaTipo[] }) {
         return (
           <div key={tipo} className="overflow-hidden rounded-2xl border border-border bg-white">
             <div className="border-b border-border bg-muted/40 px-4 py-2 text-xs font-semibold text-foreground">
-              {tipo} {variantes.length > 0 && <span className="text-muted-foreground">({variantes.length})</span>}
+              {tipoLabel(tipo)} {variantes.length > 0 && <span className="text-muted-foreground">({variantes.length})</span>}
             </div>
             {variantes.length === 0 ? (
               <div className="px-4 py-3 text-xs text-muted-foreground">Sin variantes registradas.</div>
@@ -504,7 +648,7 @@ function PolizasForm({
           >
             {TIPOS_SEGURO.map((t) => (
               <option key={t} value={t}>
-                {t}
+                {tipoLabel(t)}
               </option>
             ))}
           </select>
@@ -684,6 +828,14 @@ function EditDialog({
             <Field label="Contraseña" value={form.contrasena ?? ""} onChange={(v) => set("contrasena", v)} type="password" />
             <Field label="Clave agente en la aseguradora" value={form.claveAgente ?? ""} onChange={(v) => set("claveAgente", v)} className="sm:col-span-2" />
           </div>
+        </div>
+
+        <div className="mt-8 border-t border-border pt-6">
+          <h3 className="text-lg font-semibold text-foreground">Pólizas</h3>
+          <PolizasEditor
+            polizas={form.polizas ?? []}
+            onChange={(next) => set("polizas", next)}
+          />
         </div>
 
         <div className="mt-8 flex justify-end gap-3">
