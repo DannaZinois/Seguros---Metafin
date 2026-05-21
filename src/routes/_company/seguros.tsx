@@ -201,6 +201,15 @@ function SegurosPage() {
                       </span>
                     </td>
                     <td className="py-3" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEdit(p)}
+                        title="Editar"
+                        aria-label="Editar"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--brand-blue)]/10 text-[color:var(--brand-blue)] hover:bg-[color:var(--brand-blue)]/20"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
                       <button
                         onClick={() => handleBaja(p.tipo || "")}
                         title="Dar de baja"
@@ -209,6 +218,7 @@ function SegurosPage() {
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
+                      </div>
                     </td>
                   </tr>
                 ))
