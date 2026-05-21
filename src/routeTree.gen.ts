@@ -12,7 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
+import { Route as AdminCotizadoresRouteImport } from './routes/_admin/cotizadores'
 import { Route as AdminCarteraRouteImport } from './routes/_admin/cartera'
+import { Route as AdminAseguradorasRouteImport } from './routes/_admin/aseguradoras'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -28,35 +31,79 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCotizadoresRoute = AdminCotizadoresRouteImport.update({
+  id: '/cotizadores',
+  path: '/cotizadores',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCarteraRoute = AdminCarteraRouteImport.update({
   id: '/cartera',
   path: '/cartera',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAseguradorasRoute = AdminAseguradorasRouteImport.update({
+  id: '/aseguradoras',
+  path: '/aseguradoras',
   getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/aseguradoras': typeof AdminAseguradorasRoute
   '/cartera': typeof AdminCarteraRoute
+  '/cotizadores': typeof AdminCotizadoresRoute
+  '/dashboard': typeof AdminDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/aseguradoras': typeof AdminAseguradorasRoute
   '/cartera': typeof AdminCarteraRoute
+  '/cotizadores': typeof AdminCotizadoresRoute
+  '/dashboard': typeof AdminDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
+  '/_admin/aseguradoras': typeof AdminAseguradorasRoute
   '/_admin/cartera': typeof AdminCarteraRoute
+  '/_admin/cotizadores': typeof AdminCotizadoresRoute
+  '/_admin/dashboard': typeof AdminDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/cartera'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/aseguradoras'
+    | '/cartera'
+    | '/cotizadores'
+    | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/cartera'
-  id: '__root__' | '/' | '/_admin' | '/login' | '/_admin/cartera'
+  to:
+    | '/'
+    | '/login'
+    | '/aseguradoras'
+    | '/cartera'
+    | '/cotizadores'
+    | '/dashboard'
+  id:
+    | '__root__'
+    | '/'
+    | '/_admin'
+    | '/login'
+    | '/_admin/aseguradoras'
+    | '/_admin/cartera'
+    | '/_admin/cotizadores'
+    | '/_admin/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -88,6 +135,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_admin/dashboard': {
+      id: '/_admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/cotizadores': {
+      id: '/_admin/cotizadores'
+      path: '/cotizadores'
+      fullPath: '/cotizadores'
+      preLoaderRoute: typeof AdminCotizadoresRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/cartera': {
       id: '/_admin/cartera'
       path: '/cartera'
@@ -95,15 +156,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCarteraRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/aseguradoras': {
+      id: '/_admin/aseguradoras'
+      path: '/aseguradoras'
+      fullPath: '/aseguradoras'
+      preLoaderRoute: typeof AdminAseguradorasRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminAseguradorasRoute: typeof AdminAseguradorasRoute
   AdminCarteraRoute: typeof AdminCarteraRoute
+  AdminCotizadoresRoute: typeof AdminCotizadoresRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAseguradorasRoute: AdminAseguradorasRoute,
   AdminCarteraRoute: AdminCarteraRoute,
+  AdminCotizadoresRoute: AdminCotizadoresRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
