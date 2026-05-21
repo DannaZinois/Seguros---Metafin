@@ -6,6 +6,15 @@ export interface ProfileField {
   value: string;
 }
 
+function getInitials(name: string) {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("") || "·";
+}
+
 export function HeaderProfile({
   name,
   role,
@@ -16,18 +25,24 @@ export function HeaderProfile({
   fields: ProfileField[];
 }) {
   const [open, setOpen] = useState(false);
+  const initials = getInitials(name);
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-3 rounded-full px-2 py-1 transition-colors hover:bg-white"
+        className="flex items-center gap-3 rounded-full border border-transparent px-2 py-1 transition-all hover:border-border hover:bg-white hover:shadow-sm"
         aria-label="Ver datos de la cuenta"
       >
-        <div className="h-10 w-10 rounded-full bg-muted" />
         <div className="text-right">
           <p className="text-sm font-semibold text-foreground">{name}</p>
           <p className="text-xs text-muted-foreground">{role}</p>
+        </div>
+        <div
+          className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white shadow-sm ring-2 ring-white"
+          style={{ background: "var(--gradient-brand)" }}
+        >
+          {initials}
         </div>
       </button>
 
@@ -48,7 +63,12 @@ export function HeaderProfile({
               <X className="h-4 w-4" />
             </button>
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-full bg-muted" />
+              <div
+                className="flex h-14 w-14 items-center justify-center rounded-full text-base font-semibold text-white shadow-md"
+                style={{ background: "var(--gradient-brand)" }}
+              >
+                {initials}
+              </div>
               <div>
                 <h3 className="text-lg font-bold text-foreground">{name}</h3>
                 <p className="text-xs text-muted-foreground">{role}</p>
