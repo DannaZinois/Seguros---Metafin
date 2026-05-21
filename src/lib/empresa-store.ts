@@ -134,7 +134,11 @@ export function seedEmpresasIfEmpty(seeds: Empresa[]) {
   const userCreated = existing.filter((e) => !seedIds.has(e.id));
   const needsRefresh = seeds.some((s) => {
     const cur = existing.find((e) => e.id === s.id);
-    return !cur || cur.polizas.some((p) => p.asegurados.length === 0);
+    return (
+      !cur ||
+      cur.polizas.length !== s.polizas.length ||
+      cur.polizas.some((p) => p.asegurados.length === 0)
+    );
   });
   if (needsRefresh) write([...userCreated, ...seeds]);
 }
