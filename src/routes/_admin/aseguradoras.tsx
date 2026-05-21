@@ -425,7 +425,7 @@ function PolizasResumen({ polizas }: { polizas: PolizaTipo[] }) {
         return (
           <div key={tipo} className="overflow-hidden rounded-2xl border border-border bg-white">
             <div className="border-b border-border bg-muted/40 px-4 py-2 text-xs font-semibold text-foreground">
-              {tipo} {variantes.length > 0 && <span className="text-muted-foreground">({variantes.length})</span>}
+              {tipoLabel(tipo)} {variantes.length > 0 && <span className="text-muted-foreground">({variantes.length})</span>}
             </div>
             {variantes.length === 0 ? (
               <div className="px-4 py-3 text-xs text-muted-foreground">Sin variantes registradas.</div>
