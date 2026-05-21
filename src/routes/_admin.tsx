@@ -33,9 +33,10 @@ function AdminLayout() {
 
   // Client-side guard
   useEffect(() => {
-    if (ready && !user) {
-      router.navigate({ to: "/login" });
-    }
+    if (!ready) return;
+    if (!user) router.navigate({ to: "/login" });
+    else if (user.role === "company")
+      router.navigate({ to: "/empresa-portal/perfil" });
   }, [ready, user, router]);
 
   const navItems = [
