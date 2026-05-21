@@ -13,14 +13,17 @@ export function DatosGeneralesReadonly() {
         <Field label="Número de contacto*">
           <TextInput value="" onChange={noop} placeholder="+00 0000 0000 00" />
         </Field>
-        <Field label="Tipo de asegurado*">
-          <Select value="" onChange={noop} options={["Individual", "Familiar", "Otro asegurado"]} placeholder="Selecciona" />
+        <Field label="Tipo de asegurado">
+          <Select value="" onChange={noop} options={["Individual", "Familiar", "Otro asegurado"]} placeholder="Nombre aquí" />
         </Field>
-        <Field label="Correo de contacto*">
-          <TextInput type="email" value="" onChange={noop} placeholder="correo@ejemplo.com" />
+        <Field label="RFC*">
+          <TextInput value="" onChange={noop} placeholder="Lore ipsum dolor est" />
         </Field>
-        <Field label="Sexo*">
-          <Select value="" onChange={noop} options={["Masculino", "Femenino"]} placeholder="Selecciona" />
+        <Field label="Sexo">
+          <Select value="" onChange={noop} options={["Masculino", "Femenino"]} placeholder="Nombre aquí" />
+        </Field>
+        <Field label="Dirección*">
+          <TextInput value="" onChange={noop} placeholder="Lore ipsum dolor est" />
         </Field>
         <Field label="Código postal*">
           <TextInput value="" onChange={noop} placeholder="Lore ipsum dolor est" />
@@ -32,21 +35,18 @@ export function DatosGeneralesReadonly() {
           <DateInput value="" onChange={noop} />
         </Field>
         <Field label="Tipo de seguro*">
-          <Select value="" onChange={noop} options={["Auto", "Gastos Médicos Mayores", "Vida", "Exceso"]} placeholder="Selecciona" />
+          <Select value="" onChange={noop} options={["Auto", "Gastos Médicos Mayores", "Vida", "Exceso"]} placeholder="Nombre aquí" />
         </Field>
         <Field label="Aseguradora*">
           <Select
             value=""
             onChange={noop}
             options={aseguradoras.map((a) => a.name)}
-            placeholder={aseguradoras.length === 0 ? "Registra aseguradoras primero" : "Selecciona"}
+            placeholder={aseguradoras.length === 0 ? "Registra aseguradoras primero" : "Nombre aquí"}
           />
         </Field>
-        <Field label="Tipo de plan*">
-          <Select value="" onChange={noop} options={[]} placeholder="Selecciona aseguradora y tipo de seguro" disabled />
-        </Field>
         <Field label="Tipo de persona*">
-          <Select value="" onChange={noop} options={["Persona Física", "Persona Moral"]} placeholder="Selecciona" />
+          <Select value="" onChange={noop} options={["Persona Física", "Persona Moral"]} placeholder="Nombre aquí" />
         </Field>
       </Grid>
     </Section>
