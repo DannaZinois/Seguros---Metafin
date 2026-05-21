@@ -1,3 +1,5 @@
+import type { Empresa } from "@/lib/empresa-store";
+
 export type ClienteStatus = "Activa" | "Cancelada" | "En revisión" | "Por renovar";
 export type TipoCliente = "Personal" | "Empresa";
 
@@ -178,4 +180,64 @@ export function findPoliza(clienteId: string, polizaId: string) {
   if (!cliente) return undefined;
   const poliza = cliente.polizas.find((p) => p.id === polizaId) ?? cliente.polizas[0];
   return { cliente, poliza };
+}
+
+/**
+ * Build seed Empresa records (for the empresa-store) from the dummy CLIENTES
+ * marked as "Empresa". Used by Cartera so that clicking a company opens its
+ * full "Perfil de Empresa" with realistic data.
+ */
+export function buildEmpresaSeeds(): Empresa[] {
+  const ENCARGADOS: Record<string, Array<{ nombre: string; contacto: string; email: string; acceso: "Admin" | "RRHH" | "Lectura" }>> = {
+    E880101: [
+      { nombre: "Roberto Salinas", contacto: "+52 55 4422 1101", email: "roberto.salinas@aztlan.com.mx", acceso: "Admin" },
+      { nombre: "Lucía Hernández", contacto: "+52 55 4422 1102", email: "lucia.hernandez@aztlan.com.mx", acceso: "RRHH" },
+    ],
+    E880201: [
+      { nombre: "Jorge Méndez", contacto: "+52 33 8899 5545", email: "jorge.mendez@pacifico.mx", acceso: "Admin" },
+      { nombre: "Patricia Núñez", contacto: "+52 33 8899 5546", email: "patricia.nunez@pacifico.mx", acceso: "Lectura" },
+    ],
+    E880301: [
+      { nombre: "Daniela Ortega", contacto: "+52 81 2233 4456", email: "daniela.ortega@vertice.io", acceso: "Admin" },
+    ],
+  };
+  const GIROS: Record<string, string> = {
+    E880101: "Manufactura industrial",
+    E880201: "Construcción y obra civil",
+    E880301: "Desarrollo de software",
+  };
+  return CLIENTES.filter((c) => c.tipo === "Empresa").map((c) => ({
+    id: c.clienteId,
+    nombre: c.profile.nombre,
+    rfc: c.profile.rfc,
+    giro: GIROS[c.clienteId] ?? "Servicios",
+    direccion: c.profile.direccion,
+    codigoPostal: c.profile.codigoPostal,
+    encargados: (ENCARGADOS[c.clienteId] ?? []).map((e, i) => ({
+      id: `${c.clienteId}-enc-${i}`,
+      nombre: e.nombre,
+      contacto: e.contacto,
+      email: e.email,
+      acceso: e.acceso,
+      invited: true,
+    })),
+    polizas: c.polizas.map((p) => ({
+      id: p.id,
+      tipo: p.tipoSeguro,
+      aseguradora: p.aseguradora,
+      contratante: c.profile.nombre,
+      contacto: c.profile.contacto,
+      codigoPostal: c.profile.codigoPostal,
+      tipoPago: "Mensual",
+      numAsegurados: "0050",
+      rfc: c.profile.rfc,
+      envio: null,
+      asegurados: [],
+      comprobantes: [],
+      comentarios: "",
+      vigencia: p.vigencia,
+      estatus: (p.status === "Cancelada" ? "Vencida" : "Vigente") as "Vigente" | "Vencida",
+    })),
+    createdAt: Date.now(),
+  }));
 }
