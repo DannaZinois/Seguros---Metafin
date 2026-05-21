@@ -115,6 +115,18 @@ export function deleteEmpresa(id: string) {
   write(read().filter((e) => e.id !== id));
 }
 
+/**
+ * Seed the empresa store with demo companies if it is empty.
+ * Used so the Cartera dummy "Empresa" profiles open the full registration
+ * screen with realistic data.
+ */
+export function seedEmpresasIfEmpty(seeds: Empresa[]) {
+  if (typeof window === "undefined") return;
+  const existing = read();
+  if (existing.length > 0) return;
+  write(seeds);
+}
+
 export function newEncargado(): Encargado {
   return {
     id: crypto.randomUUID(),
