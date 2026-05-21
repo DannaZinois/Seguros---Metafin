@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { useCompanyEmpresa } from "@/lib/company-context";
 import { HeaderProfile } from "@/components/layout/header-profile";
 import { AppShell } from "@/components/layout/app-shell";
+import orionLogo from "@/assets/orion-logo.webp";
 
 export const Route = createFileRoute("/_company")({
   component: CompanyLayout,
@@ -38,6 +39,7 @@ function CompanyLayout() {
     <AppShell
       brandTitle={empresa?.nombre ?? "Mi empresa"}
       brandSubtitle="Portal Compañía"
+      brandLogo={orionLogo}
       navItems={navItems}
       onLogout={onLogout}
       header={
