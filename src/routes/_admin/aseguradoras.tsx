@@ -690,6 +690,14 @@ function EditDialog({
           </div>
         </div>
 
+        <div className="mt-8 border-t border-border pt-6">
+          <h3 className="text-lg font-semibold text-foreground">Pólizas</h3>
+          <PolizasEditor
+            polizas={form.polizas ?? []}
+            onChange={(next) => set("polizas", next)}
+          />
+        </div>
+
         <div className="mt-8 flex justify-end gap-3">
           <button
             onClick={onClose}
