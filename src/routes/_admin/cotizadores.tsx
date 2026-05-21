@@ -45,7 +45,7 @@ function CotizadorPage() {
   // Hydrate from sessionStorage so user can come back from /cuestionario
   useEffect(() => {
     const d = loadDraft();
-    if (d) setDraft(d);
+    if (d) setDraft({ ...emptyDraft(), ...d });
   }, []);
 
   const update = <K extends keyof CotizadorDraft>(k: K, v: CotizadorDraft[K]) =>
