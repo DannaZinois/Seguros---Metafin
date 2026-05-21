@@ -8,6 +8,8 @@ import {
   TextInput,
   Select,
   DateInput,
+  Popup,
+  type PopupState,
 } from "@/components/cotizador/shared";
 import { useEmpresas, saveEmpresa, type Empresa } from "@/lib/empresa-store";
 
@@ -92,6 +94,7 @@ function PerfilEmpleadoPage() {
   const [cp, setCp] = useState("");
   const [fnac, setFnac] = useState("");
   const [fant, setFant] = useState("");
+  const [popup, setPopup] = useState<PopupState>(null);
 
   useEffect(() => {
     if (!seed) return;
@@ -303,7 +306,36 @@ function PerfilEmpleadoPage() {
       </Section>
 
       <div className="mt-10 flex flex-wrap items-center justify-end gap-3">
-        <button className="rounded-full bg-orange-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-600">
+        <button
+          onClick={() =>
+            setPopup({
+              kind: "confirm",
+              title: "¿Dar de baja a este trabajador?",
+              message:
+                "Esta acción es permanente. Se eliminarán los datos del trabajador de todas las pólizas de la empresa y no podrán recuperarse.",
+              onConfirm: () => {
+                const next: Empresa = {
+                  ...empresa,
+                  polizas: empresa.polizas.map((p) => ({
+                    ...p,
+                    asegurados: p.asegurados.filter(
+                      (a) => a.trabajadorId !== base.asegurado.trabajadorId,
+                    ),
+                  })),
+                };
+                saveEmpresa(next);
+                setPopup({
+                  kind: "info",
+                  title: "Trabajador dado de baja",
+                  message:
+                    "Los datos del trabajador se eliminaron de las pólizas.",
+                });
+                setTimeout(() => router.history.back(), 600);
+              },
+            })
+          }
+          className="rounded-full bg-orange-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-600"
+        >
           Dar de baja
         </button>
         <button
@@ -338,6 +370,8 @@ function PerfilEmpleadoPage() {
         Copyrights ©{" "}
         <span className="text-[color:var(--brand-blue)]">Zinois</span>
       </p>
+
+      {popup && <Popup state={popup} onClose={() => setPopup(null)} />}
     </div>
   );
 }
