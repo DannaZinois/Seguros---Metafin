@@ -123,8 +123,20 @@ export function deleteEmpresa(id: string) {
 export function seedEmpresasIfEmpty(seeds: Empresa[]) {
   if (typeof window === "undefined") return;
   const existing = read();
-  if (existing.length > 0) return;
-  write(seeds);
+  // Re-seed if empty, or if existing seeded entries are missing the richer
+  // dummy data (asegurados/comprobantes). Preserves user-created empresas
+  // that aren't in the seed set.
+  if (existing.length === 0) {
+    write(seeds);
+    return;
+  }
+  const seedIds = new Set(seeds.map((s) => s.id));
+  const userCreated = existing.filter((e) => !seedIds.has(e.id));
+  const needsRefresh = seeds.some((s) => {
+    const cur = existing.find((e) => e.id === s.id);
+    return !cur || cur.polizas.some((p) => p.asegurados.length === 0);
+  });
+  if (needsRefresh) write([...userCreated, ...seeds]);
 }
 
 export function newEncargado(): Encargado {

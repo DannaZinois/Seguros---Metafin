@@ -1,4 +1,4 @@
-import type { Empresa } from "@/lib/empresa-store";
+import type { Asegurado, Comprobante, Empresa } from "@/lib/empresa-store";
 
 export type ClienteStatus = "Activa" | "Cancelada" | "En revisión" | "Por renovar";
 export type TipoCliente = "Personal" | "Empresa";
@@ -206,6 +206,41 @@ export function buildEmpresaSeeds(): Empresa[] {
     E880201: "Construcción y obra civil",
     E880301: "Desarrollo de software",
   };
+  const NOMBRES = [
+    "Andrés Gutiérrez", "Sofía Mendoza", "Luis Alvarado", "Mariana Ríos",
+    "Pablo Cárdenas", "Renata Vega", "Diego Fuentes", "Camila Soto",
+    "Iván Pacheco", "Valeria Ramos", "Héctor Solís", "Paola Aguirre",
+  ];
+  const buildAsegurados = (polizaId: string, count: number): Asegurado[] =>
+    Array.from({ length: count }).map((_, i) => {
+      const nombre = NOMBRES[(i + polizaId.length) % NOMBRES.length];
+      const slug = nombre.toLowerCase().normalize("NFD").replace(/[^a-z ]/g, "").replace(/ /g, ".");
+      const statuses: Asegurado["status"][] = ["Activa", "Activa", "Activa", "Por renovar", "En revisión"];
+      return {
+        id: `${polizaId}-a-${i}`,
+        trabajadorId: `T${1000 + i}`,
+        nombre,
+        poliza: polizaId,
+        vigencia: "01/15/2024",
+        renovacion: "01/15/2025",
+        correo: `${slug}@empresa.com`,
+        telefono: `+52 55 ${String(1000 + i * 7).padStart(4, "0")} ${String(2000 + i * 11).padStart(4, "0")}`,
+        consentimiento: i % 3 !== 0,
+        certificado: i % 2 === 0,
+        status: statuses[i % statuses.length],
+      };
+    });
+  const buildComprobantes = (polizaId: string, count: number): Comprobante[] =>
+    Array.from({ length: count }).map((_, i) => ({
+      id: `${polizaId}-c-${i}`,
+      poliza: polizaId,
+      tipoPago: i % 2 === 0 ? "Cliente" : "Asesor",
+      fechaPago: `0${(i % 9) + 1}/15/2024`,
+      recibo: i % 2 === 0,
+      fechaCarga: `0${(i % 9) + 1}/18/2024`,
+      comprobante: i !== 1,
+      estatus: i === 1 ? "Sin archivo" : "Cargado",
+    }));
   return CLIENTES.filter((c) => c.tipo === "Empresa").map((c) => ({
     id: c.clienteId,
     nombre: c.profile.nombre,
@@ -229,12 +264,12 @@ export function buildEmpresaSeeds(): Empresa[] {
       contacto: c.profile.contacto,
       codigoPostal: c.profile.codigoPostal,
       tipoPago: "Mensual",
-      numAsegurados: "0050",
+      numAsegurados: String(8 + (p.id.charCodeAt(p.id.length - 1) % 6)).padStart(4, "0"),
       rfc: c.profile.rfc,
-      envio: null,
-      asegurados: [],
-      comprobantes: [],
-      comentarios: "",
+      envio: "whatsapp",
+      asegurados: buildAsegurados(p.id, 8 + (p.id.charCodeAt(p.id.length - 1) % 6)),
+      comprobantes: buildComprobantes(p.id, 4),
+      comentarios: `Póliza ${p.tipoSeguro} con ${p.aseguradora}. Renovación programada para ${p.renovacion}.`,
       vigencia: p.vigencia,
       estatus: (p.status === "Cancelada" ? "Vencida" : "Vigente") as "Vigente" | "Vencida",
     })),
