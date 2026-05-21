@@ -80,14 +80,6 @@ function ClientLayout() {
             Otros
           </p>
           <div className="mt-3 space-y-2">
-            <a
-              href={waUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full items-center gap-3 rounded-xl bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-sm hover:brightness-95"
-            >
-              <MessageCircle className="h-5 w-5" /> Contactar al admin
-            </a>
             <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-foreground/80 hover:bg-white">
               <Settings className="h-5 w-5" /> Settings
             </button>
