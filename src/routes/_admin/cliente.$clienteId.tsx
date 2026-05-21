@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { ArrowLeft, Download } from "lucide-react";
 import { DatosGeneralesReadonly } from "@/components/cotizador/datos-generales-readonly";
+import { emptyDraft, saveDraft } from "@/lib/cotizador-draft";
 
 export const Route = createFileRoute("/_admin/cliente/$clienteId")({
   component: PerfilCliente,
@@ -39,6 +40,22 @@ function PerfilCliente() {
   const router = useRouter();
   const { clienteId } = Route.useParams();
 
+  const nuevaPoliza = () => {
+    saveDraft({
+      ...emptyDraft(),
+      nombre: "John Doe",
+      contacto: "+000 000 000",
+      correoContacto: "johndoe@correo.com",
+      tipoAsegurado: "Individual",
+      sexo: "Masculino",
+      codigoPostal: "00000",
+      fechaNacimiento: "1990-01-01",
+      fechaAntiguedad: "2024-01-01",
+      tipoPersona: "Persona Física",
+    });
+    router.navigate({ to: "/cotizadores" });
+  };
+
   return (
     <div>
       <div className="flex items-start gap-4">
@@ -63,7 +80,7 @@ function PerfilCliente() {
       <section className="mt-6 rounded-3xl border border-border bg-white p-6 shadow-sm">
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-bold text-foreground">Pólizas del cliente</h2>
-          <button className="inline-flex items-center gap-1 rounded-full bg-violet-500 px-4 py-1.5 text-xs font-medium text-white hover:bg-violet-600">
+          <button onClick={nuevaPoliza} className="inline-flex items-center gap-1 rounded-full bg-violet-500 px-4 py-1.5 text-xs font-medium text-white hover:bg-violet-600">
             + Nueva póliza
           </button>
         </div>
