@@ -184,22 +184,20 @@ function PerfilEmpresaPage() {
               <Field label="Nombre completo">
                 <TextInput
                   value={form.nombre}
-                  onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                  onChange={(v) => setForm({ ...form, nombre: v })}
                 />
               </Field>
               <Field label="Número de contacto">
                 <TextInput
                   value={form.contacto}
-                  onChange={(e) =>
-                    setForm({ ...form, contacto: e.target.value })
-                  }
+                  onChange={(v) => setForm({ ...form, contacto: v })}
                 />
               </Field>
               <Field label="Correo electrónico">
                 <TextInput
                   type="email"
                   value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  onChange={(v) => setForm({ ...form, email: v })}
                 />
               </Field>
               <Field label="Tipo de acceso">
