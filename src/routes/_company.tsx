@@ -11,9 +11,6 @@ import {
   Users,
   Receipt,
   LogOut,
-  Bell,
-  Settings,
-  HelpCircle,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import cityBg from "@/assets/city-skyline.png";
@@ -70,23 +67,12 @@ function CompanyLayout() {
         </nav>
 
         <div className="mt-6">
-          <p className="px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Otros
-          </p>
-          <div className="mt-3 space-y-2">
-            <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-foreground/80 hover:bg-white">
-              <Settings className="h-5 w-5" /> Settings
-            </button>
-            <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-foreground/80 hover:bg-white">
-              <HelpCircle className="h-5 w-5" /> Ayuda
-            </button>
-            <button
-              onClick={onLogout}
-              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-destructive hover:bg-white"
-            >
-              <LogOut className="h-5 w-5" /> Cerrar sesión
-            </button>
-          </div>
+          <button
+            onClick={onLogout}
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-destructive hover:bg-white"
+          >
+            <LogOut className="h-5 w-5" /> Cerrar sesión
+          </button>
         </div>
 
         <img
@@ -99,10 +85,6 @@ function CompanyLayout() {
 
       <div className="flex flex-1 flex-col bg-white">
         <header className="flex items-center justify-end gap-4 border-b border-border bg-[color:var(--brand-bg-soft)]/60 px-10 py-4">
-          <button className="relative rounded-full p-2 text-muted-foreground hover:bg-white">
-            <Bell className="h-5 w-5" />
-            <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" />
-          </button>
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full bg-muted" />
             <div className="text-right">
