@@ -85,7 +85,12 @@ function useStore<T>(key: string, fallback: T) {
 }
 
 export function useAseguradoras() {
-  return useStore<Aseguradora[]>(AS_KEY, DUMMY_ASEGURADORAS);
+  const result = useStore<Aseguradora[]>(AS_KEY, DUMMY_ASEGURADORAS);
+  const [list] = result;
+  if (typeof window !== "undefined" && Array.isArray(list) && list.length === 0) {
+    write(AS_KEY, DUMMY_ASEGURADORAS);
+  }
+  return result;
 }
 
 export interface ChatMessage {
