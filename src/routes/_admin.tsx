@@ -4,6 +4,7 @@ import {
   Outlet,
   useRouter,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -31,9 +32,11 @@ function AdminLayout() {
   };
 
   // Client-side guard
-  if (typeof window !== "undefined" && !user) {
-    router.navigate({ to: "/login" });
-  }
+  useEffect(() => {
+    if (typeof window !== "undefined" && !user) {
+      router.navigate({ to: "/login" });
+    }
+  }, [user, router]);
 
   const navItems = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
