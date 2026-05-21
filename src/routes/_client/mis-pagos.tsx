@@ -21,7 +21,7 @@ function today() {
   return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`;
 }
 
-const FORMAS_PAGO = ["Mensual", "Trimestral", "Semestral", "Anual"] as const;
+const FORMAS_PAGO = ["Domiciliado", "Asesor", "Transferencia"] as const;
 const formaPagoFor = (id: string) =>
   FORMAS_PAGO[id.charCodeAt(id.length - 1) % FORMAS_PAGO.length];
 
