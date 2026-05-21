@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_admin")({
 });
 
 function AdminLayout() {
-  const { user, logout } = useAuth();
+  const { user, ready, logout } = useAuth();
   const router = useRouter();
 
   const onLogout = () => {
@@ -33,10 +33,10 @@ function AdminLayout() {
 
   // Client-side guard
   useEffect(() => {
-    if (typeof window !== "undefined" && !user) {
+    if (ready && !user) {
       router.navigate({ to: "/login" });
     }
-  }, [user, router]);
+  }, [ready, user, router]);
 
   const navItems = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
