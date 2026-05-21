@@ -15,11 +15,14 @@ import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CompanySegurosRouteImport } from './routes/_company/seguros'
 import { Route as CompanyPerfilRouteImport } from './routes/_company/perfil'
+import { Route as CompanyPagosRouteImport } from './routes/_company/pagos'
+import { Route as CompanyEmpleadosRouteImport } from './routes/_company/empleados'
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
 import { Route as AdminCuestionarioRouteImport } from './routes/_admin/cuestionario'
 import { Route as AdminCotizadoresRouteImport } from './routes/_admin/cotizadores'
 import { Route as AdminCarteraRouteImport } from './routes/_admin/cartera'
 import { Route as AdminAseguradorasRouteImport } from './routes/_admin/aseguradoras'
+import { Route as CompanySegurosPolizaIdRouteImport } from './routes/_company/seguros.$polizaId'
 import { Route as AdminEmpresaNuevaRouteImport } from './routes/_admin/empresa.nueva'
 import { Route as AdminClienteClienteIdRouteImport } from './routes/_admin/cliente.$clienteId'
 import { Route as AdminEmpresaPolizaNuevaRouteImport } from './routes/_admin/empresa.poliza.nueva'
@@ -55,6 +58,16 @@ const CompanyPerfilRoute = CompanyPerfilRouteImport.update({
   path: '/perfil',
   getParentRoute: () => CompanyRoute,
 } as any)
+const CompanyPagosRoute = CompanyPagosRouteImport.update({
+  id: '/pagos',
+  path: '/pagos',
+  getParentRoute: () => CompanyRoute,
+} as any)
+const CompanyEmpleadosRoute = CompanyEmpleadosRouteImport.update({
+  id: '/empleados',
+  path: '/empleados',
+  getParentRoute: () => CompanyRoute,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -79,6 +92,11 @@ const AdminAseguradorasRoute = AdminAseguradorasRouteImport.update({
   id: '/aseguradoras',
   path: '/aseguradoras',
   getParentRoute: () => AdminRoute,
+} as any)
+const CompanySegurosPolizaIdRoute = CompanySegurosPolizaIdRouteImport.update({
+  id: '/$polizaId',
+  path: '/$polizaId',
+  getParentRoute: () => CompanySegurosRoute,
 } as any)
 const AdminEmpresaNuevaRoute = AdminEmpresaNuevaRouteImport.update({
   id: '/empresa/nueva',
@@ -122,10 +140,13 @@ export interface FileRoutesByFullPath {
   '/cotizadores': typeof AdminCotizadoresRoute
   '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/empleados': typeof CompanyEmpleadosRoute
+  '/pagos': typeof CompanyPagosRoute
   '/perfil': typeof CompanyPerfilRoute
-  '/seguros': typeof CompanySegurosRoute
+  '/seguros': typeof CompanySegurosRouteWithChildren
   '/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/empresa/nueva': typeof AdminEmpresaNuevaRoute
+  '/seguros/$polizaId': typeof CompanySegurosPolizaIdRoute
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
   '/cliente/$clienteId/poliza/$polizaId': typeof AdminClienteClienteIdPolizaPolizaIdRoute
@@ -139,10 +160,13 @@ export interface FileRoutesByTo {
   '/cotizadores': typeof AdminCotizadoresRoute
   '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/empleados': typeof CompanyEmpleadosRoute
+  '/pagos': typeof CompanyPagosRoute
   '/perfil': typeof CompanyPerfilRoute
-  '/seguros': typeof CompanySegurosRoute
+  '/seguros': typeof CompanySegurosRouteWithChildren
   '/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/empresa/nueva': typeof AdminEmpresaNuevaRoute
+  '/seguros/$polizaId': typeof CompanySegurosPolizaIdRoute
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
   '/cliente/$clienteId/poliza/$polizaId': typeof AdminClienteClienteIdPolizaPolizaIdRoute
@@ -159,10 +183,13 @@ export interface FileRoutesById {
   '/_admin/cotizadores': typeof AdminCotizadoresRoute
   '/_admin/cuestionario': typeof AdminCuestionarioRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
+  '/_company/empleados': typeof CompanyEmpleadosRoute
+  '/_company/pagos': typeof CompanyPagosRoute
   '/_company/perfil': typeof CompanyPerfilRoute
-  '/_company/seguros': typeof CompanySegurosRoute
+  '/_company/seguros': typeof CompanySegurosRouteWithChildren
   '/_admin/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/_admin/empresa/nueva': typeof AdminEmpresaNuevaRoute
+  '/_company/seguros/$polizaId': typeof CompanySegurosPolizaIdRoute
   '/_admin/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/_admin/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
   '/_admin/cliente/$clienteId/poliza/$polizaId': typeof AdminClienteClienteIdPolizaPolizaIdRoute
@@ -178,10 +205,13 @@ export interface FileRouteTypes {
     | '/cotizadores'
     | '/cuestionario'
     | '/dashboard'
+    | '/empleados'
+    | '/pagos'
     | '/perfil'
     | '/seguros'
     | '/cliente/$clienteId'
     | '/empresa/nueva'
+    | '/seguros/$polizaId'
     | '/empresa/poliza/$polizaId'
     | '/empresa/poliza/nueva'
     | '/cliente/$clienteId/poliza/$polizaId'
@@ -195,10 +225,13 @@ export interface FileRouteTypes {
     | '/cotizadores'
     | '/cuestionario'
     | '/dashboard'
+    | '/empleados'
+    | '/pagos'
     | '/perfil'
     | '/seguros'
     | '/cliente/$clienteId'
     | '/empresa/nueva'
+    | '/seguros/$polizaId'
     | '/empresa/poliza/$polizaId'
     | '/empresa/poliza/nueva'
     | '/cliente/$clienteId/poliza/$polizaId'
@@ -214,10 +247,13 @@ export interface FileRouteTypes {
     | '/_admin/cotizadores'
     | '/_admin/cuestionario'
     | '/_admin/dashboard'
+    | '/_company/empleados'
+    | '/_company/pagos'
     | '/_company/perfil'
     | '/_company/seguros'
     | '/_admin/cliente/$clienteId'
     | '/_admin/empresa/nueva'
+    | '/_company/seguros/$polizaId'
     | '/_admin/empresa/poliza/$polizaId'
     | '/_admin/empresa/poliza/nueva'
     | '/_admin/cliente/$clienteId/poliza/$polizaId'
@@ -275,6 +311,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompanyPerfilRouteImport
       parentRoute: typeof CompanyRoute
     }
+    '/_company/pagos': {
+      id: '/_company/pagos'
+      path: '/pagos'
+      fullPath: '/pagos'
+      preLoaderRoute: typeof CompanyPagosRouteImport
+      parentRoute: typeof CompanyRoute
+    }
+    '/_company/empleados': {
+      id: '/_company/empleados'
+      path: '/empleados'
+      fullPath: '/empleados'
+      preLoaderRoute: typeof CompanyEmpleadosRouteImport
+      parentRoute: typeof CompanyRoute
+    }
     '/_admin/dashboard': {
       id: '/_admin/dashboard'
       path: '/dashboard'
@@ -309,6 +359,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/aseguradoras'
       preLoaderRoute: typeof AdminAseguradorasRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/_company/seguros/$polizaId': {
+      id: '/_company/seguros/$polizaId'
+      path: '/$polizaId'
+      fullPath: '/seguros/$polizaId'
+      preLoaderRoute: typeof CompanySegurosPolizaIdRouteImport
+      parentRoute: typeof CompanySegurosRoute
     }
     '/_admin/empresa/nueva': {
       id: '/_admin/empresa/nueva'
@@ -398,14 +455,30 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface CompanySegurosRouteChildren {
+  CompanySegurosPolizaIdRoute: typeof CompanySegurosPolizaIdRoute
+}
+
+const CompanySegurosRouteChildren: CompanySegurosRouteChildren = {
+  CompanySegurosPolizaIdRoute: CompanySegurosPolizaIdRoute,
+}
+
+const CompanySegurosRouteWithChildren = CompanySegurosRoute._addFileChildren(
+  CompanySegurosRouteChildren,
+)
+
 interface CompanyRouteChildren {
+  CompanyEmpleadosRoute: typeof CompanyEmpleadosRoute
+  CompanyPagosRoute: typeof CompanyPagosRoute
   CompanyPerfilRoute: typeof CompanyPerfilRoute
-  CompanySegurosRoute: typeof CompanySegurosRoute
+  CompanySegurosRoute: typeof CompanySegurosRouteWithChildren
 }
 
 const CompanyRouteChildren: CompanyRouteChildren = {
+  CompanyEmpleadosRoute: CompanyEmpleadosRoute,
+  CompanyPagosRoute: CompanyPagosRoute,
   CompanyPerfilRoute: CompanyPerfilRoute,
-  CompanySegurosRoute: CompanySegurosRoute,
+  CompanySegurosRoute: CompanySegurosRouteWithChildren,
 }
 
 const CompanyRouteWithChildren =
