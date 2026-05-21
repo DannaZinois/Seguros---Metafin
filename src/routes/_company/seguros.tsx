@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Trash2, X, Plus, Upload, UserPlus, Loader2, CheckCircle2 } from "lucide-react";
+import { Trash2, X, Plus, Upload, UserPlus, Loader2, CheckCircle2, Pencil } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   Section,
@@ -25,6 +25,7 @@ function SegurosPage() {
   const [nuevoOpen, setNuevoOpen] = useState(false);
   type NuevoStep = "form" | "reviewing" | "approved";
   const [step, setStep] = useState<NuevoStep>("form");
+  const [editingId, setEditingId] = useState<string | null>(null);
   const bulkRef = useRef<HTMLInputElement | null>(null);
   const initialNuevo = {
     tipo: "",
@@ -75,6 +76,25 @@ function SegurosPage() {
     setNuevoOpen(false);
     setNuevo(initialNuevo);
     setStep("form");
+    setEditingId(null);
+  };
+
+  const handleEdit = (p: Poliza) => {
+    setEditingId(p.id);
+    setNuevo({
+      tipo: p.tipo ?? "",
+      aseguradora: p.aseguradora ?? "",
+      contratante: p.contratante ?? "",
+      contacto: p.contacto ?? "",
+      codigoPostal: p.codigoPostal ?? "",
+      tipoPago: p.tipoPago ?? "",
+      numAsegurados: p.numAsegurados ?? "",
+      rfc: p.rfc ?? "",
+      vigencia: p.vigencia ?? "",
+      comentarios: "",
+    });
+    setStep("form");
+    setNuevoOpen(true);
   };
 
   const handleSolicitar = () => {
@@ -83,6 +103,15 @@ function SegurosPage() {
         kind: "error",
         title: "Datos incompletos",
         message: "Tipo de póliza y aseguradora son obligatorios.",
+      });
+      return;
+    }
+    if (editingId) {
+      closeNuevo();
+      setPopup({
+        kind: "info",
+        title: "Cambios guardados",
+        message: `Se actualizaron los datos de la póliza ${nuevo.tipo}.`,
       });
       return;
     }
