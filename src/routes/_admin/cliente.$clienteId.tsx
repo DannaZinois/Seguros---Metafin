@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { ArrowLeft, Download } from "lucide-react";
-import { Section, Grid, Field, TextInput, DateInput, Select } from "@/components/cotizador/shared";
+import { DatosGeneralesReadonly } from "@/components/cotizador/datos-generales-readonly";
 
 export const Route = createFileRoute("/_admin/cliente/$clienteId")({
   component: PerfilCliente,
@@ -30,9 +30,9 @@ interface PolizaRow {
 }
 
 const POLIZAS: PolizaRow[] = [
-  { id: "F990234", contratante: "John Doe", asegurado: "John Doe", poliza: "Póliza aquí", vigencia: "01/01/2024", renovacion: "01/01/2024", correo: "johndoe@correo.com", telefono: "+000 000 000", consentimiento: true, certificado: true, status: "Activa" },
-  { id: "F990233", contratante: "John Doe", asegurado: "John Doe", poliza: "Póliza aquí", vigencia: "12/01/2023", renovacion: "12/01/2023", correo: "johndoe@correo.com", telefono: "+000 000 000", consentimiento: false, certificado: false, status: "Cancelada" },
-  { id: "F990232", contratante: "John Doe", asegurado: "John Doe", poliza: "Póliza aquí", vigencia: "11/01/2023", renovacion: "11/01/2023", correo: "johndoe@correo.com", telefono: "+000 000 000", consentimiento: true, certificado: true, status: "En revisión" },
+  { id: "F990234", contratante: "John Doe", asegurado: "John Doe", poliza: "GMM", vigencia: "01/01/2024", renovacion: "01/01/2024", correo: "johndoe@correo.com", telefono: "+000 000 000", consentimiento: true, certificado: true, status: "Activa" },
+  { id: "F990233", contratante: "John Doe", asegurado: "John Doe", poliza: "Auto", vigencia: "12/01/2023", renovacion: "12/01/2023", correo: "johndoe@correo.com", telefono: "+000 000 000", consentimiento: false, certificado: false, status: "Cancelada" },
+  { id: "F990232", contratante: "John Doe", asegurado: "John Doe", poliza: "Vida", vigencia: "11/01/2023", renovacion: "11/01/2023", correo: "johndoe@correo.com", telefono: "+000 000 000", consentimiento: true, certificado: true, status: "En revisión" },
 ];
 
 function PerfilCliente() {
@@ -58,40 +58,7 @@ function PerfilCliente() {
         </div>
       </div>
 
-      <Section title="Datos generales">
-        <Grid>
-          <Field label="Nombre completo del contratante*">
-            <TextInput value="" onChange={() => {}} placeholder="Nombre aquí" />
-          </Field>
-          <Field label="Número de contacto*">
-            <TextInput value="" onChange={() => {}} placeholder="+00 0000 0000 00" />
-          </Field>
-          <Field label="Tipo de asegurado">
-            <Select value="" onChange={() => {}} options={["Titular", "Familiar", "Otro asegurado"]} placeholder="Nombre aquí" />
-          </Field>
-          <Field label="Correo de contacto*">
-            <TextInput value="" onChange={() => {}} placeholder="correo@dominio.com" />
-          </Field>
-          <Field label="Sexo">
-            <Select value="" onChange={() => {}} options={["Masculino", "Femenino", "Otro"]} placeholder="Nombre aquí" />
-          </Field>
-          <Field label="Código postal*">
-            <TextInput value="" onChange={() => {}} placeholder="00000" />
-          </Field>
-          <Field label="Fecha de nacimiento">
-            <DateInput value="" onChange={() => {}} />
-          </Field>
-          <Field label="Fecha de antigüedad">
-            <DateInput value="" onChange={() => {}} />
-          </Field>
-          <Field label="Tipo de seguro">
-            <Select value="" onChange={() => {}} options={["Auto", "Vida", "GMM", "Exceso"]} placeholder="Nombre aquí" />
-          </Field>
-          <Field label="Tipo de persona">
-            <Select value="" onChange={() => {}} options={["Física", "Moral"]} placeholder="Nombre aquí" />
-          </Field>
-        </Grid>
-      </Section>
+      <DatosGeneralesReadonly />
 
       <section className="mt-6 rounded-3xl border border-border bg-white p-6 shadow-sm">
         <div className="flex items-center gap-4">
@@ -113,17 +80,17 @@ function PerfilCliente() {
             <tbody>
               {POLIZAS.map((p) => (
                 <tr key={p.id} className="border-t border-border/60 hover:bg-muted/40">
+                  <td className="py-3 text-foreground/80">{p.contratante}</td>
+                  <td className="py-3 text-foreground/80">{p.asegurado}</td>
                   <td className="py-3">
                     <Link
                       to="/cliente/$clienteId/poliza/$polizaId"
                       params={{ clienteId, polizaId: p.id }}
                       className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
                     >
-                      {p.contratante}
+                      {p.poliza}
                     </Link>
                   </td>
-                  <td className="py-3 text-foreground/80">{p.asegurado}</td>
-                  <td className="py-3 text-foreground/80">{p.poliza}</td>
                   <td className="py-3 text-foreground/80">{p.vigencia}</td>
                   <td className="py-3 text-foreground/80">{p.renovacion}</td>
                   <td className="py-3 text-foreground/80">{p.correo}</td>
