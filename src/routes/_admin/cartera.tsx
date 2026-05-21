@@ -143,7 +143,7 @@ function CarteraPage() {
               {pageRows.map((r, idx) => (
                 <tr
                   key={idx}
-                  className="border-b border-border/60 last:border-0 hover:bg-muted/40"
+                  className="border-b border-border/60 last:border-0"
                 >
                   <td className="px-5 py-3.5 align-middle whitespace-nowrap">
                     {r.tipo === "Empresa" ? (
