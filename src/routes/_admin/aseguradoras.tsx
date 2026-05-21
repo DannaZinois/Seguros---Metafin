@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Plus, Trash2, FileText, Upload, Pencil, X, ImageIcon, ChevronDown, ChevronUp, FileSpreadsheet } from "lucide-react";
 import { useAseguradoras, type Aseguradora, type PolizaTipo, type TipoSeguro, type VariantePoliza } from "@/lib/store";
 
@@ -22,6 +22,39 @@ const SEED: Aseguradora[] = [
     appUrl: "https://apps.apple.com/mx/app/axa-mexico",
     usuario: "agente_axa01",
     contrasena: "Demo$2025",
+    claveAgente: "AXA-AG-44218",
+    polizas: [
+      {
+        id: "axa-auto",
+        tipo: "Auto",
+        variantes: [
+          { id: "axa-auto-1", nombre: "Amplia Plus", pdfName: "axa-auto-amplia.pdf", wordName: "axa-auto-amplia.docx" },
+          { id: "axa-auto-2", nombre: "Limitada", pdfName: "axa-auto-limitada.pdf", wordName: "axa-auto-limitada.docx" },
+        ],
+      },
+      {
+        id: "axa-vida",
+        tipo: "Vida",
+        variantes: [
+          { id: "axa-vida-1", nombre: "Vida Temporal", pdfName: "axa-vida-temporal.pdf", wordName: "axa-vida-temporal.docx" },
+        ],
+      },
+      {
+        id: "axa-gmm",
+        tipo: "Gastos médicos mayores",
+        variantes: [
+          { id: "axa-gmm-1", nombre: "Versátil", pdfName: "axa-gmm-versatil.pdf", wordName: "axa-gmm-versatil.docx" },
+          { id: "axa-gmm-2", nombre: "Flex Plus", pdfName: "axa-gmm-flex.pdf", wordName: "axa-gmm-flex.docx" },
+        ],
+      },
+      {
+        id: "axa-exceso",
+        tipo: "Exceso",
+        variantes: [
+          { id: "axa-exceso-1", nombre: "Exceso RC", pdfName: "axa-exceso-rc.pdf", wordName: "axa-exceso-rc.docx" },
+        ],
+      },
+    ],
   },
   {
     id: "seed-gnp",
@@ -36,6 +69,39 @@ const SEED: Aseguradora[] = [
     appUrl: "https://play.google.com/store/apps/details?id=mx.gnp",
     usuario: "agente_gnp22",
     contrasena: "Gnp#Demo99",
+    claveAgente: "GNP-AG-90821",
+    polizas: [
+      {
+        id: "gnp-auto",
+        tipo: "Auto",
+        variantes: [
+          { id: "gnp-auto-1", nombre: "Auto Total", pdfName: "gnp-auto-total.pdf", wordName: "gnp-auto-total.docx" },
+        ],
+      },
+      {
+        id: "gnp-vida",
+        tipo: "Vida",
+        variantes: [
+          { id: "gnp-vida-1", nombre: "Vida Plus", pdfName: "gnp-vida-plus.pdf", wordName: "gnp-vida-plus.docx" },
+          { id: "gnp-vida-2", nombre: "Vida Inversión", pdfName: "gnp-vida-inv.pdf", wordName: "gnp-vida-inv.docx" },
+        ],
+      },
+      {
+        id: "gnp-gmm",
+        tipo: "Gastos médicos mayores",
+        variantes: [
+          { id: "gnp-gmm-1", nombre: "Médica Plus", pdfName: "gnp-gmm-plus.pdf", wordName: "gnp-gmm-plus.docx" },
+        ],
+      },
+      {
+        id: "gnp-exceso",
+        tipo: "Exceso",
+        variantes: [
+          { id: "gnp-exceso-1", nombre: "Exceso Auto", pdfName: "gnp-exceso-auto.pdf", wordName: "gnp-exceso-auto.docx" },
+          { id: "gnp-exceso-2", nombre: "Exceso RC Empresarial", pdfName: "gnp-exceso-rc.pdf", wordName: "gnp-exceso-rc.docx" },
+        ],
+      },
+    ],
   },
 ];
 
@@ -47,6 +113,7 @@ function AseguradorasPage() {
   const [editing, setEditing] = useState<Aseguradora | null>(null);
   const [open, setOpen] = useState(false);
   const [polizasMode, setPolizasMode] = useState(false);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [polizaDraft, setPolizaDraft] = useState<PolizaTipo>({
     id: "",
     tipo: "Auto",
@@ -217,6 +284,7 @@ function AseguradorasPage() {
           <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Field label="Usuario" value={draft.usuario ?? ""} onChange={(v) => setField("usuario", v)} />
             <Field label="Contraseña" value={draft.contrasena ?? ""} onChange={(v) => setField("contrasena", v)} type="password" />
+            <Field label="Clave agente en la aseguradora" value={draft.claveAgente ?? ""} onChange={(v) => setField("claveAgente", v)} />
           </div>
         </div>
 
@@ -265,9 +333,19 @@ function AseguradorasPage() {
               </tr>
             )}
             {list.map((a) => (
-              <tr key={a.id} className="border-b border-border/60 last:border-0">
+              <RowGroup key={a.id}>
+              <tr className="border-b border-border/60 last:border-0">
                 <td className="px-6 py-4 font-medium text-foreground">
-                  <span className="inline-flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setExpanded((e) => ({ ...e, [a.id]: !e[a.id] }))}
+                    className="inline-flex items-center gap-3 text-left hover:underline"
+                  >
+                    {expanded[a.id] ? (
+                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    )}
                     {a.imageDataUrl ? (
                       <img src={a.imageDataUrl} alt={a.name} className="h-9 w-9 rounded-full object-cover" />
                     ) : (
@@ -276,7 +354,7 @@ function AseguradorasPage() {
                       </span>
                     )}
                     {a.name}
-                  </span>
+                  </button>
                 </td>
                 <td className="px-6 py-4 text-foreground/80">{a.abreviacion || "—"}</td>
                 <td className="px-6 py-4 text-foreground/80">{a.ejecutivo || "—"}</td>
@@ -302,6 +380,14 @@ function AseguradorasPage() {
                   </div>
                 </td>
               </tr>
+              {expanded[a.id] && (
+                <tr className="border-b border-border/60 bg-muted/20">
+                  <td colSpan={5} className="px-6 py-4">
+                    <PolizasResumen polizas={a.polizas ?? []} />
+                  </td>
+                </tr>
+              )}
+              </RowGroup>
             ))}
           </tbody>
         </table>
@@ -318,6 +404,61 @@ function AseguradorasPage() {
 }
 
 const TIPOS_SEGURO: TipoSeguro[] = ["Auto", "Vida", "Gastos médicos mayores", "Exceso"];
+
+function RowGroup({ children }: { children: ReactNode }) {
+  return <>{children}</>;
+}
+
+function PolizasResumen({ polizas }: { polizas: PolizaTipo[] }) {
+  if (polizas.length === 0) {
+    return <p className="text-sm text-muted-foreground">Sin pólizas registradas.</p>;
+  }
+  return (
+    <div className="space-y-4">
+      {TIPOS_SEGURO.map((tipo) => {
+        const grupo = polizas.find((p) => p.tipo === tipo);
+        const variantes = grupo?.variantes ?? [];
+        return (
+          <div key={tipo} className="overflow-hidden rounded-2xl border border-border bg-white">
+            <div className="border-b border-border bg-muted/40 px-4 py-2 text-xs font-semibold text-foreground">
+              {tipo} {variantes.length > 0 && <span className="text-muted-foreground">({variantes.length})</span>}
+            </div>
+            {variantes.length === 0 ? (
+              <div className="px-4 py-3 text-xs text-muted-foreground">Sin variantes registradas.</div>
+            ) : (
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-border text-xs text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-2 font-medium">Nombre</th>
+                    <th className="px-4 py-2 font-medium">PDF</th>
+                    <th className="px-4 py-2 font-medium">Word</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {variantes.map((v, idx) => (
+                    <tr key={v.id} className="border-b border-border/60 last:border-0">
+                      <td className="px-4 py-2 text-foreground">{v.nombre || `Variante ${idx + 1}`}</td>
+                      <td className="px-4 py-2 text-foreground/80">
+                        {v.pdfName ? (
+                          <span className="inline-flex items-center gap-1.5"><FileText className="h-3.5 w-3.5" />{v.pdfName}</span>
+                        ) : "—"}
+                      </td>
+                      <td className="px-4 py-2 text-foreground/80">
+                        {v.wordName ? (
+                          <span className="inline-flex items-center gap-1.5"><FileSpreadsheet className="h-3.5 w-3.5" />{v.wordName}</span>
+                        ) : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 function PolizasForm({
   draft,
@@ -541,6 +682,7 @@ function EditDialog({
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <Field label="Usuario" value={form.usuario ?? ""} onChange={(v) => set("usuario", v)} />
             <Field label="Contraseña" value={form.contrasena ?? ""} onChange={(v) => set("contrasena", v)} type="password" />
+            <Field label="Clave agente en la aseguradora" value={form.claveAgente ?? ""} onChange={(v) => set("claveAgente", v)} className="sm:col-span-2" />
           </div>
         </div>
 
