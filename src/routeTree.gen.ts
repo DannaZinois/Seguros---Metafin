@@ -18,8 +18,10 @@ import { Route as AdminCotizadoresRouteImport } from './routes/_admin/cotizadore
 import { Route as AdminCarteraRouteImport } from './routes/_admin/cartera'
 import { Route as AdminAseguradorasRouteImport } from './routes/_admin/aseguradoras'
 import { Route as AdminEmpresaNuevaRouteImport } from './routes/_admin/empresa.nueva'
+import { Route as AdminClienteClienteIdRouteImport } from './routes/_admin/cliente.$clienteId'
 import { Route as AdminEmpresaPolizaNuevaRouteImport } from './routes/_admin/empresa.poliza.nueva'
 import { Route as AdminEmpresaPolizaPolizaIdRouteImport } from './routes/_admin/empresa.poliza.$polizaId'
+import { Route as AdminClienteClienteIdPolizaPolizaIdRouteImport } from './routes/_admin/cliente.$clienteId.poliza.$polizaId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -65,6 +67,11 @@ const AdminEmpresaNuevaRoute = AdminEmpresaNuevaRouteImport.update({
   path: '/empresa/nueva',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminClienteClienteIdRoute = AdminClienteClienteIdRouteImport.update({
+  id: '/cliente/$clienteId',
+  path: '/cliente/$clienteId',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEmpresaPolizaNuevaRoute = AdminEmpresaPolizaNuevaRouteImport.update({
   id: '/empresa/poliza/nueva',
   path: '/empresa/poliza/nueva',
@@ -76,6 +83,12 @@ const AdminEmpresaPolizaPolizaIdRoute =
     path: '/empresa/poliza/$polizaId',
     getParentRoute: () => AdminRoute,
   } as any)
+const AdminClienteClienteIdPolizaPolizaIdRoute =
+  AdminClienteClienteIdPolizaPolizaIdRouteImport.update({
+    id: '/poliza/$polizaId',
+    path: '/poliza/$polizaId',
+    getParentRoute: () => AdminClienteClienteIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -85,9 +98,11 @@ export interface FileRoutesByFullPath {
   '/cotizadores': typeof AdminCotizadoresRoute
   '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
+  '/cliente/$clienteId/poliza/$polizaId': typeof AdminClienteClienteIdPolizaPolizaIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -97,9 +112,11 @@ export interface FileRoutesByTo {
   '/cotizadores': typeof AdminCotizadoresRoute
   '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
+  '/cliente/$clienteId/poliza/$polizaId': typeof AdminClienteClienteIdPolizaPolizaIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -111,9 +128,11 @@ export interface FileRoutesById {
   '/_admin/cotizadores': typeof AdminCotizadoresRoute
   '/_admin/cuestionario': typeof AdminCuestionarioRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
+  '/_admin/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/_admin/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/_admin/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/_admin/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
+  '/_admin/cliente/$clienteId/poliza/$polizaId': typeof AdminClienteClienteIdPolizaPolizaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -125,9 +144,11 @@ export interface FileRouteTypes {
     | '/cotizadores'
     | '/cuestionario'
     | '/dashboard'
+    | '/cliente/$clienteId'
     | '/empresa/nueva'
     | '/empresa/poliza/$polizaId'
     | '/empresa/poliza/nueva'
+    | '/cliente/$clienteId/poliza/$polizaId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -137,9 +158,11 @@ export interface FileRouteTypes {
     | '/cotizadores'
     | '/cuestionario'
     | '/dashboard'
+    | '/cliente/$clienteId'
     | '/empresa/nueva'
     | '/empresa/poliza/$polizaId'
     | '/empresa/poliza/nueva'
+    | '/cliente/$clienteId/poliza/$polizaId'
   id:
     | '__root__'
     | '/'
@@ -150,9 +173,11 @@ export interface FileRouteTypes {
     | '/_admin/cotizadores'
     | '/_admin/cuestionario'
     | '/_admin/dashboard'
+    | '/_admin/cliente/$clienteId'
     | '/_admin/empresa/nueva'
     | '/_admin/empresa/poliza/$polizaId'
     | '/_admin/empresa/poliza/nueva'
+    | '/_admin/cliente/$clienteId/poliza/$polizaId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -226,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEmpresaNuevaRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/cliente/$clienteId': {
+      id: '/_admin/cliente/$clienteId'
+      path: '/cliente/$clienteId'
+      fullPath: '/cliente/$clienteId'
+      preLoaderRoute: typeof AdminClienteClienteIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/empresa/poliza/nueva': {
       id: '/_admin/empresa/poliza/nueva'
       path: '/empresa/poliza/nueva'
@@ -240,8 +272,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEmpresaPolizaPolizaIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/cliente/$clienteId/poliza/$polizaId': {
+      id: '/_admin/cliente/$clienteId/poliza/$polizaId'
+      path: '/poliza/$polizaId'
+      fullPath: '/cliente/$clienteId/poliza/$polizaId'
+      preLoaderRoute: typeof AdminClienteClienteIdPolizaPolizaIdRouteImport
+      parentRoute: typeof AdminClienteClienteIdRoute
+    }
   }
 }
+
+interface AdminClienteClienteIdRouteChildren {
+  AdminClienteClienteIdPolizaPolizaIdRoute: typeof AdminClienteClienteIdPolizaPolizaIdRoute
+}
+
+const AdminClienteClienteIdRouteChildren: AdminClienteClienteIdRouteChildren = {
+  AdminClienteClienteIdPolizaPolizaIdRoute:
+    AdminClienteClienteIdPolizaPolizaIdRoute,
+}
+
+const AdminClienteClienteIdRouteWithChildren =
+  AdminClienteClienteIdRoute._addFileChildren(
+    AdminClienteClienteIdRouteChildren,
+  )
 
 interface AdminRouteChildren {
   AdminAseguradorasRoute: typeof AdminAseguradorasRoute
@@ -249,6 +302,7 @@ interface AdminRouteChildren {
   AdminCotizadoresRoute: typeof AdminCotizadoresRoute
   AdminCuestionarioRoute: typeof AdminCuestionarioRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminClienteClienteIdRoute: typeof AdminClienteClienteIdRouteWithChildren
   AdminEmpresaNuevaRoute: typeof AdminEmpresaNuevaRoute
   AdminEmpresaPolizaPolizaIdRoute: typeof AdminEmpresaPolizaPolizaIdRoute
   AdminEmpresaPolizaNuevaRoute: typeof AdminEmpresaPolizaNuevaRoute
@@ -260,6 +314,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCotizadoresRoute: AdminCotizadoresRoute,
   AdminCuestionarioRoute: AdminCuestionarioRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminClienteClienteIdRoute: AdminClienteClienteIdRouteWithChildren,
   AdminEmpresaNuevaRoute: AdminEmpresaNuevaRoute,
   AdminEmpresaPolizaPolizaIdRoute: AdminEmpresaPolizaPolizaIdRoute,
   AdminEmpresaPolizaNuevaRoute: AdminEmpresaPolizaNuevaRoute,

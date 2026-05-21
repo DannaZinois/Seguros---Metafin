@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { Search, Download, Plus, ChevronLeft, ChevronRight, X, User, Building2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -94,7 +94,6 @@ function CarteraPage() {
             <thead className="border-b border-border bg-white text-muted-foreground">
               <tr>
                 {[
-                  "ID de cliente",
                   "Nombre",
                   "Póliza",
                   "Fecha de renovación",
@@ -117,11 +116,14 @@ function CarteraPage() {
                   key={idx}
                   className="border-b border-border/60 last:border-0 hover:bg-muted/40"
                 >
-                  <td className="px-6 py-4 text-foreground/80">{r.id}</td>
                   <td className="px-6 py-4">
-                    <a href="#" className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline">
+                    <Link
+                      to="/cliente/$clienteId"
+                      params={{ clienteId: r.id.replace(/[^a-zA-Z0-9]/g, "") }}
+                      className="text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
+                    >
                       {r.name}
-                    </a>
+                    </Link>
                   </td>
                   <td className="px-6 py-4 text-foreground/80">{r.poliza}</td>
                   <td className="px-6 py-4 text-foreground/80">{r.renovacion}</td>
