@@ -10,8 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as CompanyRouteImport } from './routes/_company'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CompanySegurosRouteImport } from './routes/_company/seguros'
+import { Route as CompanyPerfilRouteImport } from './routes/_company/perfil'
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
 import { Route as AdminCuestionarioRouteImport } from './routes/_admin/cuestionario'
 import { Route as AdminCotizadoresRouteImport } from './routes/_admin/cotizadores'
@@ -29,6 +32,10 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompanyRoute = CompanyRouteImport.update({
+  id: '/_company',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/_admin',
   getParentRoute: () => rootRouteImport,
@@ -37,6 +44,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const CompanySegurosRoute = CompanySegurosRouteImport.update({
+  id: '/seguros',
+  path: '/seguros',
+  getParentRoute: () => CompanyRoute,
+} as any)
+const CompanyPerfilRoute = CompanyPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => CompanyRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
@@ -105,6 +122,8 @@ export interface FileRoutesByFullPath {
   '/cotizadores': typeof AdminCotizadoresRoute
   '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/perfil': typeof CompanyPerfilRoute
+  '/seguros': typeof CompanySegurosRoute
   '/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
@@ -120,6 +139,8 @@ export interface FileRoutesByTo {
   '/cotizadores': typeof AdminCotizadoresRoute
   '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/perfil': typeof CompanyPerfilRoute
+  '/seguros': typeof CompanySegurosRoute
   '/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
@@ -131,12 +152,15 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_admin': typeof AdminRouteWithChildren
+  '/_company': typeof CompanyRouteWithChildren
   '/login': typeof LoginRoute
   '/_admin/aseguradoras': typeof AdminAseguradorasRoute
   '/_admin/cartera': typeof AdminCarteraRoute
   '/_admin/cotizadores': typeof AdminCotizadoresRoute
   '/_admin/cuestionario': typeof AdminCuestionarioRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
+  '/_company/perfil': typeof CompanyPerfilRoute
+  '/_company/seguros': typeof CompanySegurosRoute
   '/_admin/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/_admin/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/_admin/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
@@ -154,6 +178,8 @@ export interface FileRouteTypes {
     | '/cotizadores'
     | '/cuestionario'
     | '/dashboard'
+    | '/perfil'
+    | '/seguros'
     | '/cliente/$clienteId'
     | '/empresa/nueva'
     | '/empresa/poliza/$polizaId'
@@ -169,6 +195,8 @@ export interface FileRouteTypes {
     | '/cotizadores'
     | '/cuestionario'
     | '/dashboard'
+    | '/perfil'
+    | '/seguros'
     | '/cliente/$clienteId'
     | '/empresa/nueva'
     | '/empresa/poliza/$polizaId'
@@ -179,12 +207,15 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_admin'
+    | '/_company'
     | '/login'
     | '/_admin/aseguradoras'
     | '/_admin/cartera'
     | '/_admin/cotizadores'
     | '/_admin/cuestionario'
     | '/_admin/dashboard'
+    | '/_company/perfil'
+    | '/_company/seguros'
     | '/_admin/cliente/$clienteId'
     | '/_admin/empresa/nueva'
     | '/_admin/empresa/poliza/$polizaId'
@@ -196,6 +227,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  CompanyRoute: typeof CompanyRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
 
@@ -206,6 +238,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_company': {
+      id: '/_company'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof CompanyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_admin': {
@@ -221,6 +260,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_company/seguros': {
+      id: '/_company/seguros'
+      path: '/seguros'
+      fullPath: '/seguros'
+      preLoaderRoute: typeof CompanySegurosRouteImport
+      parentRoute: typeof CompanyRoute
+    }
+    '/_company/perfil': {
+      id: '/_company/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof CompanyPerfilRouteImport
+      parentRoute: typeof CompanyRoute
     }
     '/_admin/dashboard': {
       id: '/_admin/dashboard'
@@ -345,11 +398,35 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface CompanyRouteChildren {
+  CompanyPerfilRoute: typeof CompanyPerfilRoute
+  CompanySegurosRoute: typeof CompanySegurosRoute
+}
+
+const CompanyRouteChildren: CompanyRouteChildren = {
+  CompanyPerfilRoute: CompanyPerfilRoute,
+  CompanySegurosRoute: CompanySegurosRoute,
+}
+
+const CompanyRouteWithChildren =
+  CompanyRoute._addFileChildren(CompanyRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  CompanyRoute: CompanyRouteWithChildren,
   LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
