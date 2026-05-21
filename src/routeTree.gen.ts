@@ -17,6 +17,7 @@ import { Route as AdminCuestionarioRouteImport } from './routes/_admin/cuestiona
 import { Route as AdminCotizadoresRouteImport } from './routes/_admin/cotizadores'
 import { Route as AdminCarteraRouteImport } from './routes/_admin/cartera'
 import { Route as AdminAseguradorasRouteImport } from './routes/_admin/aseguradoras'
+import { Route as AdminEmpresaNuevaRouteImport } from './routes/_admin/empresa.nueva'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -57,6 +58,11 @@ const AdminAseguradorasRoute = AdminAseguradorasRouteImport.update({
   path: '/aseguradoras',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminEmpresaNuevaRoute = AdminEmpresaNuevaRouteImport.update({
+  id: '/empresa/nueva',
+  path: '/empresa/nueva',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/cotizadores': typeof AdminCotizadoresRoute
   '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/empresa/nueva': typeof AdminEmpresaNuevaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/cotizadores': typeof AdminCotizadoresRoute
   '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/empresa/nueva': typeof AdminEmpresaNuevaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/_admin/cotizadores': typeof AdminCotizadoresRoute
   '/_admin/cuestionario': typeof AdminCuestionarioRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
+  '/_admin/empresa/nueva': typeof AdminEmpresaNuevaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/cotizadores'
     | '/cuestionario'
     | '/dashboard'
+    | '/empresa/nueva'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/cotizadores'
     | '/cuestionario'
     | '/dashboard'
+    | '/empresa/nueva'
   id:
     | '__root__'
     | '/'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/_admin/cotizadores'
     | '/_admin/cuestionario'
     | '/_admin/dashboard'
+    | '/_admin/empresa/nueva'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -182,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAseguradorasRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/empresa/nueva': {
+      id: '/_admin/empresa/nueva'
+      path: '/empresa/nueva'
+      fullPath: '/empresa/nueva'
+      preLoaderRoute: typeof AdminEmpresaNuevaRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
@@ -191,6 +210,7 @@ interface AdminRouteChildren {
   AdminCotizadoresRoute: typeof AdminCotizadoresRoute
   AdminCuestionarioRoute: typeof AdminCuestionarioRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminEmpresaNuevaRoute: typeof AdminEmpresaNuevaRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -199,6 +219,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCotizadoresRoute: AdminCotizadoresRoute,
   AdminCuestionarioRoute: AdminCuestionarioRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminEmpresaNuevaRoute: AdminEmpresaNuevaRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -211,3 +232,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
