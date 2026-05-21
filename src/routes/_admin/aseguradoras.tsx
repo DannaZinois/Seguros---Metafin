@@ -360,7 +360,7 @@ function AseguradorasPage() {
                 <td className="px-6 py-4 text-foreground/80">{a.ejecutivo || "—"}</td>
                 <td className="px-6 py-4 text-foreground/80">
                   {a.polizas && a.polizas.length > 0
-                    ? a.polizas.map((p) => `${p.tipo} (${p.variantes.length})`).join(", ")
+                    ? a.polizas.map((p) => `${tipoLabel(p.tipo)} (${p.variantes.length})`).join(", ")
                     : "—"}
                 </td>
                 <td className="px-6 py-4 text-right">
