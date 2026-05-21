@@ -291,6 +291,7 @@ function VerPolizaPage() {
         <AseguradosSection
           poliza={poliza}
           onChange={(asegurados) => updatePoliza({ asegurados })}
+          empresaId={empresa.id}
         />
       </div>
 

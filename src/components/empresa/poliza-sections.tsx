@@ -1,4 +1,6 @@
-import { Plus, Trash2, Download } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Plus, Trash2, Download, Search } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Section } from "@/components/cotizador/shared";
 import type { Poliza } from "@/lib/empresa-store";
 
@@ -13,11 +15,24 @@ export function AseguradosSection({
   poliza,
   onChange,
   readOnly,
+  empresaId,
 }: {
   poliza: Poliza;
   onChange: (a: Poliza["asegurados"]) => void;
   readOnly?: boolean;
+  empresaId?: string;
 }) {
+  const [query, setQuery] = useState("");
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return poliza.asegurados;
+    return poliza.asegurados.filter(
+      (a) =>
+        a.trabajadorId.toLowerCase().includes(q) ||
+        a.nombre.toLowerCase().includes(q),
+    );
+  }, [poliza.asegurados, query]);
+
   const addRow = () =>
     onChange([
       ...poliza.asegurados,
@@ -58,6 +73,17 @@ export function AseguradosSection({
         </div>
       }
     >
+      <div className="mb-4 flex items-center">
+        <div className="relative w-full max-w-sm">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar por ID o nombre del trabajador"
+            className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-[color:var(--brand-blue)]"
+          />
+        </div>
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[1100px] text-left text-sm">
           <thead className="text-xs text-muted-foreground">
@@ -76,19 +102,43 @@ export function AseguradosSection({
             </tr>
           </thead>
           <tbody>
-            {poliza.asegurados.length === 0 && (
+            {filtered.length === 0 && (
               <tr>
                 <td colSpan={11} className="py-8 text-center text-sm text-muted-foreground">
-                  Aún no hay asegurados. Carga el archivo o agrega una persona.
+                  {poliza.asegurados.length === 0
+                    ? "Aún no hay asegurados. Carga el archivo o agrega una persona."
+                    : "Sin resultados para tu búsqueda."}
                 </td>
               </tr>
             )}
-            {poliza.asegurados.map((a) => (
+            {filtered.map((a) => (
               <tr key={a.id} className="border-t border-border/60">
-                <td className="py-3 text-foreground/80">{a.trabajadorId}</td>
+                <td className="py-3 text-foreground/80">
+                  {empresaId ? (
+                    <Link
+                      to="/empresa/$empresaId/empleado/$empleadoId"
+                      params={{ empresaId, empleadoId: a.id }}
+                      className="text-[color:var(--brand-blue)] hover:underline"
+                    >
+                      {a.trabajadorId}
+                    </Link>
+                  ) : (
+                    a.trabajadorId
+                  )}
+                </td>
                 <td className="py-3">
                   {readOnly ? (
-                    a.nombre || "—"
+                    empresaId && a.nombre ? (
+                      <Link
+                        to="/empresa/$empresaId/empleado/$empleadoId"
+                        params={{ empresaId, empleadoId: a.id }}
+                        className="text-[color:var(--brand-blue)] hover:underline"
+                      >
+                        {a.nombre}
+                      </Link>
+                    ) : (
+                      a.nombre || "—"
+                    )
                   ) : (
                     <input
                       value={a.nombre}
