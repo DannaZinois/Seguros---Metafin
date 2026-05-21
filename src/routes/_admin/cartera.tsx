@@ -23,7 +23,6 @@ interface Row {
 }
 
 const ROWS: Row[] = [
-const ROWS: Row[] = [
   // María González (Personal) — 2 pólizas
   { id: "P-990234", name: "María González", poliza: "GMM", renovacion: "01/15/2025", proximoPago: "02/01/2025", cantidad: "$8,450", correo: "maria.gonzalez@correo.com", telefono: "+52 555 102 3344", hasComprobante: true, status: "Activa" },
   { id: "P-990235", name: "María González", poliza: "Auto", renovacion: "03/22/2025", proximoPago: "02/22/2025", cantidad: "$3,200", correo: "maria.gonzalez@correo.com", telefono: "+52 555 102 3344", hasComprobante: true, status: "Por renovar" },
