@@ -8,11 +8,12 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { user } = useAuth();
+  const { user, ready } = useAuth();
   const router = useRouter();
   useEffect(() => {
-    if (user?.role === "admin") router.navigate({ to: "/cartera" });
+    if (!ready) return;
+    if (user) router.navigate({ to: "/cartera" });
     else router.navigate({ to: "/login" });
-  }, [user, router]);
+  }, [ready, user, router]);
   return null;
 }
