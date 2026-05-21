@@ -52,6 +52,12 @@ function CarteraPage() {
   const [query, setQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
 
+  // Seed empresa store with dummy companies so empresa profile pages
+  // show coherent data when opened from this table.
+  useEffect(() => {
+    seedEmpresasIfEmpty(buildEmpresaSeeds());
+  }, []);
+
   const rows = useMemo(() => {
     if (!query.trim()) return ROWS;
     const q = query.toLowerCase();
