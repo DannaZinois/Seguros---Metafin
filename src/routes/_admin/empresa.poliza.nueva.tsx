@@ -1,11 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import {
-  ArrowLeft,
-  MessageCircle,
-  FileText as FileIcon,
-  Pencil,
-} from "lucide-react";
+import { ArrowLeft, MessageCircle, FileText as FileIcon, Pencil } from "lucide-react";
 import { z } from "zod";
 import { useAseguradoras, appendChat } from "@/lib/store";
 import {
@@ -22,6 +17,7 @@ import {
 import {
   useEmpresas,
   saveEmpresa,
+  newPoliza,
   type Empresa,
   type Poliza,
   type EnvioType,
@@ -33,71 +29,35 @@ import {
 
 const searchSchema = z.object({
   empresaId: z.string().optional(),
-  addPerson: z.boolean().optional(),
 });
 
-export const Route = createFileRoute("/_admin/empresa/poliza/$polizaId")({
-  component: VerPolizaPage,
-  head: () => ({ meta: [{ title: "Ver póliza" }] }),
+export const Route = createFileRoute("/_admin/empresa/poliza/nueva")({
+  component: NuevaPolizaPage,
+  head: () => ({ meta: [{ title: "Nueva póliza" }] }),
   validateSearch: searchSchema,
 });
 
-function VerPolizaPage() {
+function NuevaPolizaPage() {
   const router = useRouter();
-  const { polizaId } = Route.useParams();
-  const { empresaId, addPerson } = Route.useSearch();
+  const { empresaId } = Route.useSearch();
   const list = useEmpresas();
   const [aseguradoras] = useAseguradoras();
 
-  const found = useMemo(() => {
-    for (const emp of list) {
-      if (empresaId && emp.id !== empresaId) continue;
-      const pl = emp.polizas.find((p) => p.id === polizaId);
-      if (pl) return { empresa: emp, poliza: pl };
-    }
-    return null;
-  }, [list, polizaId, empresaId]);
+  const baseEmpresa = useMemo(
+    () => (empresaId ? list.find((e) => e.id === empresaId) ?? null : null),
+    [empresaId, list],
+  );
 
-  const [empresa, setEmpresa] = useState<Empresa | null>(null);
-  const [poliza, setPoliza] = useState<Poliza | null>(null);
+  const [empresa, setEmpresa] = useState<Empresa | null>(baseEmpresa);
+  const [poliza, setPoliza] = useState<Poliza>(() => newPoliza());
   const [popup, setPopup] = useState<PopupState>(null);
 
   useEffect(() => {
-    if (found) {
-      setEmpresa(found.empresa);
-      setPoliza(found.poliza);
-    }
-  }, [found]);
+    if (baseEmpresa) setEmpresa(baseEmpresa);
+  }, [baseEmpresa]);
 
-  // When addPerson flag is present, scroll to / open add row in asegurados
-  useEffect(() => {
-    if (addPerson && poliza) {
-      const el = document.getElementById("asegurados-section");
-      el?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [addPerson, poliza]);
-
-  if (!empresa || !poliza) {
-    return (
-      <div className="py-12 text-center text-sm text-muted-foreground">
-        Cargando póliza...
-      </div>
-    );
-  }
-
-  const updatePoliza = (patch: Partial<Poliza>) => {
-    const next = { ...poliza, ...patch };
-    setPoliza(next);
-    const e: Empresa = {
-      ...empresa,
-      polizas: empresa.polizas.map((p) => (p.id === poliza.id ? next : p)),
-    };
-    setEmpresa(e);
-  };
-
-  const persist = () => {
-    if (empresa) saveEmpresa(empresa);
-  };
+  const updatePoliza = (patch: Partial<Poliza>) =>
+    setPoliza((p) => ({ ...p, ...patch }));
 
   const handleEnvio = (type: Exclude<EnvioType, null>) => {
     if (type === "whatsapp" || type === "pdf") {
@@ -106,7 +66,7 @@ function VerPolizaPage() {
           kind: "error",
           title: "Datos requeridos",
           message:
-            "Captura nombre del contratante y número de contacto antes de usar WhatsApp o PDF.",
+            "Captura el nombre del contratante y el número de contacto antes de usar WhatsApp o PDF.",
         });
         return;
       }
@@ -115,7 +75,9 @@ function VerPolizaPage() {
     if (type === "whatsapp") {
       appendChat(poliza.contacto, {
         from: "bot",
-        text: `Hola ${poliza.contratante}, soy el asistente. Te haré algunas preguntas para la póliza de ${empresa.nombre}.`,
+        text: `Hola ${poliza.contratante}, soy el asistente. Te haré algunas preguntas para la póliza${
+          empresa ? ` de ${empresa.nombre}` : ""
+        }.`,
       });
     } else if (type === "pdf") {
       const pdf =
@@ -126,6 +88,77 @@ function VerPolizaPage() {
         text: `Hola ${poliza.contratante}, te envío el siguiente formato: ${pdf}`,
       });
     }
+  };
+
+  const persist = () => {
+    if (!empresa) {
+      setPopup({
+        kind: "error",
+        title: "Sin empresa",
+        message: "Esta póliza no está asociada a una empresa registrada.",
+      });
+      return false;
+    }
+    if (!poliza.tipo) {
+      setPopup({
+        kind: "error",
+        title: "Falta tipo de póliza",
+        message: "Selecciona el tipo de póliza antes de guardar.",
+      });
+      return false;
+    }
+    const exists = empresa.polizas.some((p) => p.id === poliza.id);
+    const next: Empresa = {
+      ...empresa,
+      polizas: exists
+        ? empresa.polizas.map((p) => (p.id === poliza.id ? poliza : p))
+        : [...empresa.polizas, poliza],
+    };
+    saveEmpresa(next);
+    setEmpresa(next);
+    return true;
+  };
+
+  const onGuardar = () => {
+    if (persist())
+      setPopup({
+        kind: "info",
+        title: "Cambios guardados",
+        message: "La póliza se guardó correctamente.",
+      });
+  };
+
+  const onEnviar = () => {
+    if (persist())
+      router.navigate({
+        to: "/empresa/poliza/$polizaId",
+        params: { polizaId: poliza.id },
+        search: { empresaId: empresa!.id },
+      });
+  };
+
+  const onBorrar = () => {
+    setPopup({
+      kind: "confirm",
+      title: "¿Borrar póliza?",
+      message: "Esto eliminará la información capturada en este formulario.",
+      onConfirm: () => {
+        setPoliza(newPoliza());
+        setPopup(null);
+      },
+    });
+  };
+
+  const onVerWhatsapp = () => {
+    if (!poliza.contacto.trim()) {
+      setPopup({
+        kind: "error",
+        title: "Sin número de contacto",
+        message: "Captura primero el número de contacto del contratante.",
+      });
+      return;
+    }
+    setPopup({ kind: "chat", phone: poliza.contacto });
   };
 
   return (
@@ -140,7 +173,7 @@ function VerPolizaPage() {
         </button>
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Ver póliza {empresa.nombre || "nombre aquí"}
+            Nueva póliza
           </h1>
           <p className="text-sm text-muted-foreground">
             Registra una nueva empresa para obtener sus cotizaciones
@@ -148,57 +181,88 @@ function VerPolizaPage() {
         </div>
       </div>
 
+      {/* Datos generales (read-only from empresa if present) */}
       <Section title="Datos generales">
         <Grid>
           <Field label="Nombre de la empresa*">
-            <TextInput value={empresa.nombre} readOnly />
+            <TextInput
+              value={empresa?.nombre ?? ""}
+              readOnly={!!empresa}
+              onChange={(v) => setEmpresa((e) => (e ? { ...e, nombre: v } : e))}
+              placeholder="Nombre aquí"
+            />
           </Field>
           <Field label="RFC*">
-            <TextInput value={empresa.rfc} readOnly />
+            <TextInput
+              value={empresa?.rfc ?? ""}
+              readOnly={!!empresa}
+              onChange={(v) => setEmpresa((e) => (e ? { ...e, rfc: v } : e))}
+              placeholder="+00 0000 0000 00"
+            />
           </Field>
           <Field label="Giro*">
-            <TextInput value={empresa.giro} readOnly />
+            <TextInput
+              value={empresa?.giro ?? ""}
+              readOnly={!!empresa}
+              onChange={(v) => setEmpresa((e) => (e ? { ...e, giro: v } : e))}
+              placeholder="Lore ipsum dolor est"
+            />
           </Field>
           <Field label="Código postal*">
-            <TextInput value={empresa.codigoPostal} readOnly />
+            <TextInput
+              value={empresa?.codigoPostal ?? ""}
+              readOnly={!!empresa}
+              onChange={(v) =>
+                setEmpresa((e) => (e ? { ...e, codigoPostal: v } : e))
+              }
+              placeholder="Lore ipsum dolor est"
+            />
           </Field>
         </Grid>
       </Section>
 
+      {/* Póliza */}
       <Section title={`Póliza: ${poliza.tipo || "Tipo de póliza aquí"}`}>
         <Grid>
           <Field label="Tipo de póliza*">
             <Select
               value={poliza.tipo}
               onChange={(v) => updatePoliza({ tipo: v })}
-              options={["Auto", "Gastos Médicos Mayores", "Vida", "Exceso GMM"]}
-              placeholder="Selecciona"
+              options={["Auto", "Gastos Médicos Mayores", "Vida", "Exceso GMM", "Casa", "GMM"]}
+              placeholder="Nombre aquí"
             />
           </Field>
-          <Field label="Aseguradora">
+          <Field label="Aseguradora*">
             <Select
               value={poliza.aseguradora}
               onChange={(v) => updatePoliza({ aseguradora: v })}
               options={aseguradoras.map((a) => a.name)}
-              placeholder="Selecciona"
+              placeholder={
+                aseguradoras.length === 0
+                  ? "Registra aseguradoras primero"
+                  : "Nombre aquí"
+              }
             />
           </Field>
           <Field label="Nombre completo del contratante*">
             <TextInput
               value={poliza.contratante}
               onChange={(v) => updatePoliza({ contratante: v })}
+              placeholder="Nombre aquí"
             />
           </Field>
           <Field label="Número de contacto*">
             <TextInput
               value={poliza.contacto}
               onChange={(v) => updatePoliza({ contacto: v })}
+              placeholder="+00 0000 0000 00"
             />
           </Field>
           <Field label="Código postal*">
             <TextInput
               value={poliza.codigoPostal}
               onChange={(v) => updatePoliza({ codigoPostal: v })}
+              placeholder="Lore ipsum dolor est"
             />
           </Field>
           <Field label="Tipo de pago*">
@@ -206,24 +270,27 @@ function VerPolizaPage() {
               value={poliza.tipoPago}
               onChange={(v) => updatePoliza({ tipoPago: v })}
               options={["Agente", "Domiciliado", "Directo"]}
-              placeholder="Selecciona"
+              placeholder="Nombre aquí"
             />
           </Field>
           <Field label="Número de asegurados">
             <TextInput
               value={poliza.numAsegurados}
               onChange={(v) => updatePoliza({ numAsegurados: v })}
+              placeholder="000"
             />
           </Field>
           <Field label="RFC*">
             <TextInput
               value={poliza.rfc}
               onChange={(v) => updatePoliza({ rfc: v })}
+              placeholder="Lore ipsum dolor est"
             />
           </Field>
         </Grid>
       </Section>
 
+      {/* Tipo de envío */}
       <Section
         title="Tipo de envio"
         subtitle="Selecciona cómo quieres recopilar la información"
@@ -256,14 +323,26 @@ function VerPolizaPage() {
         </div>
       </Section>
 
+      {/* Carga masiva + Comentarios */}
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="rounded-3xl border border-border bg-white p-6 shadow-sm">
           <h3 className="text-lg font-bold text-foreground">
-            Carga de asegurados
+            Carga masiva de asegurados
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">
             Carga un solo archivo para registrar a tus asegurados.
           </p>
+          {poliza.cargaFileName && (
+            <div className="mt-4">
+              <div className="flex items-center justify-between text-sm">
+                <span>{poliza.cargaFileName}</span>
+                <span className="text-muted-foreground">25 MB</span>
+              </div>
+              <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
+                <div className="h-full w-full bg-violet-500" />
+              </div>
+            </div>
+          )}
           <Dropzone
             className="mt-4"
             onFile={(f) => updatePoliza({ cargaFileName: f.name })}
@@ -287,12 +366,10 @@ function VerPolizaPage() {
         </div>
       </div>
 
-      <div id="asegurados-section">
-        <AseguradosSection
-          poliza={poliza}
-          onChange={(asegurados) => updatePoliza({ asegurados })}
-        />
-      </div>
+      <AseguradosSection
+        poliza={poliza}
+        onChange={(asegurados) => updatePoliza({ asegurados })}
+      />
 
       <ComprobantesSection
         poliza={poliza}
@@ -301,63 +378,25 @@ function VerPolizaPage() {
 
       <div className="mt-10 flex flex-wrap items-center justify-end gap-3">
         <button
-          onClick={() => {
-            if (!poliza.contacto.trim()) {
-              setPopup({
-                kind: "error",
-                title: "Sin número de contacto",
-                message: "Captura primero el número de contacto del contratante.",
-              });
-              return;
-            }
-            setPopup({ kind: "chat", phone: poliza.contacto });
-          }}
+          onClick={onVerWhatsapp}
           className="rounded-full bg-green-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-green-600"
         >
           Ver whatsapp
         </button>
         <button
-          onClick={() => {
-            persist();
-            setPopup({
-              kind: "info",
-              title: "Cambios guardados",
-              message: "La información de la póliza se guardó correctamente.",
-            });
-          }}
+          onClick={onGuardar}
           className="rounded-full bg-violet-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-violet-600"
         >
           + Guardar cambios
         </button>
         <button
-          onClick={() => {
-            persist();
-            setPopup({
-              kind: "info",
-              title: "Póliza enviada",
-              message: "La póliza se actualizó correctamente.",
-            });
-          }}
+          onClick={onEnviar}
           className="rounded-full bg-blue-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-600"
         >
           Enviar
         </button>
         <button
-          onClick={() =>
-            setPopup({
-              kind: "confirm",
-              title: "¿Borrar póliza?",
-              message: "Esto eliminará esta póliza de la empresa.",
-              onConfirm: () => {
-                const e: Empresa = {
-                  ...empresa,
-                  polizas: empresa.polizas.filter((p) => p.id !== poliza.id),
-                };
-                saveEmpresa(e);
-                router.navigate({ to: "/cartera" });
-              },
-            })
-          }
+          onClick={onBorrar}
           className="rounded-full bg-red-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-red-600"
         >
           Borrar
@@ -365,8 +404,7 @@ function VerPolizaPage() {
       </div>
 
       <p className="mt-10 text-center text-xs text-muted-foreground">
-        Copyrights ©{" "}
-        <span className="text-[color:var(--brand-blue)]">Zinois</span>
+        Copyrights © <span className="text-[color:var(--brand-blue)]">Zinois</span>
       </p>
 
       {popup && <Popup state={popup} onClose={() => setPopup(null)} />}

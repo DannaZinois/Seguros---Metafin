@@ -18,6 +18,7 @@ import { Route as AdminCotizadoresRouteImport } from './routes/_admin/cotizadore
 import { Route as AdminCarteraRouteImport } from './routes/_admin/cartera'
 import { Route as AdminAseguradorasRouteImport } from './routes/_admin/aseguradoras'
 import { Route as AdminEmpresaNuevaRouteImport } from './routes/_admin/empresa.nueva'
+import { Route as AdminEmpresaPolizaNuevaRouteImport } from './routes/_admin/empresa.poliza.nueva'
 import { Route as AdminEmpresaPolizaPolizaIdRouteImport } from './routes/_admin/empresa.poliza.$polizaId'
 
 const LoginRoute = LoginRouteImport.update({
@@ -64,6 +65,11 @@ const AdminEmpresaNuevaRoute = AdminEmpresaNuevaRouteImport.update({
   path: '/empresa/nueva',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminEmpresaPolizaNuevaRoute = AdminEmpresaPolizaNuevaRouteImport.update({
+  id: '/empresa/poliza/nueva',
+  path: '/empresa/poliza/nueva',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEmpresaPolizaPolizaIdRoute =
   AdminEmpresaPolizaPolizaIdRouteImport.update({
     id: '/empresa/poliza/$polizaId',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AdminDashboardRoute
   '/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
+  '/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AdminDashboardRoute
   '/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
+  '/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/_admin/dashboard': typeof AdminDashboardRoute
   '/_admin/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/_admin/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
+  '/_admin/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/empresa/nueva'
     | '/empresa/poliza/$polizaId'
+    | '/empresa/poliza/nueva'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/empresa/nueva'
     | '/empresa/poliza/$polizaId'
+    | '/empresa/poliza/nueva'
   id:
     | '__root__'
     | '/'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/_admin/dashboard'
     | '/_admin/empresa/nueva'
     | '/_admin/empresa/poliza/$polizaId'
+    | '/_admin/empresa/poliza/nueva'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -214,6 +226,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEmpresaNuevaRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/empresa/poliza/nueva': {
+      id: '/_admin/empresa/poliza/nueva'
+      path: '/empresa/poliza/nueva'
+      fullPath: '/empresa/poliza/nueva'
+      preLoaderRoute: typeof AdminEmpresaPolizaNuevaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/empresa/poliza/$polizaId': {
       id: '/_admin/empresa/poliza/$polizaId'
       path: '/empresa/poliza/$polizaId'
@@ -232,6 +251,7 @@ interface AdminRouteChildren {
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminEmpresaNuevaRoute: typeof AdminEmpresaNuevaRoute
   AdminEmpresaPolizaPolizaIdRoute: typeof AdminEmpresaPolizaPolizaIdRoute
+  AdminEmpresaPolizaNuevaRoute: typeof AdminEmpresaPolizaNuevaRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -242,6 +262,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDashboardRoute: AdminDashboardRoute,
   AdminEmpresaNuevaRoute: AdminEmpresaNuevaRoute,
   AdminEmpresaPolizaPolizaIdRoute: AdminEmpresaPolizaPolizaIdRoute,
+  AdminEmpresaPolizaNuevaRoute: AdminEmpresaPolizaNuevaRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

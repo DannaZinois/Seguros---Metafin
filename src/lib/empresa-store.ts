@@ -5,6 +5,7 @@ export type AccessType = "Admin" | "RRHH" | "Lectura";
 export interface Encargado {
   id: string;
   nombre: string;
+  contacto: string;
   email: string;
   acceso: AccessType;
   invited?: boolean;
@@ -52,6 +53,8 @@ export interface Poliza {
   comprobantes: Comprobante[];
   comentarios: string;
   cargaFileName?: string;
+  vigencia?: string;
+  estatus?: "Vigente" | "Vencida";
 }
 
 export interface Empresa {
@@ -59,6 +62,7 @@ export interface Empresa {
   nombre: string;
   rfc: string;
   giro: string;
+  direccion: string;
   codigoPostal: string;
   encargados: Encargado[];
   polizas: Poliza[];
@@ -115,6 +119,7 @@ export function newEncargado(): Encargado {
   return {
     id: crypto.randomUUID(),
     nombre: "",
+    contacto: "",
     email: "",
     acceso: "Lectura",
     invited: false,
@@ -136,6 +141,8 @@ export function newPoliza(): Poliza {
     asegurados: [],
     comprobantes: [],
     comentarios: "",
+    vigencia: "00/00/0000",
+    estatus: "Vigente",
   };
 }
 
@@ -145,9 +152,10 @@ export function newEmpresa(): Empresa {
     nombre: "",
     rfc: "",
     giro: "",
+    direccion: "",
     codigoPostal: "",
     encargados: [],
-    polizas: [newPoliza()],
+    polizas: [],
     createdAt: Date.now(),
   };
 }
