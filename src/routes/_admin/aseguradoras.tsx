@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Plus, Trash2, FileText, Upload, Pencil, X, ImageIcon, ChevronDown, ChevronUp, FileSpreadsheet } from "lucide-react";
 import { useAseguradoras, type Aseguradora, type PolizaTipo, type TipoSeguro, type VariantePoliza } from "@/lib/store";
 
@@ -405,7 +405,7 @@ function AseguradorasPage() {
 
 const TIPOS_SEGURO: TipoSeguro[] = ["Auto", "Vida", "Gastos médicos mayores", "Exceso"];
 
-function RowGroup({ children }: { children: React.ReactNode }) {
+function RowGroup({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
