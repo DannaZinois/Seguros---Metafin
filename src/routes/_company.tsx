@@ -6,52 +6,50 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 import {
-  LayoutDashboard,
+  Building2,
+  Shield,
   Users,
-  FileText,
-  ShieldCheck,
-  Settings,
-  HelpCircle,
+  Receipt,
   LogOut,
   Bell,
+  Settings,
+  HelpCircle,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import cityBg from "@/assets/city-skyline.png";
 
-export const Route = createFileRoute("/_admin")({
-  component: AdminLayout,
+export const Route = createFileRoute("/_company")({
+  component: CompanyLayout,
 });
 
-function AdminLayout() {
+function CompanyLayout() {
   const { user, ready, logout } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!ready) return;
+    if (!user) router.navigate({ to: "/login" });
+    else if (user.role !== "company")
+      router.navigate({ to: "/cartera" });
+  }, [ready, user, router]);
 
   const onLogout = () => {
     logout();
     router.navigate({ to: "/login" });
   };
 
-  // Client-side guard
-  useEffect(() => {
-    if (!ready) return;
-    if (!user) router.navigate({ to: "/login" });
-    else if (user.role === "company")
-      router.navigate({ to: "/perfil" });
-  }, [ready, user, router]);
-
   const navItems = [
-    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/cartera", label: "Cartera", icon: Users },
-    { to: "/cotizadores", label: "Cotizadores", icon: FileText },
-    { to: "/aseguradoras", label: "Aseguradoras", icon: ShieldCheck },
+    { to: "/perfil", label: "Mi empresa", icon: Building2 },
+    { to: "/seguros", label: "Seguros", icon: Shield },
+    { to: "/empleados", label: "Empleados", icon: Users },
+    { to: "/pagos", label: "Pagos", icon: Receipt },
   ] as const;
 
   return (
     <div className="flex min-h-screen bg-[color:var(--brand-bg-soft)]">
-      {/* Sidebar */}
       <aside className="relative flex w-64 flex-col bg-[color:var(--brand-bg-soft)] px-6 py-8">
         <div className="mb-10 text-lg font-medium text-foreground/80">
-          Nombre aquí
+          {user?.name ?? "Mi empresa"}
         </div>
 
         <nav className="flex-1 space-y-2">
@@ -99,7 +97,6 @@ function AdminLayout() {
         />
       </aside>
 
-      {/* Main */}
       <div className="flex flex-1 flex-col bg-white">
         <header className="flex items-center justify-end gap-4 border-b border-border bg-[color:var(--brand-bg-soft)]/60 px-10 py-4">
           <button className="relative rounded-full p-2 text-muted-foreground hover:bg-white">
@@ -112,13 +109,7 @@ function AdminLayout() {
               <p className="text-sm font-semibold text-foreground">
                 {user?.name ?? "Invitado"}
               </p>
-              <p className="text-xs text-muted-foreground">
-                {user?.role === "admin"
-                  ? "Perfil Broker"
-                  : user?.role === "company"
-                    ? "Perfil Compañía"
-                    : "Perfil Cliente"}
-              </p>
+              <p className="text-xs text-muted-foreground">Perfil Compañía</p>
             </div>
           </div>
         </header>
