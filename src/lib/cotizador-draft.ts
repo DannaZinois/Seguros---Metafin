@@ -16,15 +16,15 @@ export type EnvioType = "whatsapp" | "manual" | "pdf" | null;
 export interface CotizadorDraft {
   nombre: string;
   contacto: string;
+  correoContacto: string;
   tipoAsegurado: string;
-  rfc: string;
   sexo: string;
-  direccion: string;
   codigoPostal: string;
   fechaNacimiento: string;
   fechaAntiguedad: string;
   tipoSeguro: string;
   aseguradora: string;
+  tipoPlan: string;
   tipoPersona: string;
   asegurados: Asegurado[];
   envio: EnvioType;
@@ -51,15 +51,15 @@ export function emptyDraft(): CotizadorDraft {
   return {
     nombre: "",
     contacto: "",
+    correoContacto: "",
     tipoAsegurado: "",
-    rfc: "",
     sexo: "",
-    direccion: "",
     codigoPostal: "",
     fechaNacimiento: "",
     fechaAntiguedad: "",
     tipoSeguro: "",
     aseguradora: "",
+    tipoPlan: "",
     tipoPersona: "",
     asegurados: [newAsegurado()],
     envio: null,
