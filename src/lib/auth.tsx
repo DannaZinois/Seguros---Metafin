@@ -27,6 +27,7 @@ const STORAGE_KEY = "zinois.auth";
 
 interface AuthContextValue {
   user: AuthUser | null;
+  ready: boolean;
   login: (email: string, password: string, remember: boolean) => AuthUser;
   logout: () => void;
 }
