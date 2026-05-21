@@ -229,13 +229,9 @@ function NuevaEmpresaPage() {
     });
   };
 
-  // List of "active" polizas (other than the one currently being edited)
-  const otherPolizas = empresa.polizas
-    .map((p, i) => ({ p, i }))
-    .filter(({ i }) => i !== activePolizaIdx && p[0]);
-  // Actually use saved polizas:
+  // Pólizas already saved on this empresa (other than the one being edited)
   const savedPolizas =
-    existing?.polizas.filter((p) => p.id !== poliza.id) ?? [];
+    existing?.polizas.filter((pl) => pl.id !== poliza.id) ?? [];
 
   return (
     <div className="pb-12">
