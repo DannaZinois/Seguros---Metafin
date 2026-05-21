@@ -3,7 +3,6 @@ import {
   Link,
   Outlet,
   useRouter,
-  redirect,
 } from "@tanstack/react-router";
 import {
   LayoutDashboard,
