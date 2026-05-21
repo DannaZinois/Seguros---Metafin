@@ -51,6 +51,8 @@ const STATUS_STYLES: Record<ClienteStatus, string> = {
 function CarteraPage() {
   const [query, setQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 15;
 
   // Seed empresa store with dummy companies so empresa profile pages
   // show coherent data when opened from this table.
@@ -68,6 +70,24 @@ function CarteraPage() {
         r.correo.toLowerCase().includes(q),
     );
   }, [query]);
+
+  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+  useEffect(() => {
+    if (page > totalPages) setPage(1);
+  }, [page, totalPages]);
+  const pageRows = rows.slice((page - 1) * pageSize, page * pageSize);
+  const startIdx = rows.length === 0 ? 0 : (page - 1) * pageSize + 1;
+  const endIdx = Math.min(page * pageSize, rows.length);
+
+  const pageNumbers = useMemo(() => {
+    const nums: number[] = [];
+    const maxButtons = 5;
+    let start = Math.max(1, page - 2);
+    let end = Math.min(totalPages, start + maxButtons - 1);
+    start = Math.max(1, end - maxButtons + 1);
+    for (let i = start; i <= end; i++) nums.push(i);
+    return nums;
+  }, [page, totalPages]);
 
   return (
     <div>
@@ -113,19 +133,19 @@ function CarteraPage() {
                   "Comprobante",
                   "Status",
                 ].map((h) => (
-                  <th key={h} className="px-6 py-4 text-xs font-medium">
+                <th key={h} className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wide whitespace-nowrap">
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {rows.map((r, idx) => (
+              {pageRows.map((r, idx) => (
                 <tr
                   key={idx}
                   className="border-b border-border/60 last:border-0 hover:bg-muted/40"
                 >
-                  <td className="px-6 py-4">
+                  <td className="px-5 py-3.5 align-middle whitespace-nowrap">
                     {r.tipo === "Empresa" ? (
                       <Link
                         to="/empresa/nueva"
@@ -144,7 +164,7 @@ function CarteraPage() {
                       </Link>
                     )}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-5 py-3.5 align-middle whitespace-nowrap">
                     {r.tipo === "Empresa" ? (
                       <Link
                         to="/empresa/poliza/$polizaId"
@@ -164,12 +184,12 @@ function CarteraPage() {
                       </Link>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-foreground/80">{r.renovacion}</td>
-                  <td className="px-6 py-4 text-foreground/80">{r.proximoPago}</td>
-                  <td className="px-6 py-4 text-foreground/80">{r.cantidad}</td>
-                  <td className="px-6 py-4 text-foreground/80">{r.correo}</td>
-                  <td className="px-6 py-4 text-foreground/80">{r.telefono}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-5 py-3.5 align-middle whitespace-nowrap text-foreground/80">{r.renovacion}</td>
+                  <td className="px-5 py-3.5 align-middle whitespace-nowrap text-foreground/80">{r.proximoPago}</td>
+                  <td className="px-5 py-3.5 align-middle whitespace-nowrap text-foreground/80">{r.cantidad}</td>
+                  <td className="px-5 py-3.5 align-middle whitespace-nowrap text-foreground/80">{r.correo}</td>
+                  <td className="px-5 py-3.5 align-middle whitespace-nowrap text-foreground/80">{r.telefono}</td>
+                  <td className="px-5 py-3.5 align-middle whitespace-nowrap">
                     {r.hasComprobante ? (
                       <button className="inline-flex items-center gap-1 text-[color:var(--brand-blue)] underline-offset-4 hover:underline">
                         <Download className="h-4 w-4" /> Descargar
@@ -180,7 +200,7 @@ function CarteraPage() {
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-5 py-3.5 align-middle whitespace-nowrap">
                     <span
                       className={`inline-flex rounded-full px-4 py-1 text-xs font-medium ${STATUS_STYLES[r.status]}`}
                     >
@@ -196,19 +216,26 @@ function CarteraPage() {
 
       {/* Pagination */}
       <div className="mt-6 flex items-center justify-between text-sm text-muted-foreground">
-        <p>Mostrando 10 de 160 registros</p>
+        <p>
+          Mostrando {startIdx}-{endIdx} de {rows.length} registros
+        </p>
         <p>
           Copyrights © <span className="text-[color:var(--brand-blue)]">Zinois</span>
         </p>
         <div className="flex items-center gap-2">
-          <button className="inline-flex items-center gap-1 rounded-full border border-[color:var(--brand-blue)] px-4 py-2 text-[color:var(--brand-blue)]">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="inline-flex items-center gap-1 rounded-full border border-[color:var(--brand-blue)] px-4 py-2 text-[color:var(--brand-blue)] disabled:opacity-40"
+          >
             <ChevronLeft className="h-4 w-4" /> Previo
           </button>
-          {[1, 2, 3, 4].map((n) => (
+          {pageNumbers.map((n) => (
             <button
               key={n}
+              onClick={() => setPage(n)}
               className={`h-9 w-9 rounded-full text-sm ${
-                n === 1
+                n === page
                   ? "bg-[color:var(--brand-blue)] text-white"
                   : "text-foreground hover:bg-muted"
               }`}
@@ -216,7 +243,11 @@ function CarteraPage() {
               {n}
             </button>
           ))}
-          <button className="inline-flex items-center gap-1 rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-white">
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className="inline-flex items-center gap-1 rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-white disabled:opacity-40"
+          >
             Siguiente <ChevronRight className="h-4 w-4" />
           </button>
         </div>
