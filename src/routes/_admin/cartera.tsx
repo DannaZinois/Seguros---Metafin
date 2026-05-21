@@ -188,15 +188,15 @@ function CarteraPage() {
 }
 
 function NewRegistroModal({ onClose }: { onClose: () => void }) {
-  const [selected, setSelected] = useState<"personal" | "compania" | null>(null);
+  const [selected, setSelected] = useState<"personal" | "empresa" | null>(null);
   const router = useRouter();
 
   const confirm = () => {
     onClose();
     if (selected === "personal") {
       router.navigate({ to: "/cotizadores" });
-    } else {
-      router.navigate({ to: "/cartera" });
+    } else if (selected === "empresa") {
+      router.navigate({ to: "/empresa/nueva" });
     }
   };
 
@@ -239,9 +239,9 @@ function NewRegistroModal({ onClose }: { onClose: () => void }) {
           </button>
 
           <button
-            onClick={() => setSelected("compania")}
+            onClick={() => setSelected("empresa")}
             className={`flex flex-col items-center gap-3 rounded-2xl border-2 p-6 transition-all ${
-              selected === "compania"
+              selected === "empresa"
                 ? "border-[color:var(--brand-blue)] bg-[color:var(--brand-bg-soft)] shadow-md"
                 : "border-border hover:border-[color:var(--brand-blue)]/50"
             }`}
@@ -249,7 +249,7 @@ function NewRegistroModal({ onClose }: { onClose: () => void }) {
             <div className="rounded-full bg-[color:var(--brand-bg-soft)] p-3">
               <Building2 className="h-6 w-6 text-[color:var(--brand-blue)]" />
             </div>
-            <span className="text-sm font-semibold text-foreground">Compañía</span>
+            <span className="text-sm font-semibold text-foreground">Empresa</span>
             <span className="text-xs text-muted-foreground text-center">
               Empresa o entidad jurídica
             </span>
