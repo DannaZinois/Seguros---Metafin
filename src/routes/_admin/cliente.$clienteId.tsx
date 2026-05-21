@@ -1,7 +1,6 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { ArrowLeft, Download } from "lucide-react";
-import { Section, Grid, Field, TextInput, DateInput, Select } from "@/components/cotizador/shared";
-import { useAseguradoras } from "@/lib/store";
+import { DatosGeneralesReadonly } from "@/components/cotizador/datos-generales-readonly";
 
 export const Route = createFileRoute("/_admin/cliente/$clienteId")({
   component: PerfilCliente,
@@ -39,7 +38,6 @@ const POLIZAS: PolizaRow[] = [
 function PerfilCliente() {
   const router = useRouter();
   const { clienteId } = Route.useParams();
-  const [aseguradoras] = useAseguradoras();
 
   return (
     <div>
@@ -60,7 +58,7 @@ function PerfilCliente() {
         </div>
       </div>
 
-      <DatosGeneralesIdenticos aseguradoraNames={aseguradoras.map((a) => a.name)} />
+      <DatosGeneralesReadonly />
 
       <section className="mt-6 rounded-3xl border border-border bg-white p-6 shadow-sm">
         <div className="flex items-center gap-4">
