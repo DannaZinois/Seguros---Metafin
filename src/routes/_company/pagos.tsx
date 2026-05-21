@@ -230,29 +230,6 @@ function PagosPage() {
                 </tbody>
               </table>
             </div>
-            {p.comprobantes.length > 0 && (
-              <div className="mt-4 flex justify-end">
-                <button
-                  onClick={() => inputRefs.current[newInputKey]?.click()}
-                  className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-foreground/80 hover:bg-muted"
-                >
-                  <UploadCloud className="h-3.5 w-3.5" /> Cargar nuevo comprobante
-                </button>
-                <input
-                  ref={(el) => {
-                    inputRefs.current[newInputKey] = el;
-                  }}
-                  type="file"
-                  accept="application/pdf,image/*"
-                  hidden
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) handleUploadNew(p.id, f);
-                    e.target.value = "";
-                  }}
-                />
-              </div>
-            )}
           </Section>
         );
       })}
