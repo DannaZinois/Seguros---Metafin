@@ -21,6 +21,7 @@ import { Route as AdminEmpresaNuevaRouteImport } from './routes/_admin/empresa.n
 import { Route as AdminClienteClienteIdRouteImport } from './routes/_admin/cliente.$clienteId'
 import { Route as AdminEmpresaPolizaNuevaRouteImport } from './routes/_admin/empresa.poliza.nueva'
 import { Route as AdminEmpresaPolizaPolizaIdRouteImport } from './routes/_admin/empresa.poliza.$polizaId'
+import { Route as AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRouteImport } from './routes/_admin/empresa.$empresaId.empleado.$empleadoId'
 import { Route as AdminClienteClienteIdPolizaPolizaIdRouteImport } from './routes/_admin/cliente.$clienteId.poliza.$polizaId'
 
 const LoginRoute = LoginRouteImport.update({
@@ -83,6 +84,12 @@ const AdminEmpresaPolizaPolizaIdRoute =
     path: '/empresa/poliza/$polizaId',
     getParentRoute: () => AdminRoute,
   } as any)
+const AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRoute =
+  AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRouteImport.update({
+    id: '/empresa/$empresaId/empleado/$empleadoId',
+    path: '/empresa/$empresaId/empleado/$empleadoId',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AdminClienteClienteIdPolizaPolizaIdRoute =
   AdminClienteClienteIdPolizaPolizaIdRouteImport.update({
     id: '/poliza/$polizaId',
@@ -103,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
   '/cliente/$clienteId/poliza/$polizaId': typeof AdminClienteClienteIdPolizaPolizaIdRoute
+  '/empresa/$empresaId/empleado/$empleadoId': typeof AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -117,6 +125,7 @@ export interface FileRoutesByTo {
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
   '/cliente/$clienteId/poliza/$polizaId': typeof AdminClienteClienteIdPolizaPolizaIdRoute
+  '/empresa/$empresaId/empleado/$empleadoId': typeof AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -133,6 +142,7 @@ export interface FileRoutesById {
   '/_admin/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/_admin/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
   '/_admin/cliente/$clienteId/poliza/$polizaId': typeof AdminClienteClienteIdPolizaPolizaIdRoute
+  '/_admin/empresa/$empresaId/empleado/$empleadoId': typeof AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/empresa/poliza/$polizaId'
     | '/empresa/poliza/nueva'
     | '/cliente/$clienteId/poliza/$polizaId'
+    | '/empresa/$empresaId/empleado/$empleadoId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/empresa/poliza/$polizaId'
     | '/empresa/poliza/nueva'
     | '/cliente/$clienteId/poliza/$polizaId'
+    | '/empresa/$empresaId/empleado/$empleadoId'
   id:
     | '__root__'
     | '/'
@@ -178,6 +190,7 @@ export interface FileRouteTypes {
     | '/_admin/empresa/poliza/$polizaId'
     | '/_admin/empresa/poliza/nueva'
     | '/_admin/cliente/$clienteId/poliza/$polizaId'
+    | '/_admin/empresa/$empresaId/empleado/$empleadoId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEmpresaPolizaPolizaIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/empresa/$empresaId/empleado/$empleadoId': {
+      id: '/_admin/empresa/$empresaId/empleado/$empleadoId'
+      path: '/empresa/$empresaId/empleado/$empleadoId'
+      fullPath: '/empresa/$empresaId/empleado/$empleadoId'
+      preLoaderRoute: typeof AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/cliente/$clienteId/poliza/$polizaId': {
       id: '/_admin/cliente/$clienteId/poliza/$polizaId'
       path: '/poliza/$polizaId'
@@ -306,6 +326,7 @@ interface AdminRouteChildren {
   AdminEmpresaNuevaRoute: typeof AdminEmpresaNuevaRoute
   AdminEmpresaPolizaPolizaIdRoute: typeof AdminEmpresaPolizaPolizaIdRoute
   AdminEmpresaPolizaNuevaRoute: typeof AdminEmpresaPolizaNuevaRoute
+  AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRoute: typeof AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -318,6 +339,8 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEmpresaNuevaRoute: AdminEmpresaNuevaRoute,
   AdminEmpresaPolizaPolizaIdRoute: AdminEmpresaPolizaPolizaIdRoute,
   AdminEmpresaPolizaNuevaRoute: AdminEmpresaPolizaNuevaRoute,
+  AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRoute:
+    AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -330,3 +353,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
