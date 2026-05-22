@@ -46,6 +46,7 @@ function CompanyLayout() {
         <HeaderProfile
           name={empresa?.nombre ?? user?.name ?? "Invitado"}
           role="Perfil Compañía"
+          editTo="/perfil"
           fields={[
             { label: "Empresa", value: empresa?.nombre ?? "" },
             { label: "RFC", value: empresa?.rfc ?? "" },
