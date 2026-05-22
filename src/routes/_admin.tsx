@@ -4,6 +4,7 @@ import { Users, FileText, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { HeaderProfile } from "@/components/layout/header-profile";
 import { AppShell } from "@/components/layout/app-shell";
+import metafinLogo from "@/assets/metafin-logo.jpeg";
 
 export const Route = createFileRoute("/_admin")({
   component: AdminLayout,
@@ -35,6 +36,7 @@ function AdminLayout() {
     <AppShell
       brandTitle="Metafin"
       brandSubtitle="Administración"
+      brandLogo={metafinLogo}
       navItems={navItems}
       onLogout={onLogout}
       header={
