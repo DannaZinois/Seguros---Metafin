@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { User, Shield, Receipt, MessageCircle } from "lucide-react";
+import { User, Shield, MessageCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useCurrentClient, ADMIN_WHATSAPP } from "@/lib/client-context";
 import { HeaderProfile } from "@/components/layout/header-profile";
@@ -30,7 +30,6 @@ function ClientLayout() {
   const navItems = [
     { to: "/mi-perfil", label: "Mi perfil", icon: User },
     { to: "/mis-polizas", label: "Mis pólizas", icon: Shield },
-    { to: "/mis-pagos", label: "Pagos", icon: Receipt },
   ] as const;
 
   const waMessage = encodeURIComponent(
