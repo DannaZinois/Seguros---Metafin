@@ -164,77 +164,8 @@ function SegurosPage() {
         </button>
       </div>
 
-      <Section title="Pólizas activas">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="text-xs text-muted-foreground">
-              <tr>
-                <th className="py-3 font-medium">Tipo de póliza</th>
-                <th className="py-3 font-medium">Aseguradora</th>
-                <th className="py-3 font-medium">Contratante</th>
-                <th className="py-3 font-medium">Número de asegurados</th>
-                <th className="py-3 font-medium">Vigencia</th>
-                <th className="py-3 font-medium">Estatus</th>
-                <th className="py-3 font-medium">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {empresa.polizas.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-6 text-center text-sm text-muted-foreground">
-                    Sin pólizas registradas.
-                  </td>
-                </tr>
-              ) : (
-                empresa.polizas.map((p) => (
-                  <tr
-                    key={p.id}
-                    className="cursor-pointer border-t border-border/60 hover:bg-muted/40"
-                    onClick={() => setDetail(p)}
-                  >
-                    <td className="py-3">{p.tipo || "—"}</td>
-                    <td className="py-3 text-foreground/80">{p.aseguradora}</td>
-                    <td className="py-3 text-foreground/80">{p.contratante}</td>
-                    <td className="py-3 text-foreground/80">{p.numAsegurados}</td>
-                    <td className="py-3 text-foreground/80">{p.vigencia || "—"}</td>
-                    <td className="py-3">
-                      <span
-                        className={`inline-flex rounded-full px-4 py-1 text-xs font-medium ${
-                          p.estatus === "Vencida"
-                            ? "bg-[color:var(--status-cancelled)] text-[color:var(--status-cancelled-fg)]"
-                            : "bg-[color:var(--status-active)] text-[color:var(--status-active-fg)]"
-                        }`}
-                      >
-                        {p.estatus || "Vigente"}
-                      </span>
-                    </td>
-                    <td className="py-3" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleEdit(p)}
-                        title="Editar"
-                        aria-label="Editar"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--brand-blue)]/10 text-[color:var(--brand-blue)] hover:bg-[color:var(--brand-blue)]/20"
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleBaja(p.tipo || "")}
-                        title="Dar de baja"
-                        aria-label="Dar de baja"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--status-cancelled)] text-[color:var(--status-cancelled-fg)] hover:opacity-90"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Section>
+      <PolizasSecciones />
+
 
       {detail && (
         <div
