@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CompanySegurosRouteImport } from './routes/_company/seguros'
 import { Route as CompanyPerfilRouteImport } from './routes/_company/perfil'
 import { Route as CompanyPagosRouteImport } from './routes/_company/pagos'
+import { Route as CompanyMovimientosRouteImport } from './routes/_company/movimientos'
 import { Route as CompanyEmpleadosRouteImport } from './routes/_company/empleados'
 import { Route as ClientMisPolizasRouteImport } from './routes/_client/mis-polizas'
 import { Route as ClientMisPagosRouteImport } from './routes/_client/mis-pagos'
@@ -69,6 +70,11 @@ const CompanyPerfilRoute = CompanyPerfilRouteImport.update({
 const CompanyPagosRoute = CompanyPagosRouteImport.update({
   id: '/pagos',
   path: '/pagos',
+  getParentRoute: () => CompanyRoute,
+} as any)
+const CompanyMovimientosRoute = CompanyMovimientosRouteImport.update({
+  id: '/movimientos',
+  path: '/movimientos',
   getParentRoute: () => CompanyRoute,
 } as any)
 const CompanyEmpleadosRoute = CompanyEmpleadosRouteImport.update({
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/mis-pagos': typeof ClientMisPagosRoute
   '/mis-polizas': typeof ClientMisPolizasRoute
   '/empleados': typeof CompanyEmpleadosRoute
+  '/movimientos': typeof CompanyMovimientosRoute
   '/pagos': typeof CompanyPagosRoute
   '/perfil': typeof CompanyPerfilRoute
   '/seguros': typeof CompanySegurosRouteWithChildren
@@ -190,6 +197,7 @@ export interface FileRoutesByTo {
   '/mis-pagos': typeof ClientMisPagosRoute
   '/mis-polizas': typeof ClientMisPolizasRoute
   '/empleados': typeof CompanyEmpleadosRoute
+  '/movimientos': typeof CompanyMovimientosRoute
   '/pagos': typeof CompanyPagosRoute
   '/perfil': typeof CompanyPerfilRoute
   '/seguros': typeof CompanySegurosRouteWithChildren
@@ -217,6 +225,7 @@ export interface FileRoutesById {
   '/_client/mis-pagos': typeof ClientMisPagosRoute
   '/_client/mis-polizas': typeof ClientMisPolizasRoute
   '/_company/empleados': typeof CompanyEmpleadosRoute
+  '/_company/movimientos': typeof CompanyMovimientosRoute
   '/_company/pagos': typeof CompanyPagosRoute
   '/_company/perfil': typeof CompanyPerfilRoute
   '/_company/seguros': typeof CompanySegurosRouteWithChildren
@@ -242,6 +251,7 @@ export interface FileRouteTypes {
     | '/mis-pagos'
     | '/mis-polizas'
     | '/empleados'
+    | '/movimientos'
     | '/pagos'
     | '/perfil'
     | '/seguros'
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
     | '/mis-pagos'
     | '/mis-polizas'
     | '/empleados'
+    | '/movimientos'
     | '/pagos'
     | '/perfil'
     | '/seguros'
@@ -291,6 +302,7 @@ export interface FileRouteTypes {
     | '/_client/mis-pagos'
     | '/_client/mis-polizas'
     | '/_company/empleados'
+    | '/_company/movimientos'
     | '/_company/pagos'
     | '/_company/perfil'
     | '/_company/seguros'
@@ -367,6 +379,13 @@ declare module '@tanstack/react-router' {
       path: '/pagos'
       fullPath: '/pagos'
       preLoaderRoute: typeof CompanyPagosRouteImport
+      parentRoute: typeof CompanyRoute
+    }
+    '/_company/movimientos': {
+      id: '/_company/movimientos'
+      path: '/movimientos'
+      fullPath: '/movimientos'
+      preLoaderRoute: typeof CompanyMovimientosRouteImport
       parentRoute: typeof CompanyRoute
     }
     '/_company/empleados': {
@@ -556,6 +575,7 @@ const CompanySegurosRouteWithChildren = CompanySegurosRoute._addFileChildren(
 
 interface CompanyRouteChildren {
   CompanyEmpleadosRoute: typeof CompanyEmpleadosRoute
+  CompanyMovimientosRoute: typeof CompanyMovimientosRoute
   CompanyPagosRoute: typeof CompanyPagosRoute
   CompanyPerfilRoute: typeof CompanyPerfilRoute
   CompanySegurosRoute: typeof CompanySegurosRouteWithChildren
@@ -563,6 +583,7 @@ interface CompanyRouteChildren {
 
 const CompanyRouteChildren: CompanyRouteChildren = {
   CompanyEmpleadosRoute: CompanyEmpleadosRoute,
+  CompanyMovimientosRoute: CompanyMovimientosRoute,
   CompanyPagosRoute: CompanyPagosRoute,
   CompanyPerfilRoute: CompanyPerfilRoute,
   CompanySegurosRoute: CompanySegurosRouteWithChildren,
@@ -581,3 +602,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
