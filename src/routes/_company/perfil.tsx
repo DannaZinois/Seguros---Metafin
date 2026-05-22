@@ -195,7 +195,24 @@ function PerfilEmpresaPage() {
           <label className="flex flex-col gap-1.5">
             <span className="flex items-center gap-1.5 text-xs font-medium text-foreground">
               Correo institucional
-              <span title="info">i</span>
+              <TooltipProvider delayDuration={150}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={(e) => e.preventDefault()}
+                      className="inline-flex items-center text-muted-foreground hover:text-[color:var(--brand-blue)]"
+                      aria-label="Más información sobre el correo institucional"
+                    >
+                      <Info className="h-3.5 w-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs bg-foreground text-xs text-white">
+                    Este correo será utilizado para enviar avisos de manera
+                    interna a tus empleados.
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </span>
             <TextInput
               value={
