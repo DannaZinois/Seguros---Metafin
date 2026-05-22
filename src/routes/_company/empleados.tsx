@@ -735,6 +735,55 @@ function EmpleadosPage() {
         </div>
       )}
 
+      {confirmAlta && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 p-4 backdrop-blur-md"
+          onClick={() => setConfirmAlta(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl"
+          >
+            <h3 className="text-lg font-bold text-foreground">
+              Dar de alta al empleado
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              ¿Confirmas reactivar a{" "}
+              <span className="font-semibold text-foreground">
+                {confirmAlta.nombre}
+              </span>
+              ? Una vez reactivado, te invitamos a{" "}
+              <span className="font-semibold text-foreground">
+                actualizar los datos
+              </span>{" "}
+              de su perfil para asegurar que la información esté al día.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-end gap-2">
+              <button
+                onClick={() => setConfirmAlta(null)}
+                className="rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+              >
+                Cancelar
+              </button>
+              <Link
+                to="/empleado/$empleadoId"
+                params={{ empleadoId: confirmAlta.trabajadorId }}
+                onClick={confirmarAlta}
+                className="rounded-full border border-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-[color:var(--brand-blue)] hover:bg-[color:var(--brand-blue)]/10"
+              >
+                Activar y actualizar datos
+              </Link>
+              <button
+                onClick={confirmarAlta}
+                className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+              >
+                Sí, dar de alta
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {popup && <Popup state={popup} onClose={() => setPopup(null)} />}
     </div>
   );
