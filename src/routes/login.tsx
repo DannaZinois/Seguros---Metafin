@@ -112,24 +112,6 @@ function LoginPage() {
         </form>
       </main>
 
-      {/* Footer */}
-      <footer className="absolute inset-x-0 bottom-0 border-t border-border bg-white/60 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <span className="inline-block h-5 w-5 rounded-full bg-gradient-to-br from-[color:var(--brand-blue)] to-orange-400" />
-            Copyright © 2025
-          </div>
-          <a href="#" className="underline underline-offset-4">
-            Política de Privacidad
-          </a>
-          <div>
-            Powered by Orion Innovation | ¿Más información?{" "}
-            <a href="#" className="underline underline-offset-4">
-              Contactanos
-            </a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
