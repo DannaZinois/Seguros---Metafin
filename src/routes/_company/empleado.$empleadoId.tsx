@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Pencil, Check, X, ExternalLink } from "lucide-react";
+import { ArrowLeft, Pencil, Check, X } from "lucide-react";
 import { Section, Grid, Field, TextInput } from "@/components/cotizador/shared";
 import { EMPLEADOS_NOMBRES } from "@/lib/empleados-nombres";
 import { useCompanyEmpresa } from "@/lib/company-context";
-import { ASEGURADORA_LINKS } from "@/lib/client-context";
+
 import { FamiliaresBeneficiariosSection } from "@/components/familiares-beneficiarios";
 
 export const Route = createFileRoute("/_company/empleado/$empleadoId")({
