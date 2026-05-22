@@ -143,7 +143,7 @@ function MiPerfilPage() {
         </Grid>
       </Section>
 
-      <FamiliaresBeneficiariosSection editable={editing} />
+      <FamiliaresBeneficiariosSection />
     </div>
   );
 }
