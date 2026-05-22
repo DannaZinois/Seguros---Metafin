@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { Pencil, Check, X } from "lucide-react";
 import { Section, Grid, Field, TextInput } from "@/components/cotizador/shared";
 import { useCurrentClient } from "@/lib/client-context";
 
@@ -9,6 +11,29 @@ export const Route = createFileRoute("/_client/mi-perfil")({
 
 function MiPerfilPage() {
   const cliente = useCurrentClient();
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({
+    nombre: "",
+    correo: "",
+    contacto: "",
+    rfc: "",
+    numeroEmpleado: "EMP-00123",
+    area: "Tecnología",
+  });
+  const empresa = "BBVA";
+
+  useEffect(() => {
+    if (cliente) {
+      setForm((f) => ({
+        ...f,
+        nombre: cliente.profile.nombre,
+        correo: cliente.profile.correo,
+        contacto: cliente.profile.contacto,
+        rfc: cliente.profile.rfc,
+      }));
+    }
+  }, [cliente]);
+
   if (!cliente) {
     return (
       <div className="py-12 text-center text-sm text-muted-foreground">
@@ -16,55 +41,90 @@ function MiPerfilPage() {
       </div>
     );
   }
-  const p = cliente.profile;
   return (
     <div className="pb-12">
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          {p.nombre}
+          {form.nombre}
         </h1>
         <p className="text-sm text-muted-foreground">
           Tus datos generales registrados en la plataforma.
         </p>
       </div>
 
-      <Section title="Datos generales">
+      <Section
+        title="Datos generales"
+        extra={
+          editing ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setEditing(false)}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-sm hover:bg-muted"
+              >
+                <X className="h-4 w-4" /> Cancelar
+              </button>
+              <button
+                onClick={() => setEditing(false)}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--brand-blue)] px-3.5 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+              >
+                <Check className="h-4 w-4" /> Guardar cambios
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setEditing(true)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-sm hover:bg-muted"
+            >
+              <Pencil className="h-4 w-4" /> Editar
+            </button>
+          )
+        }
+      >
         <Grid>
           <Field label="Nombre completo">
-            <TextInput value={p.nombre} readOnly />
+            <TextInput
+              value={form.nombre}
+              onChange={(v) => setForm({ ...form, nombre: v })}
+              readOnly={!editing}
+            />
           </Field>
           <Field label="Correo electrónico">
-            <TextInput value={p.correo} readOnly />
+            <TextInput
+              value={form.correo}
+              onChange={(v) => setForm({ ...form, correo: v })}
+              readOnly={!editing}
+            />
           </Field>
           <Field label="Número de contacto">
-            <TextInput value={p.contacto} readOnly />
+            <TextInput
+              value={form.contacto}
+              onChange={(v) => setForm({ ...form, contacto: v })}
+              readOnly={!editing}
+            />
           </Field>
           <Field label="RFC">
-            <TextInput value={p.rfc} readOnly />
+            <TextInput
+              value={form.rfc}
+              onChange={(v) => setForm({ ...form, rfc: v })}
+              readOnly={!editing}
+            />
           </Field>
-          <Field label="Tipo de asegurado">
-            <TextInput value={p.tipoAsegurado} readOnly />
+          <Field label="Número de empleado">
+            <TextInput
+              value={form.numeroEmpleado}
+              onChange={(v) => setForm({ ...form, numeroEmpleado: v })}
+              readOnly={!editing}
+            />
           </Field>
-          <Field label="Tipo de persona">
-            <TextInput value={p.tipoPersona} readOnly />
+          <Field label="Área">
+            <TextInput
+              value={form.area}
+              onChange={(v) => setForm({ ...form, area: v })}
+              readOnly={!editing}
+            />
           </Field>
-          <Field label="Sexo">
-            <TextInput value={p.sexo} readOnly />
-          </Field>
-          <Field label="Fecha de nacimiento">
-            <TextInput value={p.fechaNacimiento} readOnly />
-          </Field>
-          <Field label="Fecha de antigüedad">
-            <TextInput value={p.fechaAntiguedad} readOnly />
-          </Field>
-          <Field label="Dirección">
-            <TextInput value={p.direccion} readOnly />
-          </Field>
-          <Field label="Código postal">
-            <TextInput value={p.codigoPostal} readOnly />
-          </Field>
-          <Field label="ID de cliente">
-            <TextInput value={cliente.clienteId} readOnly />
+          <Field label="Empresa">
+            <TextInput value={empresa} readOnly />
           </Field>
         </Grid>
       </Section>
