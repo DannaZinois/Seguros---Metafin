@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { ExternalLink, X, Download, Eye, Upload, FileText, CheckCircle2, Loader2 } from "lucide-react";
+import { X, Download, Eye, Upload, FileText, CheckCircle2, Loader2 } from "lucide-react";
 import { Section } from "@/components/cotizador/shared";
 import { ASEGURADORA_LINKS } from "@/lib/client-context";
 
@@ -107,12 +107,10 @@ function MisPolizasPage() {
                 <th className="py-3 font-medium">Aseguradora</th>
                 <th className="py-3 font-medium">Contratante</th>
                 <th className="py-3 font-medium">Estatus</th>
-                <th className="py-3 font-medium">Portal aseguradora</th>
               </tr>
             </thead>
             <tbody>
               {POLIZAS.map((p) => {
-                const link = ASEGURADORA_LINKS[p.aseguradora];
                 return (
                   <tr
                     key={p.id}
@@ -130,20 +128,6 @@ function MisPolizasPage() {
                       >
                         {p.status}
                       </span>
-                    </td>
-                    <td className="py-3" onClick={(e) => e.stopPropagation()}>
-                      {link ? (
-                        <a
-                          href={link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
-                        >
-                          <ExternalLink className="h-3.5 w-3.5" /> Ir al sitio
-                        </a>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
                     </td>
                   </tr>
                 );
