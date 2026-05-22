@@ -26,6 +26,13 @@ function isVida(tipo: string) {
   return tipo.toLowerCase().includes("vida");
 }
 
+function isGMM(tipo: string) {
+  const t = tipo.toLowerCase();
+  return t.includes("gmm") || t.includes("gastos médicos") || t.includes("gastos medicos");
+}
+
+type TabKey = "gmm" | "vida";
+
 function EmpleadosPage() {
   const empresa = useCompanyEmpresa();
   const [query, setQuery] = useState("");
@@ -34,6 +41,7 @@ function EmpleadosPage() {
   const [popup, setPopup] = useState<PopupState>(null);
   const [page, setPage] = useState(1);
   const pageSize = 15;
+  const [tab, setTab] = useState<TabKey>("gmm");
   const bulkRef = useRef<HTMLInputElement | null>(null);
   const cotizRef = useRef<HTMLInputElement | null>(null);
   const cuestRef = useRef<HTMLInputElement | null>(null);
@@ -63,15 +71,26 @@ function EmpleadosPage() {
     return rows;
   }, [empresa]);
 
+  const byTab = useMemo(
+    () =>
+      empleados.filter((e) =>
+        tab === "vida" ? isVida(e.polizaTipo) : isGMM(e.polizaTipo),
+      ),
+    [empleados, tab],
+  );
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return empleados;
-    return empleados.filter(
+    if (!q) return byTab;
+    return byTab.filter(
       (e) =>
         e.trabajadorId.toLowerCase().includes(q) ||
         e.nombre.toLowerCase().includes(q),
     );
-  }, [empleados, query]);
+  }, [byTab, query]);
+
+  const countGMM = useMemo(() => empleados.filter((e) => isGMM(e.polizaTipo)).length, [empleados]);
+  const countVida = useMemo(() => empleados.filter((e) => isVida(e.polizaTipo)).length, [empleados]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -175,7 +194,29 @@ function EmpleadosPage() {
         </button>
       </div>
 
-      <Section title={`Total: ${empleados.length}`}>
+      <Section title={`Total: ${filtered.length}`}>
+        <div className="mb-4 inline-flex rounded-full border border-border bg-muted/40 p-1">
+          <button
+            onClick={() => { setTab("gmm"); setPage(1); }}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+              tab === "gmm"
+                ? "bg-[color:var(--brand-blue)] text-white"
+                : "text-foreground/70 hover:text-foreground"
+            }`}
+          >
+            GMM ({countGMM})
+          </button>
+          <button
+            onClick={() => { setTab("vida"); setPage(1); }}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+              tab === "vida"
+                ? "bg-[color:var(--brand-blue)] text-white"
+                : "text-foreground/70 hover:text-foreground"
+            }`}
+          >
+            Vida ({countVida})
+          </button>
+        </div>
         <div className="mb-4 flex items-center">
           <div className="relative w-full max-w-sm">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
