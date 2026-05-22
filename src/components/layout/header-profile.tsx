@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { X, Pencil } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export interface ProfileField {
   label: string;
@@ -20,10 +21,12 @@ export function HeaderProfile({
   name,
   role,
   fields,
+  editTo,
 }: {
   name: string;
   role: string;
   fields: ProfileField[];
+  editTo?: string;
 }) {
   const [open, setOpen] = useState(false);
   const initials = getInitials(name);
@@ -83,6 +86,17 @@ export function HeaderProfile({
                 </div>
               ))}
             </div>
+            {editTo && (
+              <div className="mt-6 flex justify-end">
+                <Link
+                  to={editTo}
+                  onClick={() => setOpen(false)}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+                >
+                  <Pencil className="h-4 w-4" /> Editar
+                </Link>
+              </div>
+            )}
           </div>
         </div>,
         document.body,
