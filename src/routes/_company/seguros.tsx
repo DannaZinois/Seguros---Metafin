@@ -372,21 +372,13 @@ function SegurosPage() {
 
   return (
     <div className="pb-12">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Mis seguros
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Consulta las pólizas activas de {empresa.nombre}.
-          </p>
-        </div>
-        <button
-          onClick={() => setNuevoOpen(true)}
-          className="inline-flex items-center gap-2 rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
-        >
-          <Plus className="h-4 w-4" /> Nuevo seguro
-        </button>
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Mis seguros
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Consulta las pólizas activas de {empresa.nombre}.
+        </p>
       </div>
 
       <PolizasSecciones />
