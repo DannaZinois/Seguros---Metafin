@@ -21,6 +21,7 @@ import {
   newEncargado,
   type AccessType,
 } from "@/lib/empresa-store";
+import { logMovimiento } from "@/lib/movimientos-log";
 
 export const Route = createFileRoute("/_company/perfil")({
   component: PerfilEmpresaPage,
@@ -80,6 +81,10 @@ function PerfilEmpresaPage() {
       correoInstitucional: editForm.correoInstitucional.trim(),
     });
     setEditing(false);
+    logMovimiento(
+      "Cambio de datos",
+      `Actualización de datos generales de ${editForm.nombre.trim() || empresa.nombre}`,
+    );
     setPopup({
       kind: "info",
       title: "Datos actualizados",
@@ -110,6 +115,10 @@ function PerfilEmpresaPage() {
     saveEmpresa({ ...empresa, encargados: [...empresa.encargados, enc] });
     setOpen(false);
     resetForm();
+    logMovimiento(
+      "Cambio de datos",
+      `Registro de encargado ${enc.nombre} (${enc.acceso})`,
+    );
     setPopup({
       kind: "info",
       title: "Encargado registrado",
