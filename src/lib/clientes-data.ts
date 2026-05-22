@@ -216,15 +216,15 @@ export function findPoliza(clienteId: string, polizaId: string) {
 export function buildEmpresaSeeds(): Empresa[] {
   const ENCARGADOS: Record<string, Array<{ nombre: string; contacto: string; email: string; acceso: "Admin" | "RRHH" | "Lectura" }>> = {
     E880101: [
-      { nombre: "Roberto Salinas", contacto: "+52 55 4422 1101", email: "roberto.salinas@aztlan.com.mx", acceso: "Admin" },
-      { nombre: "Lucía Hernández", contacto: "+52 55 4422 1102", email: "lucia.hernandez@aztlan.com.mx", acceso: "RRHH" },
+      { nombre: "Roberto Salinas", contacto: "+52 55 4422 1101", email: "roberto.salinas@orion.com.mx", acceso: "Admin" },
+      { nombre: "Lucía Hernández", contacto: "+52 55 4422 1102", email: "lucia.hernandez@orion.com.mx", acceso: "RRHH" },
     ],
     E880201: [
-      { nombre: "Jorge Méndez", contacto: "+52 33 8899 5545", email: "jorge.mendez@pacifico.mx", acceso: "Admin" },
-      { nombre: "Patricia Núñez", contacto: "+52 33 8899 5546", email: "patricia.nunez@pacifico.mx", acceso: "Lectura" },
+      { nombre: "Jorge Méndez", contacto: "+52 33 8899 5545", email: "jorge.mendez@orion.com.mx", acceso: "Admin" },
+      { nombre: "Patricia Núñez", contacto: "+52 33 8899 5546", email: "patricia.nunez@orion.com.mx", acceso: "Lectura" },
     ],
     E880301: [
-      { nombre: "Daniela Ortega", contacto: "+52 81 2233 4456", email: "daniela.ortega@vertice.io", acceso: "Admin" },
+      { nombre: "Daniela Ortega", contacto: "+52 81 2233 4456", email: "daniela.ortega@orion.com.mx", acceso: "Admin" },
     ],
   };
   const GIROS: Record<string, string> = {
