@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { X, Pencil } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { X, Pencil, Check } from "lucide-react";
 
 export interface ProfileField {
   label: string;
@@ -21,15 +20,52 @@ export function HeaderProfile({
   name,
   role,
   fields,
-  editTo,
+  onSave,
+  editableLabels,
 }: {
   name: string;
   role: string;
   fields: ProfileField[];
-  editTo?: string;
+  onSave?: (fields: ProfileField[]) => void;
+  /** Optional whitelist of labels that can be edited. Defaults to all. */
+  editableLabels?: string[];
 }) {
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [localFields, setLocalFields] = useState<ProfileField[]>(fields);
+  const fieldsKey = useRef("");
+  const newKey = JSON.stringify(fields);
+  if (fieldsKey.current !== newKey && !editing) {
+    fieldsKey.current = newKey;
+  }
+  useEffect(() => {
+    if (!editing) setLocalFields(fields);
+  }, [fieldsKey.current, editing]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const initials = getInitials(name);
+  const canEditLabel = (label: string) =>
+    !editableLabels || editableLabels.includes(label);
+
+  const updateField = (label: string, value: string) => {
+    setLocalFields((prev) =>
+      prev.map((f) => (f.label === label ? { ...f, value } : f)),
+    );
+  };
+
+  const handleSave = () => {
+    onSave?.(localFields);
+    setEditing(false);
+  };
+
+  const handleCancel = () => {
+    setLocalFields(fields);
+    setEditing(false);
+  };
+
+  const handleClose = () => {
+    handleCancel();
+    setOpen(false);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -44,7 +80,7 @@ export function HeaderProfile({
     ? createPortal(
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-foreground/40 p-4 backdrop-blur-md"
-          onClick={() => setOpen(false)}
+          onClick={handleClose}
           role="dialog"
           aria-modal="true"
         >
@@ -53,7 +89,7 @@ export function HeaderProfile({
             className="relative my-auto w-full max-w-lg rounded-3xl bg-white p-8 shadow-2xl"
           >
             <button
-              onClick={() => setOpen(false)}
+              onClick={handleClose}
               className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               aria-label="Cerrar"
             >
@@ -72,7 +108,7 @@ export function HeaderProfile({
               </div>
             </div>
             <div className="mt-6 divide-y divide-border/60 rounded-2xl border border-border bg-muted/20">
-              {fields.map((f) => (
+              {localFields.map((f) => (
                 <div
                   key={f.label}
                   className="flex items-start justify-between gap-4 px-5 py-3.5"
@@ -80,23 +116,46 @@ export function HeaderProfile({
                   <span className="text-sm font-medium text-muted-foreground">
                     {f.label}
                   </span>
-                  <span className="text-right text-sm font-medium text-foreground">
-                    {f.value || "—"}
-                  </span>
+                  {editing && canEditLabel(f.label) ? (
+                    <input
+                      type="text"
+                      value={f.value}
+                      onChange={(e) => updateField(f.label, e.target.value)}
+                      className="w-1/2 rounded-lg border border-border bg-white px-3 py-1.5 text-right text-sm font-medium text-foreground focus:border-orange-500 focus:outline-none"
+                    />
+                  ) : (
+                    <span className="text-right text-sm font-medium text-foreground">
+                      {f.value || "—"}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
-            {editTo && (
-              <div className="mt-6 flex justify-end">
-                <Link
-                  to={editTo}
-                  onClick={() => setOpen(false)}
+            <div className="mt-6 flex justify-end gap-2">
+              {editing ? (
+                <>
+                  <button
+                    onClick={handleCancel}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+                  >
+                    <X className="h-4 w-4" /> Cancelar
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+                  >
+                    <Check className="h-4 w-4" /> Guardar
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setEditing(true)}
                   className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
                 >
                   <Pencil className="h-4 w-4" /> Editar
-                </Link>
-              </div>
-            )}
+                </button>
+              )}
+            </div>
           </div>
         </div>,
         document.body,
