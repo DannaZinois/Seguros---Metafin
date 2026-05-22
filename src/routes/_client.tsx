@@ -1,8 +1,8 @@
 import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { User, Shield, MessageCircle } from "lucide-react";
+import { User, Shield, Mail } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { useCurrentClient, ADMIN_WHATSAPP } from "@/lib/client-context";
+import { useCurrentClient } from "@/lib/client-context";
 import { HeaderProfile } from "@/components/layout/header-profile";
 import { AppShell } from "@/components/layout/app-shell";
 
@@ -32,11 +32,6 @@ function ClientLayout() {
     { to: "/mis-polizas", label: "Mis pólizas", icon: Shield },
   ] as const;
 
-  const waMessage = encodeURIComponent(
-    `Hola, soy ${cliente?.profile.nombre ?? user?.name ?? "cliente"} y necesito ayuda con mi cuenta.`,
-  );
-  const waUrl = `https://wa.me/${ADMIN_WHATSAPP}?text=${waMessage}`;
-
   return (
     <AppShell
       brandTitle={cliente?.profile.nombre ?? user?.name ?? "Mi cuenta"}
@@ -59,14 +54,12 @@ function ClientLayout() {
       }
       floating={
         <a
-          href={waUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Contactar al admin por WhatsApp"
-          className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-semibold text-white shadow-lg transition-transform hover:scale-105 hover:brightness-95"
+          href="mailto:siniestro@metafin.mx"
+          aria-label="Contactar por correo"
+          className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 rounded-full bg-[color:var(--brand-blue)] px-5 py-3 text-sm font-semibold text-white shadow-lg transition-transform hover:scale-105 hover:bg-[color:var(--brand-blue-dark)]"
         >
-          <MessageCircle className="h-5 w-5" />
-          WhatsApp
+          <Mail className="h-5 w-5" />
+          Contacto
         </a>
       }
     >
