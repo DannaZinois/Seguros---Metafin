@@ -191,6 +191,8 @@ function EmpleadoDetallePage() {
         </Grid>
       </Section>
 
+      <FamiliaresBeneficiariosSection editable={editing} />
+
       <Section title={`Pólizas en las que se encuentra (${polizas.length})`}>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
