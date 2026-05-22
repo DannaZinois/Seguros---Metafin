@@ -76,10 +76,8 @@ function EmpleadoDetallePage() {
     puesto: "Analista",
     sexo: "Masculino",
     edad: "32",
-    fuma: "No",
   });
   const sexos = ["Masculino", "Femenino"];
-  const fumaOpts = ["Sí", "No"];
 
   const contratante = empresa?.nombre ?? "Orion Innovation";
   const polizas: PolizaRow[] = [
@@ -214,21 +212,6 @@ function EmpleadoDetallePage() {
               onChange={(v) => setForm({ ...form, edad: v })}
               readOnly={!editing}
             />
-          </Field>
-          <Field label="¿Fuma?">
-            {editing ? (
-              <select
-                value={form.fuma}
-                onChange={(e) => setForm({ ...form, fuma: e.target.value })}
-                className="w-full rounded-xl border border-border bg-white px-3 py-2 text-sm"
-              >
-                {fumaOpts.map((s) => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            ) : (
-              <TextInput value={form.fuma} readOnly />
-            )}
           </Field>
         </Grid>
       </Section>
