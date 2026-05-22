@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Search, ClipboardList } from "lucide-react";
 import { Section } from "@/components/cotizador/shared";
 import { useCompanyEmpresa } from "@/lib/company-context";
+import { MOVIMIENTOS_KEY, MOVIMIENTOS_EVENT } from "@/lib/movimientos-log";
 
 export const Route = createFileRoute("/_company/movimientos")({
   component: MovimientosPage,
@@ -27,7 +28,7 @@ interface Movimiento {
   detalle: string;
 }
 
-const STORAGE_KEY = "zinois.movimientos";
+const STORAGE_KEY = MOVIMIENTOS_KEY;
 
 const TIPOS: TipoMovimiento[] = [
   "Alta de empleado",
@@ -40,14 +41,14 @@ const TIPOS: TipoMovimiento[] = [
 
 function seedMovimientos(): Movimiento[] {
   const base: Omit<Movimiento, "id">[] = [
-    { tipo: "Alta de empleado", usuario: "María Hernández", rol: "RRHH", fecha: "18/05/2026", hora: "09:42", detalle: "Alta de Luis Ramírez en póliza GMM-2024" },
-    { tipo: "Carga de comprobante", usuario: "Carlos Mendoza", rol: "Admin", fecha: "17/05/2026", hora: "14:08", detalle: "Comprobante de pago póliza Autos-118" },
-    { tipo: "Actualización de póliza", usuario: "Ana López", rol: "Admin", fecha: "15/05/2026", hora: "11:25", detalle: "Cambio de aseguradora a GNP" },
-    { tipo: "Baja de empleado", usuario: "María Hernández", rol: "RRHH", fecha: "12/05/2026", hora: "16:53", detalle: "Baja de Sofía Pérez" },
-    { tipo: "Renovación", usuario: "Carlos Mendoza", rol: "Admin", fecha: "08/05/2026", hora: "10:14", detalle: "Renovación póliza Vida-007" },
-    { tipo: "Cambio de datos", usuario: "Ana López", rol: "Admin", fecha: "05/05/2026", hora: "08:30", detalle: "Actualización de dirección fiscal" },
-    { tipo: "Carga de comprobante", usuario: "María Hernández", rol: "RRHH", fecha: "02/05/2026", hora: "13:46", detalle: "Comprobante póliza GMM-2024" },
-    { tipo: "Alta de empleado", usuario: "Carlos Mendoza", rol: "Admin", fecha: "28/04/2026", hora: "15:21", detalle: "Alta masiva de 12 empleados" },
+    { tipo: "Alta de empleado", usuario: "Lucía Hernández", rol: "RRHH", fecha: "18/05/2026", hora: "09:42", detalle: "Alta de Luis Ramírez en póliza GMM-2024" },
+    { tipo: "Carga de comprobante", usuario: "Roberto Salinas", rol: "Admin", fecha: "17/05/2026", hora: "14:08", detalle: "Comprobante de pago póliza Autos-118" },
+    { tipo: "Actualización de póliza", usuario: "Roberto Salinas", rol: "Admin", fecha: "15/05/2026", hora: "11:25", detalle: "Cambio de aseguradora a GNP" },
+    { tipo: "Baja de empleado", usuario: "Lucía Hernández", rol: "RRHH", fecha: "12/05/2026", hora: "16:53", detalle: "Baja de Sofía Pérez" },
+    { tipo: "Renovación", usuario: "Roberto Salinas", rol: "Admin", fecha: "08/05/2026", hora: "10:14", detalle: "Renovación póliza Vida-007" },
+    { tipo: "Cambio de datos", usuario: "Roberto Salinas", rol: "Admin", fecha: "05/05/2026", hora: "08:30", detalle: "Actualización de dirección fiscal" },
+    { tipo: "Carga de comprobante", usuario: "Lucía Hernández", rol: "RRHH", fecha: "02/05/2026", hora: "13:46", detalle: "Comprobante póliza GMM-2024" },
+    { tipo: "Alta de empleado", usuario: "Roberto Salinas", rol: "Admin", fecha: "28/04/2026", hora: "15:21", detalle: "Alta masiva de 12 empleados" },
   ];
   return base.map((m) => ({ ...m, id: crypto.randomUUID() }));
 }
@@ -56,18 +57,24 @@ function useMovimientos() {
   const [list, setList] = useState<Movimiento[]>([]);
   useEffect(() => {
     if (typeof window === "undefined") return;
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        setList(JSON.parse(raw));
-        return;
+    const load = () => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          setList(JSON.parse(raw));
+          return;
+        }
+      } catch {
+        // ignore
       }
-    } catch {
-      // ignore
-    }
-    const seeds = seedMovimientos();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(seeds));
-    setList(seeds);
+      const seeds = seedMovimientos();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(seeds));
+      setList(seeds);
+    };
+    load();
+    const h = () => load();
+    window.addEventListener(MOVIMIENTOS_EVENT, h);
+    return () => window.removeEventListener(MOVIMIENTOS_EVENT, h);
   }, []);
   return [list, setList] as const;
 }
