@@ -332,8 +332,8 @@ function EmpleadosPage() {
                               onClick={() =>
                                 setPopup({
                                   kind: "info",
-                                  title: "Enviar consentimiento",
-                                  message: `Enviando consentimiento por correo a ${e.nombre}.`,
+                                  title: "Solicitud enviada",
+                                  message: `Se envió la solicitud a ${e.nombre} para que llene y cargue su consentimiento.`,
                                 })
                               }
                               className="rounded-full p-1.5 text-[color:var(--brand-blue)] hover:bg-muted"
