@@ -230,6 +230,9 @@ function EmpleadosPage() {
                 <th className="py-3 font-medium">Renovación</th>
                 <th className="py-3 font-medium">Teléfono</th>
                 <th className="py-3 font-medium">Certificado</th>
+                {tab === "vida" && (
+                  <th className="py-3 font-medium">Consentimiento</th>
+                )}
                 <th className="py-3 font-medium">Status</th>
                 <th className="py-3 font-medium">Acciones</th>
               </tr>
@@ -237,7 +240,7 @@ function EmpleadosPage() {
             <tbody>
               {pageRows.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-8 text-center text-sm text-muted-foreground">
+                  <td colSpan={tab === "vida" ? 9 : 8} className="py-8 text-center text-sm text-muted-foreground">
                     Sin resultados.
                   </td>
                 </tr>
@@ -295,6 +298,51 @@ function EmpleadosPage() {
                           </button>
                         </div>
                       </td>
+                      {tab === "vida" && (
+                        <td className="py-3">
+                          <div className="flex items-center gap-2">
+                            <button
+                              title="Descargar consentimiento"
+                              onClick={() =>
+                                setPopup({
+                                  kind: "info",
+                                  title: "Descargar consentimiento",
+                                  message: `Descargando consentimiento de ${e.nombre} en PDF.`,
+                                })
+                              }
+                              className="rounded-full p-1.5 text-[color:var(--brand-blue)] hover:bg-muted"
+                            >
+                              <Download className="h-4 w-4" />
+                            </button>
+                            <button
+                              title="Ver consentimiento"
+                              onClick={() =>
+                                setPopup({
+                                  kind: "info",
+                                  title: "Ver consentimiento",
+                                  message: `Abriendo consentimiento de ${e.nombre}.`,
+                                })
+                              }
+                              className="rounded-full p-1.5 text-[color:var(--brand-blue)] hover:bg-muted"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
+                            <button
+                              title="Enviar por correo"
+                              onClick={() =>
+                                setPopup({
+                                  kind: "info",
+                                  title: "Enviar consentimiento",
+                                  message: `Enviando consentimiento por correo a ${e.nombre}.`,
+                                })
+                              }
+                              className="rounded-full p-1.5 text-[color:var(--brand-blue)] hover:bg-muted"
+                            >
+                              <Send className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </td>
+                      )}
                       <td className="py-3">
                         <span
                           className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
