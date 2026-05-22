@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { X, Download, Eye, Upload, FileText, CheckCircle2, Loader2 } from "lucide-react";
 import { Section } from "@/components/cotizador/shared";
-import { ASEGURADORA_LINKS } from "@/lib/client-context";
+
 
 export const Route = createFileRoute("/_client/mis-polizas")({
   component: MisPolizasPage,
