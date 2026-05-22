@@ -18,9 +18,10 @@ function MiPerfilPage() {
     contacto: "",
     rfc: "",
     numeroEmpleado: "EMP-00123",
-    area: "Tecnología",
+    area: "BBVA",
+    puesto: "Analista",
   });
-  const empresa = "BBVA";
+  const puestos = ["Analista", "Gerente", "Director", "Coordinador", "Asistente"];
 
   useEffect(() => {
     if (cliente) {
