@@ -288,12 +288,6 @@ function PerfilEmpresaPage() {
           </table>
         </div>
       </Section>
-
-      <p className="mt-10 text-center text-xs text-muted-foreground">
-        Copyrights ©{" "}
-        <span className="text-[color:var(--brand-blue)]">Orion Innovation</span>
-      </p>
-
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 p-4 backdrop-blur-md"

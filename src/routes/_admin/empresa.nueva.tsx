@@ -440,11 +440,6 @@ function RegistroEmpresaPage() {
           Borrar
         </button>
       </div>
-
-      <p className="mt-10 text-center text-xs text-muted-foreground">
-        Copyrights © <span className="text-[color:var(--brand-blue)]">Orion Innovation</span>
-      </p>
-
       {popup && <Popup state={popup} onClose={() => setPopup(null)} />}
     </div>
   );
