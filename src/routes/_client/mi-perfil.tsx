@@ -23,11 +23,9 @@ function MiPerfilPage() {
     puesto: "Analista",
     sexo: "Masculino",
     edad: "30",
-    fuma: "No",
   });
   const puestos = ["Analista", "Gerente", "Director", "Coordinador", "Asistente"];
   const sexos = ["Masculino", "Femenino"];
-  const fumaOpts = ["Sí", "No"];
 
   useEffect(() => {
     if (cliente) {
@@ -166,21 +164,6 @@ function MiPerfilPage() {
               onChange={(v) => setForm({ ...form, edad: v })}
               readOnly={!editing}
             />
-          </Field>
-          <Field label="¿Fuma?">
-            {editing ? (
-              <select
-                value={form.fuma}
-                onChange={(e) => setForm({ ...form, fuma: e.target.value })}
-                className="w-full rounded-xl border border-border bg-white px-3 py-2 text-sm"
-              >
-                {fumaOpts.map((s) => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            ) : (
-              <TextInput value={form.fuma} readOnly />
-            )}
           </Field>
         </Grid>
       </Section>
