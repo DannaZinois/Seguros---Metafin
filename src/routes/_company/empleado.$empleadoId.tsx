@@ -5,6 +5,7 @@ import { Section, Grid, Field, TextInput } from "@/components/cotizador/shared";
 import { EMPLEADOS_NOMBRES } from "@/lib/empleados-nombres";
 import { useCompanyEmpresa } from "@/lib/company-context";
 import { ASEGURADORA_LINKS } from "@/lib/client-context";
+import { FamiliaresBeneficiariosSection } from "@/components/familiares-beneficiarios";
 
 export const Route = createFileRoute("/_company/empleado/$empleadoId")({
   component: EmpleadoDetallePage,
@@ -189,6 +190,8 @@ function EmpleadoDetallePage() {
           </Field>
         </Grid>
       </Section>
+
+      <FamiliaresBeneficiariosSection editable={editing} />
 
       <Section title={`Pólizas en las que se encuentra (${polizas.length})`}>
         <div className="overflow-x-auto">
