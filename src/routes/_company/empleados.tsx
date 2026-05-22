@@ -117,10 +117,6 @@ function EmpleadosPage() {
     );
   }
 
-  const polizaTipos = Array.from(
-    new Set(empresa.polizas.map((p) => p.tipo).filter(Boolean)),
-  );
-
   const closeModal = () => {
     setOpen(false);
     setMode("choose");
