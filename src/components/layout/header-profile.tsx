@@ -74,6 +74,9 @@ export function HeaderProfile({
   }, [fieldsKey.current, editing]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const initials = getInitials(name);
+  const displayName =
+    mergedFields.find((f) => f.label === "Nombre")?.value?.trim() || name;
+  const displayInitials = getInitials(displayName);
   const canEditLabel = (label: string) =>
     !editableLabels || editableLabels.includes(label);
 
@@ -164,7 +167,7 @@ export function HeaderProfile({
                 {photo ? (
                   <img
                     src={photo}
-                    alt={name}
+                    alt={displayName}
                     className="h-16 w-16 rounded-full object-cover shadow-md"
                   />
                 ) : (
@@ -172,7 +175,7 @@ export function HeaderProfile({
                     className="flex h-16 w-16 items-center justify-center rounded-full text-lg font-semibold text-white shadow-md"
                     style={{ background: "var(--gradient-brand)" }}
                   >
-                    {initials}
+                    {displayInitials}
                   </div>
                 )}
                 {editing && (
@@ -196,7 +199,7 @@ export function HeaderProfile({
                 )}
               </div>
               <div>
-                <h3 className="text-xl font-bold text-foreground">{name}</h3>
+                <h3 className="text-xl font-bold text-foreground">{displayName}</h3>
                 <p className="text-sm text-muted-foreground">{role}</p>
                 {editing && (
                   <button
@@ -273,13 +276,13 @@ export function HeaderProfile({
         aria-label="Ver datos de la cuenta"
       >
         <div className="text-right">
-          <p className="text-sm font-semibold text-foreground">{name}</p>
+          <p className="text-sm font-semibold text-foreground">{displayName}</p>
           <p className="text-xs text-muted-foreground">{role}</p>
         </div>
         {photo ? (
           <img
             src={photo}
-            alt={name}
+            alt={displayName}
             className="h-10 w-10 rounded-full object-cover shadow-sm ring-2 ring-white"
           />
         ) : (
@@ -287,7 +290,7 @@ export function HeaderProfile({
             className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white shadow-sm ring-2 ring-white"
             style={{ background: "var(--gradient-brand)" }}
           >
-            {initials}
+            {displayInitials}
           </div>
         )}
       </button>
