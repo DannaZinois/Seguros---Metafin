@@ -64,6 +64,7 @@ export interface Empresa {
   giro: string;
   direccion: string;
   codigoPostal: string;
+  correoInstitucional?: string;
   encargados: Encargado[];
   polizas: Poliza[];
   createdAt: number;
@@ -137,6 +138,7 @@ export function seedEmpresasIfEmpty(seeds: Empresa[]) {
     return (
       !cur ||
       cur.nombre !== s.nombre ||
+      cur.giro !== s.giro ||
       cur.direccion !== s.direccion ||
       cur.codigoPostal !== s.codigoPostal ||
       cur.polizas.length !== s.polizas.length ||

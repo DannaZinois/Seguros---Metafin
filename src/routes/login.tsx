@@ -123,7 +123,7 @@ function LoginPage() {
             Política de Privacidad
           </a>
           <div>
-            Powered by Zinois | ¿Más información?{" "}
+            Powered by Orion Innovation | ¿Más información?{" "}
             <a href="#" className="underline underline-offset-4">
               Contactanos
             </a>

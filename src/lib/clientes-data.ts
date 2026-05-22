@@ -228,7 +228,7 @@ export function buildEmpresaSeeds(): Empresa[] {
     ],
   };
   const GIROS: Record<string, string> = {
-    E880101: "Manufactura industrial",
+    E880101: "Tecnología",
     E880201: "Construcción y obra civil",
     E880301: "Desarrollo de software",
   };
