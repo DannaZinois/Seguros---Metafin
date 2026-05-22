@@ -71,6 +71,7 @@ function EmpleadosPage() {
   const pageSize = 15;
   const [tab, setTab] = useState<TabKey>("gmm");
   const [statusMap, setStatusMap] = useState<Record<string, Status>>({});
+  const [statusFilter, setStatusFilter] = useState<"todos" | Status>("todos");
   const [confirmBaja, setConfirmBaja] = useState<EmpleadoRow | null>(null);
   const bulkRef = useRef<HTMLInputElement | null>(null);
   const cotizRef = useRef<HTMLInputElement | null>(null);
@@ -94,13 +95,20 @@ function EmpleadosPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter(
-      (e) =>
-        e.trabajadorId.toLowerCase().includes(q) ||
-        e.nombre.toLowerCase().includes(q),
-    );
-  }, [rows, query]);
+    return rows.filter((e) => {
+      if (q) {
+        const matches =
+          e.trabajadorId.toLowerCase().includes(q) ||
+          e.nombre.toLowerCase().includes(q);
+        if (!matches) return false;
+      }
+      if (statusFilter !== "todos") {
+        const s = statusMap[e.id] ?? "Activo";
+        if (s !== statusFilter) return false;
+      }
+      return true;
+    });
+  }, [rows, query, statusFilter, statusMap]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -205,7 +213,7 @@ function EmpleadosPage() {
             Vida ({VIDA_ROWS.length})
           </button>
         </div>
-        <div className="mb-4 flex items-center">
+        <div className="mb-4 flex flex-wrap items-center gap-3">
           <div className="relative w-full max-w-sm">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
@@ -215,6 +223,15 @@ function EmpleadosPage() {
               className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-[color:var(--brand-blue)]"
             />
           </div>
+          <select
+            value={statusFilter}
+            onChange={(e) => { setStatusFilter(e.target.value as "todos" | Status); setPage(1); }}
+            className="rounded-full border border-border bg-white px-4 py-2 text-sm outline-none focus:border-[color:var(--brand-blue)]"
+          >
+            <option value="todos">Todos los status</option>
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+          </select>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1100px] text-left text-sm">
