@@ -18,9 +18,10 @@ function MiPerfilPage() {
     contacto: "",
     rfc: "",
     numeroEmpleado: "EMP-00123",
-    area: "Tecnología",
+    area: "BBVA",
+    puesto: "Analista",
   });
-  const empresa = "BBVA";
+  const puestos = ["Analista", "Gerente", "Director", "Coordinador", "Asistente"];
 
   useEffect(() => {
     if (cliente) {
@@ -116,15 +117,27 @@ function MiPerfilPage() {
               readOnly={!editing}
             />
           </Field>
-          <Field label="Área">
+          <Field label="Área a la que pertenece">
             <TextInput
               value={form.area}
               onChange={(v) => setForm({ ...form, area: v })}
               readOnly={!editing}
             />
           </Field>
-          <Field label="Empresa">
-            <TextInput value={empresa} readOnly />
+          <Field label="Puesto">
+            {editing ? (
+              <select
+                value={form.puesto}
+                onChange={(e) => setForm({ ...form, puesto: e.target.value })}
+                className="w-full rounded-xl border border-border bg-white px-3 py-2 text-sm"
+              >
+                {puestos.map((p) => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
+            ) : (
+              <TextInput value={form.puesto} readOnly />
+            )}
           </Field>
         </Grid>
       </Section>
