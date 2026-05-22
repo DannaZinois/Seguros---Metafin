@@ -167,7 +167,7 @@ export function HeaderProfile({
                 {photo ? (
                   <img
                     src={photo}
-                    alt={name}
+                    alt={displayName}
                     className="h-16 w-16 rounded-full object-cover shadow-md"
                   />
                 ) : (
@@ -175,7 +175,7 @@ export function HeaderProfile({
                     className="flex h-16 w-16 items-center justify-center rounded-full text-lg font-semibold text-white shadow-md"
                     style={{ background: "var(--gradient-brand)" }}
                   >
-                    {initials}
+                    {displayInitials}
                   </div>
                 )}
                 {editing && (
@@ -199,7 +199,7 @@ export function HeaderProfile({
                 )}
               </div>
               <div>
-                <h3 className="text-xl font-bold text-foreground">{name}</h3>
+                <h3 className="text-xl font-bold text-foreground">{displayName}</h3>
                 <p className="text-sm text-muted-foreground">{role}</p>
                 {editing && (
                   <button
