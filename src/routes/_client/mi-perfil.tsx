@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_client/mi-perfil")({
 function MiPerfilPage() {
   const cliente = useCurrentClient();
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({
+  const initialForm = {
     nombre: "",
     correo: "",
     contacto: "",
@@ -23,21 +23,57 @@ function MiPerfilPage() {
     puesto: "Analista",
     sexo: "Masculino",
     edad: "30",
-  });
+  };
+  const [form, setForm] = useState(initialForm);
+  const [snapshot, setSnapshot] = useState(initialForm);
   const puestos = ["Analista", "Gerente", "Director", "Coordinador", "Asistente"];
   const sexos = ["Masculino", "Femenino"];
 
+  // Hydrate from localStorage + cliente seed.
   useEffect(() => {
-    if (cliente) {
-      setForm((f) => ({
-        ...f,
-        nombre: cliente.profile.nombre,
-        correo: cliente.profile.correo,
-        contacto: cliente.profile.contacto,
-        rfc: cliente.profile.rfc,
-      }));
+    if (!cliente) return;
+    let stored: Partial<typeof initialForm> = {};
+    if (typeof window !== "undefined") {
+      try {
+        const raw = window.localStorage.getItem("mi-perfil:form");
+        if (raw) stored = JSON.parse(raw);
+      } catch {
+        /* ignore */
+      }
     }
-  }, [cliente]);
+    const next = {
+      ...initialForm,
+      nombre: cliente.profile.nombre,
+      correo: cliente.profile.correo,
+      contacto: cliente.profile.contacto,
+      rfc: cliente.profile.rfc,
+      ...stored,
+    };
+    setForm(next);
+    setSnapshot(next);
+  }, [cliente]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleEdit = () => {
+    setSnapshot(form);
+    setEditing(true);
+  };
+
+  const handleCancel = () => {
+    setForm(snapshot);
+    setEditing(false);
+  };
+
+  const handleSave = () => {
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.setItem("mi-perfil:form", JSON.stringify(form));
+      } catch {
+        /* ignore */
+      }
+    }
+    setSnapshot(form);
+    setEditing(false);
+  };
 
   if (!cliente) {
     return (
@@ -63,13 +99,13 @@ function MiPerfilPage() {
           editing ? (
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setEditing(false)}
+                onClick={handleCancel}
                 className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-3.5 py-2 text-sm font-medium text-white hover:bg-orange-600"
               >
                 <X className="h-4 w-4" /> Cancelar
               </button>
               <button
-                onClick={() => setEditing(false)}
+                onClick={handleSave}
                 className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--brand-blue)] px-3.5 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
               >
                 <Check className="h-4 w-4" /> Guardar cambios
@@ -77,7 +113,7 @@ function MiPerfilPage() {
             </div>
           ) : (
             <button
-              onClick={() => setEditing(true)}
+              onClick={handleEdit}
               className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-3.5 py-2 text-sm font-medium text-white hover:bg-orange-600"
             >
               <Pencil className="h-4 w-4" /> Editar
