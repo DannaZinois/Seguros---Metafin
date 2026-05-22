@@ -117,10 +117,6 @@ function EmpleadosPage() {
     );
   }
 
-  const polizaTipos = Array.from(
-    new Set(empresa.polizas.map((p) => p.tipo).filter(Boolean)),
-  );
-
   const closeModal = () => {
     setOpen(false);
     setMode("choose");
@@ -503,15 +499,6 @@ function EmpleadosPage() {
                   <Field label="ID de trabajador">
                     <TextInput value={form.trabajadorId} onChange={(v) => setForm({ ...form, trabajadorId: v })} />
                   </Field>
-                  <Field label="Vigencia">
-                    <TextInput placeholder="DD/MM/AAAA" value={form.vigencia} onChange={(v) => setForm({ ...form, vigencia: v })} />
-                  </Field>
-                  <Field label="Código postal">
-                    <TextInput value={form.codigoPostal} onChange={(v) => setForm({ ...form, codigoPostal: v })} />
-                  </Field>
-                  <Field label="Teléfono">
-                    <TextInput value={form.telefono} onChange={(v) => setForm({ ...form, telefono: v })} />
-                  </Field>
                   <Field label="Número de contacto">
                     <TextInput value={form.contacto} onChange={(v) => setForm({ ...form, contacto: v })} />
                   </Field>
@@ -532,9 +519,8 @@ function EmpleadosPage() {
                       className="w-full rounded-full border border-border bg-white px-4 py-2 text-sm"
                     >
                       <option value="">Selecciona...</option>
-                      {polizaTipos.map((t) => (
-                        <option key={t} value={t}>{t}</option>
-                      ))}
+                      <option value="Gastos médicos mayores">Gastos médicos mayores</option>
+                      <option value="Vida">Vida</option>
                     </select>
                   </Field>
                 </div>
