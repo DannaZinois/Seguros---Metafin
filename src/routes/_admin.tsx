@@ -33,7 +33,7 @@ function AdminLayout() {
 
   return (
     <AppShell
-      brandTitle="Orion Innovation Broker"
+      brandTitle="Metafin"
       brandSubtitle="Administración"
       navItems={navItems}
       onLogout={onLogout}
