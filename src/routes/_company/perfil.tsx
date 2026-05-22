@@ -128,7 +128,6 @@ function PerfilEmpresaPage() {
         </p>
       </div>
 
-      <Section title="Datos generales">
       <Section
         title="Datos generales"
         extra={
