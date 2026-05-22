@@ -23,6 +23,7 @@ import {
 } from "@/components/cotizador/shared";
 import { useCompanyEmpresa } from "@/lib/company-context";
 import { EMPLEADOS_NOMBRES } from "@/lib/empleados-nombres";
+import { logMovimiento } from "@/lib/movimientos-log";
 
 export const Route = createFileRoute("/_company/empleados")({
   component: EmpleadosPage,
@@ -200,6 +201,10 @@ function EmpleadosPage() {
     setTab(targetTab);
     setPage(1);
     closeModal();
+    logMovimiento(
+      "Alta de empleado",
+      `Alta de ${newRow.nombre} en póliza ${form.polizaTipo}`,
+    );
     setPopup({
       kind: "info",
       title: "Empleado registrado",
@@ -219,7 +224,12 @@ function EmpleadosPage() {
     if (!confirmBaja) return;
     persistStatus({ ...statusMap, [confirmBaja.id]: "Inactivo" });
     const nombre = confirmBaja.nombre;
+    const trabajadorId = confirmBaja.trabajadorId;
     setConfirmBaja(null);
+    logMovimiento(
+      "Baja de empleado",
+      `Baja de ${nombre} (${trabajadorId})`,
+    );
     setPopup({
       kind: "info",
       title: "Empleado dado de baja",
@@ -232,6 +242,10 @@ function EmpleadosPage() {
     persistStatus({ ...statusMap, [confirmAlta.id]: "Activo" });
     const row = confirmAlta;
     setConfirmAlta(null);
+    logMovimiento(
+      "Alta de empleado",
+      `Reactivación de ${row.nombre} (${row.trabajadorId})`,
+    );
     setPopup({
       kind: "info",
       title: "Empleado dado de alta",
