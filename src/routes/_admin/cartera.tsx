@@ -220,7 +220,7 @@ function CarteraPage() {
           Mostrando {startIdx}-{endIdx} de {rows.length} registros
         </p>
         <p>
-          Copyrights © <span className="text-[color:var(--brand-blue)]">Zinois</span>
+          Copyrights © <span className="text-[color:var(--brand-blue)]">Orion Innovation</span>
         </p>
         <div className="flex items-center gap-2">
           <button
