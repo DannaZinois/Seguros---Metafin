@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Pencil, Check, X } from "lucide-react";
 import { Section } from "@/components/cotizador/shared";
 
 type Relacion = "Cónyuge" | "Hijo/Hija" | "Mamá/Papá";
@@ -26,8 +26,10 @@ const DEFAULT_ROWS: FamiliarRow[] = [
   { id: "f4", nombre: "Rosa Pérez Vázquez", relacion: "Mamá/Papá", edad: "62", sexo: "Femenino", poliza: "Vida", porcentaje: "30" },
 ];
 
-export function FamiliaresBeneficiariosSection({ editable = true }: { editable?: boolean }) {
+export function FamiliaresBeneficiariosSection() {
   const [rows, setRows] = useState<FamiliarRow[]>(DEFAULT_ROWS);
+  const [editing, setEditing] = useState(false);
+  const editable = editing;
 
   const update = (id: string, patch: Partial<FamiliarRow>) =>
     setRows((rs) => rs.map((r) => (r.id === id ? { ...r, ...patch } : r)));
@@ -44,14 +46,35 @@ export function FamiliaresBeneficiariosSection({ editable = true }: { editable?:
     <Section
       title="Familiares y beneficiarios"
       extra={
-        editable ? (
+        editing ? (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={add}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-sm hover:bg-muted"
+            >
+              <Plus className="h-4 w-4" /> Agregar
+            </button>
+            <button
+              onClick={() => setEditing(false)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-sm hover:bg-muted"
+            >
+              <X className="h-4 w-4" /> Cancelar
+            </button>
+            <button
+              onClick={() => setEditing(false)}
+              className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--brand-blue)] px-3.5 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+            >
+              <Check className="h-4 w-4" /> Guardar cambios
+            </button>
+          </div>
+        ) : (
           <button
-            onClick={add}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--brand-blue)] px-3.5 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+            onClick={() => setEditing(true)}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-sm hover:bg-muted"
           >
-            <Plus className="h-4 w-4" /> Agregar
+            <Pencil className="h-4 w-4" /> Editar
           </button>
-        ) : null
+        )
       }
     >
       <div className="overflow-x-auto">
