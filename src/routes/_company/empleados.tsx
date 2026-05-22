@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Search,
   Download,
@@ -12,6 +12,7 @@ import {
   Eye,
   Send,
   UserX,
+  UserCheck,
 } from "lucide-react";
 import {
   Section,
@@ -59,6 +60,20 @@ function buildRows(prefix: string): EmpleadoRow[] {
 const GMM_ROWS = buildRows("GMM");
 const VIDA_ROWS = buildRows("VID");
 
+const STATUS_KEY = "empleados:status";
+const EXTRA_GMM_KEY = "empleados:extra:gmm";
+const EXTRA_VIDA_KEY = "empleados:extra:vida";
+
+function readJSON<T>(key: string, fallback: T): T {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 type Mode = "choose" | "bulk" | "individual";
 
 function EmpleadosPage() {
@@ -73,9 +88,19 @@ function EmpleadosPage() {
   const [statusMap, setStatusMap] = useState<Record<string, Status>>({});
   const [statusFilter, setStatusFilter] = useState<"todos" | Status>("todos");
   const [confirmBaja, setConfirmBaja] = useState<EmpleadoRow | null>(null);
+  const [confirmAlta, setConfirmAlta] = useState<EmpleadoRow | null>(null);
+  const [extraGmm, setExtraGmm] = useState<EmpleadoRow[]>([]);
+  const [extraVida, setExtraVida] = useState<EmpleadoRow[]>([]);
   const bulkRef = useRef<HTMLInputElement | null>(null);
   const cotizRef = useRef<HTMLInputElement | null>(null);
   const cuestRef = useRef<HTMLInputElement | null>(null);
+
+  // Hydrate persisted state
+  useEffect(() => {
+    setStatusMap(readJSON<Record<string, Status>>(STATUS_KEY, {}));
+    setExtraGmm(readJSON<EmpleadoRow[]>(EXTRA_GMM_KEY, []));
+    setExtraVida(readJSON<EmpleadoRow[]>(EXTRA_VIDA_KEY, []));
+  }, []);
 
   const initialForm = {
     nombre: "",
@@ -91,7 +116,11 @@ function EmpleadosPage() {
   };
   const [form, setForm] = useState(initialForm);
 
-  const rows = tab === "gmm" ? GMM_ROWS : VIDA_ROWS;
+  const rows = useMemo(
+    () =>
+      tab === "gmm" ? [...extraGmm, ...GMM_ROWS] : [...extraVida, ...VIDA_ROWS],
+    [tab, extraGmm, extraVida],
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -149,25 +178,64 @@ function EmpleadosPage() {
       });
       return;
     }
+    const isVida = form.polizaTipo === "Vida";
+    const targetTab: TabKey = isVida ? "vida" : "gmm";
+    const newRow: EmpleadoRow = {
+      id: `${isVida ? "VID" : "GMM"}-new-${Date.now()}`,
+      trabajadorId: form.trabajadorId,
+      nombre: form.nombre,
+      vigencia: form.vigencia || "—",
+      renovacion: "—",
+      telefono: form.contacto || form.telefono || "—",
+    };
+    if (isVida) {
+      const next = [newRow, ...extraVida];
+      setExtraVida(next);
+      localStorage.setItem(EXTRA_VIDA_KEY, JSON.stringify(next));
+    } else {
+      const next = [newRow, ...extraGmm];
+      setExtraGmm(next);
+      localStorage.setItem(EXTRA_GMM_KEY, JSON.stringify(next));
+    }
+    setTab(targetTab);
+    setPage(1);
     closeModal();
     setPopup({
       kind: "info",
       title: "Empleado registrado",
-      message: `${form.nombre} fue agregado a la póliza ${form.polizaTipo}.`,
+      message: `${newRow.nombre} fue agregado a la póliza ${form.polizaTipo}.`,
     });
   };
 
   const getStatus = (id: string): Status => statusMap[id] ?? "Activo";
 
+  const persistStatus = (next: Record<string, Status>) => {
+    setStatusMap(next);
+    if (typeof window !== "undefined")
+      localStorage.setItem(STATUS_KEY, JSON.stringify(next));
+  };
+
   const confirmarBaja = () => {
     if (!confirmBaja) return;
-    setStatusMap((m) => ({ ...m, [confirmBaja.id]: "Inactivo" }));
+    persistStatus({ ...statusMap, [confirmBaja.id]: "Inactivo" });
     const nombre = confirmBaja.nombre;
     setConfirmBaja(null);
     setPopup({
       kind: "info",
       title: "Empleado dado de baja",
       message: `${nombre} ahora aparece como inactivo.`,
+    });
+  };
+
+  const confirmarAlta = () => {
+    if (!confirmAlta) return;
+    persistStatus({ ...statusMap, [confirmAlta.id]: "Activo" });
+    const row = confirmAlta;
+    setConfirmAlta(null);
+    setPopup({
+      kind: "info",
+      title: "Empleado dado de alta",
+      message: `${row.nombre} ahora aparece como activo. Te invitamos a actualizar los datos de su perfil para asegurar que la información esté al día.`,
     });
   };
 
@@ -376,13 +444,21 @@ function EmpleadosPage() {
                         </span>
                       </td>
                       <td className="py-3">
-                        <button
-                          disabled={!isActivo}
-                          onClick={() => setConfirmBaja(e)}
-                          className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          <UserX className="h-3 w-3" /> Dar de baja
-                        </button>
+                        {isActivo ? (
+                          <button
+                            onClick={() => setConfirmBaja(e)}
+                            className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-100"
+                          >
+                            <UserX className="h-3 w-3" /> Dar de baja
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmAlta(e)}
+                            className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-100"
+                          >
+                            <UserCheck className="h-3 w-3" /> Dar de alta
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );
