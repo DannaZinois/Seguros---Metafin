@@ -17,6 +17,231 @@ export const Route = createFileRoute("/_company/seguros")({
   head: () => ({ meta: [{ title: "Mis seguros" }] }),
 });
 
+type PolizaResumen = {
+  tipo: string;
+  aseguradora: string;
+  contratante: string;
+  numAsegurados: string;
+  vigencia: string;
+  estatus: string;
+};
+
+function PolizaResumenTable({ data }: { data: PolizaResumen }) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-left text-sm">
+        <thead className="text-xs text-muted-foreground">
+          <tr>
+            <th className="py-3 font-medium">Tipo de póliza</th>
+            <th className="py-3 font-medium">Aseguradora</th>
+            <th className="py-3 font-medium">Contratante</th>
+            <th className="py-3 font-medium">Número de asegurados</th>
+            <th className="py-3 font-medium">Vigencia</th>
+            <th className="py-3 font-medium">Estatus</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr className="border-t border-border/60">
+            <td className="py-3">{data.tipo}</td>
+            <td className="py-3 text-foreground/80">{data.aseguradora}</td>
+            <td className="py-3 text-foreground/80">{data.contratante}</td>
+            <td className="py-3 text-foreground/80">{data.numAsegurados}</td>
+            <td className="py-3 text-foreground/80">{data.vigencia}</td>
+            <td className="py-3">
+              <span className="inline-flex rounded-full bg-[color:var(--status-active)] px-4 py-1 text-xs font-medium text-[color:var(--status-active-fg)]">
+                {data.estatus}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+const COBERTURAS_BASICAS: Array<{
+  label: string;
+  directores: string;
+  empleados: string;
+  nuevoIng: string;
+  variant?: "default" | "amparado-excluido";
+}> = [
+  { label: "Suma asegurada", directores: "$6,500,000", empleados: "$6,500,000", nuevoIng: "$2,500,000" },
+  { label: "Deducible", directores: "$10,000", empleados: "$15,000", nuevoIng: "$15,000" },
+  { label: "Coaseguro", directores: "10%", empleados: "10%", nuevoIng: "10%" },
+  { label: "Tope de coaseguro", directores: "$30,000", empleados: "$30,000", nuevoIng: "$30,000" },
+  { label: "Nivel hospitalario", directores: "A", empleados: "B", nuevoIng: "B" },
+  { label: "Cobertura internacional", directores: "Amparado", empleados: "Excluido", nuevoIng: "Excluido", variant: "amparado-excluido" },
+  { label: "Emergencia extranjero", directores: "USD 50,000", empleados: "USD 50,000", nuevoIng: "USD 50,000" },
+  { label: "Asistencia dental", directores: "Amparado", empleados: "Amparado", nuevoIng: "Amparado", variant: "amparado-excluido" },
+  { label: "Asistencia visión", directores: "Excluido", empleados: "Excluido", nuevoIng: "Excluido", variant: "amparado-excluido" },
+  { label: "Asistencia integral", directores: "Amparado", empleados: "Amparado", nuevoIng: "Amparado", variant: "amparado-excluido" },
+];
+
+function CoberturaCell({ value, variant }: { value: string; variant?: "default" | "amparado-excluido" }) {
+  if (variant === "amparado-excluido") {
+    const color = value.toLowerCase() === "amparado" ? "text-emerald-600" : "text-red-600";
+    return <span className={`text-sm font-medium ${color}`}>{value}</span>;
+  }
+  return <span className="text-sm text-foreground/80">{value}</span>;
+}
+
+function CoberturasBasicasTable() {
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-border">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-[#0b1d3a] text-white">
+            <th className="p-3"></th>
+            <th className="p-3 text-center text-base font-bold" colSpan={3}>ZURICH</th>
+          </tr>
+          <tr className="bg-muted/40 text-foreground">
+            <th className="p-3 text-left"></th>
+            <th className="p-3 text-center font-semibold">Directores</th>
+            <th className="p-3 text-center font-semibold">Empleados</th>
+            <th className="p-3 text-center font-semibold">Nuevo Ing.</th>
+          </tr>
+        </thead>
+        <tbody>
+          {COBERTURAS_BASICAS.map((r) => (
+            <tr key={r.label} className="border-t border-border">
+              <td className="bg-[#0b1d3a] p-3 text-sm font-semibold text-white">{r.label}</td>
+              <td className="p-3 text-center"><CoberturaCell value={r.directores} variant={r.variant} /></td>
+              <td className="p-3 text-center"><CoberturaCell value={r.empleados} variant={r.variant} /></td>
+              <td className="p-3 text-center"><CoberturaCell value={r.nuevoIng} variant={r.variant} /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+const SERVICIOS_ASISTENCIA = [
+  "Asistencia médica, nutricional y psicológica vía telefónica o App, ilimitada y sin costo.",
+  "Ambulancia terrestre: 3 por vigencia (2 primeras sin costo, la 3ª con costo preferencial).",
+  "Videoconsulta de médico general, ilimitada y sin costo.",
+  "Consulta médica a domicilio ilimitada con costo preferencial.",
+  "Coordinación de servicios auxiliares (laboratorio, gabinete, imagen, farmacia) con costo preferencial.",
+  "Urgencias dentales y servicios básicos dentales con copago del 20%.",
+];
+
+function ServiciosAsistenciaCards() {
+  return (
+    <div className="grid grid-cols-1 gap-3">
+      {SERVICIOS_ASISTENCIA.map((texto, i) => (
+        <div
+          key={i}
+          className="flex items-center gap-4 rounded-2xl border border-border bg-muted/30 p-4"
+        >
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#0b1d3a] text-sm font-bold text-white">
+            {i + 1}
+          </div>
+          <p className="text-sm text-foreground/85">{texto}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const MEDICINA_PREVENTIVA = [
+  "Chequeos médicos periódicos",
+  "Estudios de laboratorio",
+  "Campañas educativas de salud",
+  "Detección oportuna de enfermedades",
+];
+
+function MedicinaPreventivaCards() {
+  return (
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+      {MEDICINA_PREVENTIVA.map((texto) => (
+        <div
+          key={texto}
+          className="relative overflow-hidden rounded-2xl bg-[#0b1d3a] p-5 pl-7 text-white"
+        >
+          <span className="absolute inset-y-2 left-2 w-1.5 rounded-full bg-[#c9a84c]" />
+          <p className="font-semibold">{texto}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SumaAseguradaTable() {
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-border">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-[#0b1d3a] text-white">
+            <th className="p-3 text-left font-semibold">Suma asegurada</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td className="p-4 text-center text-base font-semibold text-foreground">
+              $500,000 MXN
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function PolizasSecciones() {
+  return (
+    <div className="mt-8 space-y-10">
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold tracking-tight text-foreground">
+          Gastos médicos
+        </h2>
+        <Section title="Datos generales">
+          <PolizaResumenTable
+            data={{
+              tipo: "GMM",
+              aseguradora: "Zurich",
+              contratante: "Orion Innovation",
+              numAsegurados: "739",
+              vigencia: "06/06/2025",
+              estatus: "Vigente",
+            }}
+          />
+        </Section>
+        <Section title="Coberturas básicas">
+          <CoberturasBasicasTable />
+        </Section>
+        <Section title="Servicios de asistencia">
+          <ServiciosAsistenciaCards />
+        </Section>
+        <Section title="Medicina preventiva">
+          <MedicinaPreventivaCards />
+        </Section>
+      </section>
+
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold tracking-tight text-foreground">
+          Vida
+        </h2>
+        <Section title="Datos generales">
+          <PolizaResumenTable
+            data={{
+              tipo: "Vida",
+              aseguradora: "Mapfre",
+              contratante: "Orion Innovation",
+              numAsegurados: "739",
+              vigencia: "06/06/2025",
+              estatus: "Vigente",
+            }}
+          />
+        </Section>
+        <Section title="Suma asegurada">
+          <SumaAseguradaTable />
+        </Section>
+      </section>
+    </div>
+  );
+}
+
 function SegurosPage() {
   const empresa = useCompanyEmpresa();
   const [aseguradorasList] = useAseguradoras();
@@ -164,77 +389,8 @@ function SegurosPage() {
         </button>
       </div>
 
-      <Section title="Pólizas activas">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="text-xs text-muted-foreground">
-              <tr>
-                <th className="py-3 font-medium">Tipo de póliza</th>
-                <th className="py-3 font-medium">Aseguradora</th>
-                <th className="py-3 font-medium">Contratante</th>
-                <th className="py-3 font-medium">Número de asegurados</th>
-                <th className="py-3 font-medium">Vigencia</th>
-                <th className="py-3 font-medium">Estatus</th>
-                <th className="py-3 font-medium">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {empresa.polizas.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-6 text-center text-sm text-muted-foreground">
-                    Sin pólizas registradas.
-                  </td>
-                </tr>
-              ) : (
-                empresa.polizas.map((p) => (
-                  <tr
-                    key={p.id}
-                    className="cursor-pointer border-t border-border/60 hover:bg-muted/40"
-                    onClick={() => setDetail(p)}
-                  >
-                    <td className="py-3">{p.tipo || "—"}</td>
-                    <td className="py-3 text-foreground/80">{p.aseguradora}</td>
-                    <td className="py-3 text-foreground/80">{p.contratante}</td>
-                    <td className="py-3 text-foreground/80">{p.numAsegurados}</td>
-                    <td className="py-3 text-foreground/80">{p.vigencia || "—"}</td>
-                    <td className="py-3">
-                      <span
-                        className={`inline-flex rounded-full px-4 py-1 text-xs font-medium ${
-                          p.estatus === "Vencida"
-                            ? "bg-[color:var(--status-cancelled)] text-[color:var(--status-cancelled-fg)]"
-                            : "bg-[color:var(--status-active)] text-[color:var(--status-active-fg)]"
-                        }`}
-                      >
-                        {p.estatus || "Vigente"}
-                      </span>
-                    </td>
-                    <td className="py-3" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleEdit(p)}
-                        title="Editar"
-                        aria-label="Editar"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--brand-blue)]/10 text-[color:var(--brand-blue)] hover:bg-[color:var(--brand-blue)]/20"
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleBaja(p.tipo || "")}
-                        title="Dar de baja"
-                        aria-label="Dar de baja"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--status-cancelled)] text-[color:var(--status-cancelled-fg)] hover:opacity-90"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Section>
+      <PolizasSecciones />
+
 
       {detail && (
         <div
