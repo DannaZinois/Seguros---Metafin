@@ -42,6 +42,7 @@ function ClientLayout() {
         <HeaderProfile
           name={cliente?.profile.nombre ?? user?.name ?? "Invitado"}
           role="Perfil Cliente"
+          editTo="/mi-perfil"
           fields={[
             { label: "Nombre", value: cliente?.profile.nombre ?? user?.name ?? "" },
             { label: "Correo", value: cliente?.profile.correo ?? user?.email ?? "" },
