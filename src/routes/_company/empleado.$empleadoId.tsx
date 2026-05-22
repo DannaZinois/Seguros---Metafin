@@ -246,12 +246,10 @@ function EmpleadoDetallePage() {
                 <th className="py-3 font-medium">Aseguradora</th>
                 <th className="py-3 font-medium">Contratante</th>
                 <th className="py-3 font-medium">Estatus</th>
-                <th className="py-3 font-medium">Portal aseguradora</th>
               </tr>
             </thead>
             <tbody>
               {polizas.map((p) => {
-                const link = ASEGURADORA_LINKS[p.aseguradora];
                 return (
                   <tr key={p.id} className="border-t border-border/60 hover:bg-muted/40">
                     <td className="py-3 font-medium text-foreground">{p.id}</td>
@@ -263,20 +261,6 @@ function EmpleadoDetallePage() {
                       <span className="inline-flex rounded-full bg-[color:var(--status-active)] px-3 py-1 text-xs font-medium text-[color:var(--status-active-fg)]">
                         {p.status}
                       </span>
-                    </td>
-                    <td className="py-3">
-                      {link ? (
-                        <a
-                          href={link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
-                        >
-                          <ExternalLink className="h-3.5 w-3.5" /> Ir al sitio
-                        </a>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
                     </td>
                   </tr>
                 );
