@@ -1,6 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
-import { Search, Download, Upload, UserPlus, FileText, ClipboardList, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Search,
+  Download,
+  Upload,
+  UserPlus,
+  FileText,
+  ClipboardList,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Send,
+  UserX,
+} from "lucide-react";
 import {
   Section,
   Field,
@@ -9,29 +21,45 @@ import {
   type PopupState,
 } from "@/components/cotizador/shared";
 import { useCompanyEmpresa } from "@/lib/company-context";
-import { saveEmpresa, type Asegurado, type Empresa } from "@/lib/empresa-store";
+import { EMPLEADOS_NOMBRES } from "@/lib/empleados-nombres";
 
 export const Route = createFileRoute("/_company/empleados")({
   component: EmpleadosPage,
   head: () => ({ meta: [{ title: "Empleados" }] }),
 });
 
-interface EmpleadoRow extends Asegurado {
-  polizaTipo: string;
+type TabKey = "gmm" | "vida";
+type Status = "Activo" | "Inactivo";
+
+interface EmpleadoRow {
+  id: string;
+  trabajadorId: string;
+  nombre: string;
+  vigencia: string;
+  renovacion: string;
+  telefono: string;
 }
+
+function buildRows(prefix: string): EmpleadoRow[] {
+  return EMPLEADOS_NOMBRES.map((nombre, i) => {
+    const num = i + 1;
+    const trabajadorId = `${prefix}-${String(num).padStart(4, "0")}`;
+    const phone = `55${String(10000000 + ((num * 7919) % 89999999)).slice(0, 8)}`;
+    return {
+      id: `${prefix}-${num}`,
+      trabajadorId,
+      nombre,
+      vigencia: "06/06/2025",
+      renovacion: "06/06/2026",
+      telefono: phone,
+    };
+  });
+}
+
+const GMM_ROWS = buildRows("GMM");
+const VIDA_ROWS = buildRows("VID");
 
 type Mode = "choose" | "bulk" | "individual";
-
-function isVida(tipo: string) {
-  return tipo.toLowerCase().includes("vida");
-}
-
-function isGMM(tipo: string) {
-  const t = tipo.toLowerCase();
-  return t.includes("gmm") || t.includes("gastos médicos") || t.includes("gastos medicos");
-}
-
-type TabKey = "gmm" | "vida";
 
 function EmpleadosPage() {
   const empresa = useCompanyEmpresa();
@@ -42,6 +70,8 @@ function EmpleadosPage() {
   const [page, setPage] = useState(1);
   const pageSize = 15;
   const [tab, setTab] = useState<TabKey>("gmm");
+  const [statusMap, setStatusMap] = useState<Record<string, Status>>({});
+  const [confirmBaja, setConfirmBaja] = useState<EmpleadoRow | null>(null);
   const bulkRef = useRef<HTMLInputElement | null>(null);
   const cotizRef = useRef<HTMLInputElement | null>(null);
   const cuestRef = useRef<HTMLInputElement | null>(null);
@@ -60,37 +90,17 @@ function EmpleadosPage() {
   };
   const [form, setForm] = useState(initialForm);
 
-  const empleados: EmpleadoRow[] = useMemo(() => {
-    if (!empresa) return [];
-    const rows: EmpleadoRow[] = [];
-    for (const p of empresa.polizas) {
-      for (const a of p.asegurados) {
-        rows.push({ ...a, polizaTipo: p.tipo });
-      }
-    }
-    return rows;
-  }, [empresa]);
-
-  const byTab = useMemo(
-    () =>
-      empleados.filter((e) =>
-        tab === "vida" ? isVida(e.polizaTipo) : isGMM(e.polizaTipo),
-      ),
-    [empleados, tab],
-  );
+  const rows = tab === "gmm" ? GMM_ROWS : VIDA_ROWS;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return byTab;
-    return byTab.filter(
+    if (!q) return rows;
+    return rows.filter(
       (e) =>
         e.trabajadorId.toLowerCase().includes(q) ||
         e.nombre.toLowerCase().includes(q),
     );
-  }, [byTab, query]);
-
-  const countGMM = useMemo(() => empleados.filter((e) => isGMM(e.polizaTipo)).length, [empleados]);
-  const countVida = useMemo(() => empleados.filter((e) => isVida(e.polizaTipo)).length, [empleados]);
+  }, [rows, query]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -135,45 +145,27 @@ function EmpleadosPage() {
       });
       return;
     }
-    const target = empresa.polizas.find((p) => p.tipo === form.polizaTipo);
-    if (!target) {
-      setPopup({
-        kind: "error",
-        title: "Póliza no encontrada",
-        message: "No existe una póliza activa de ese tipo.",
-      });
-      return;
-    }
-    const nuevo: Asegurado = {
-      id: crypto.randomUUID(),
-      trabajadorId: form.trabajadorId.trim(),
-      nombre: form.nombre.trim(),
-      poliza: target.tipo,
-      vigencia: form.vigencia || "00/00/0000",
-      renovacion: "00/00/0000",
-      correo: "",
-      telefono: form.telefono,
-      consentimiento: false,
-      certificado: false,
-      status: "Activa",
-    };
-    const updated: Empresa = {
-      ...empresa,
-      polizas: empresa.polizas.map((p) =>
-        p.id === target.id ? { ...p, asegurados: [...p.asegurados, nuevo] } : p,
-      ),
-    };
-    saveEmpresa(updated);
     closeModal();
     setPopup({
       kind: "info",
       title: "Empleado registrado",
-      message: `${nuevo.nombre} fue agregado a la póliza ${target.tipo}.`,
+      message: `${form.nombre} fue agregado a la póliza ${form.polizaTipo}.`,
     });
   };
 
-  const showConsentimientoCol = empleados.some((e) => isVida(e.polizaTipo));
-  const colCount = 8 + (showConsentimientoCol ? 1 : 0);
+  const getStatus = (id: string): Status => statusMap[id] ?? "Activo";
+
+  const confirmarBaja = () => {
+    if (!confirmBaja) return;
+    setStatusMap((m) => ({ ...m, [confirmBaja.id]: "Inactivo" }));
+    const nombre = confirmBaja.nombre;
+    setConfirmBaja(null);
+    setPopup({
+      kind: "info",
+      title: "Empleado dado de baja",
+      message: `${nombre} ahora aparece como inactivo.`,
+    });
+  };
 
   return (
     <div className="pb-12">
@@ -204,7 +196,7 @@ function EmpleadosPage() {
                 : "text-foreground/70 hover:text-foreground"
             }`}
           >
-            GMM ({countGMM})
+            GMM ({GMM_ROWS.length})
           </button>
           <button
             onClick={() => { setTab("vida"); setPage(1); }}
@@ -214,7 +206,7 @@ function EmpleadosPage() {
                 : "text-foreground/70 hover:text-foreground"
             }`}
           >
-            Vida ({countVida})
+            Vida ({VIDA_ROWS.length})
           </button>
         </div>
         <div className="mb-4 flex items-center">
@@ -234,74 +226,98 @@ function EmpleadosPage() {
               <tr>
                 <th className="py-3 font-medium">ID</th>
                 <th className="py-3 font-medium">Nombre</th>
-                <th className="py-3 font-medium">Póliza</th>
                 <th className="py-3 font-medium">Vigencia</th>
                 <th className="py-3 font-medium">Renovación</th>
                 <th className="py-3 font-medium">Teléfono</th>
-                {showConsentimientoCol && (
-                  <th className="py-3 font-medium">Consentimiento</th>
-                )}
                 <th className="py-3 font-medium">Certificado</th>
                 <th className="py-3 font-medium">Status</th>
+                <th className="py-3 font-medium">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {pageRows.length === 0 ? (
                 <tr>
-                  <td colSpan={colCount} className="py-8 text-center text-sm text-muted-foreground">
+                  <td colSpan={8} className="py-8 text-center text-sm text-muted-foreground">
                     Sin resultados.
                   </td>
                 </tr>
               ) : (
-                pageRows.map((e) => (
-                  <tr key={e.id} className="border-t border-border/60">
-                    <td className="py-3 text-foreground/80">{e.trabajadorId}</td>
-                    <td className="py-3">{e.nombre}</td>
-                    <td className="py-3 text-foreground/80">{e.polizaTipo}</td>
-                    <td className="py-3 text-foreground/80">{e.vigencia}</td>
-                    <td className="py-3 text-foreground/80">{e.renovacion}</td>
-                    <td className="py-3 text-foreground/80">{e.telefono}</td>
-                    {showConsentimientoCol && (
+                pageRows.map((e) => {
+                  const status = getStatus(e.id);
+                  const isActivo = status === "Activo";
+                  return (
+                    <tr key={e.id} className="border-t border-border/60">
+                      <td className="py-3 text-foreground/80">{e.trabajadorId}</td>
+                      <td className="py-3">{e.nombre}</td>
+                      <td className="py-3 text-foreground/80">{e.vigencia}</td>
+                      <td className="py-3 text-foreground/80">{e.renovacion}</td>
+                      <td className="py-3 text-foreground/80">{e.telefono}</td>
                       <td className="py-3">
-                        {isVida(e.polizaTipo) ? (
+                        <div className="flex items-center gap-2">
                           <button
+                            title="Descargar certificado"
                             onClick={() =>
                               setPopup({
                                 kind: "info",
-                                title: "Subir consentimiento",
-                                message: `Carga el consentimiento firmado de ${e.nombre}.`,
+                                title: "Descargar certificado",
+                                message: `Descargando certificado de ${e.nombre} en PDF.`,
                               })
                             }
-                            className="inline-flex items-center gap-1 rounded-full bg-violet-500 px-3 py-1 text-xs font-medium text-white hover:bg-violet-600"
+                            className="rounded-full p-1.5 text-[color:var(--brand-blue)] hover:bg-muted"
                           >
-                            <Upload className="h-3 w-3" /> Subir
+                            <Download className="h-4 w-4" />
                           </button>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
+                          <button
+                            title="Ver certificado"
+                            onClick={() =>
+                              setPopup({
+                                kind: "info",
+                                title: "Ver certificado",
+                                message: `Abriendo certificado de ${e.nombre}.`,
+                              })
+                            }
+                            className="rounded-full p-1.5 text-[color:var(--brand-blue)] hover:bg-muted"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
+                          <button
+                            title="Enviar por correo"
+                            onClick={() =>
+                              setPopup({
+                                kind: "info",
+                                title: "Enviar certificado",
+                                message: `Enviando certificado por correo a ${e.nombre}.`,
+                              })
+                            }
+                            className="rounded-full p-1.5 text-[color:var(--brand-blue)] hover:bg-muted"
+                          >
+                            <Send className="h-4 w-4" />
+                          </button>
+                        </div>
                       </td>
-                    )}
-                    <td className="py-3">
-                      <button
-                        onClick={() =>
-                          setPopup({
-                            kind: "info",
-                            title: "Descargar certificado",
-                            message: `Descargando certificado de ${e.nombre}.`,
-                          })
-                        }
-                        className="inline-flex items-center gap-1 text-[color:var(--brand-blue)] underline-offset-4 hover:underline"
-                      >
-                        <Download className="h-3.5 w-3.5" /> Descargar
-                      </button>
-                    </td>
-                    <td className="py-3">
-                      <span className="inline-flex rounded-full bg-[color:var(--status-active)] px-3 py-1 text-xs font-medium text-[color:var(--status-active-fg)]">
-                        {e.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
+                      <td className="py-3">
+                        <span
+                          className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+                            isActivo
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-orange-100 text-orange-700"
+                          }`}
+                        >
+                          {status}
+                        </span>
+                      </td>
+                      <td className="py-3">
+                        <button
+                          disabled={!isActivo}
+                          onClick={() => setConfirmBaja(e)}
+                          className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <UserX className="h-3 w-3" /> Dar de baja
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -321,19 +337,9 @@ function EmpleadosPage() {
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-                <button
-                  key={n}
-                  onClick={() => setPage(n)}
-                  className={`min-w-8 rounded-full px-3 py-1 text-xs font-medium ${
-                    n === currentPage
-                      ? "bg-[color:var(--brand-blue)] text-white"
-                      : "text-foreground/80 hover:bg-muted"
-                  }`}
-                >
-                  {n}
-                </button>
-              ))}
+              <span className="px-2 text-xs text-muted-foreground">
+                Página {currentPage} de {totalPages}
+              </span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
@@ -558,6 +564,38 @@ function EmpleadosPage() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {confirmBaja && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 p-4 backdrop-blur-md"
+          onClick={() => setConfirmBaja(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl"
+          >
+            <h3 className="text-lg font-bold text-foreground">Dar de baja al empleado</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              ¿Confirmas dar de baja a <span className="font-semibold text-foreground">{confirmBaja.nombre}</span>?
+              Esta acción es <span className="font-semibold text-red-600">permanente</span> y el empleado quedará marcado como inactivo.
+            </p>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={() => setConfirmBaja(null)}
+                className="rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmarBaja}
+                className="rounded-full bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+              >
+                Sí, dar de baja
+              </button>
+            </div>
           </div>
         </div>
       )}
