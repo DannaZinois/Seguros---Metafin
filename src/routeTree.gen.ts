@@ -28,6 +28,7 @@ import { Route as AdminCotizadoresRouteImport } from './routes/_admin/cotizadore
 import { Route as AdminCarteraRouteImport } from './routes/_admin/cartera'
 import { Route as AdminAseguradorasRouteImport } from './routes/_admin/aseguradoras'
 import { Route as CompanySegurosPolizaIdRouteImport } from './routes/_company/seguros.$polizaId'
+import { Route as CompanyEmpleadoEmpleadoIdRouteImport } from './routes/_company/empleado.$empleadoId'
 import { Route as ClientConsentimientoVerRouteImport } from './routes/_client/consentimiento.ver'
 import { Route as AdminEmpresaNuevaRouteImport } from './routes/_admin/empresa.nueva'
 import { Route as AdminClienteClienteIdRouteImport } from './routes/_admin/cliente.$clienteId'
@@ -128,6 +129,12 @@ const CompanySegurosPolizaIdRoute = CompanySegurosPolizaIdRouteImport.update({
   path: '/$polizaId',
   getParentRoute: () => CompanySegurosRoute,
 } as any)
+const CompanyEmpleadoEmpleadoIdRoute =
+  CompanyEmpleadoEmpleadoIdRouteImport.update({
+    id: '/empleado/$empleadoId',
+    path: '/empleado/$empleadoId',
+    getParentRoute: () => CompanyRoute,
+  } as any)
 const ClientConsentimientoVerRoute = ClientConsentimientoVerRouteImport.update({
   id: '/consentimiento/ver',
   path: '/consentimiento/ver',
@@ -186,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/consentimiento/ver': typeof ClientConsentimientoVerRoute
+  '/empleado/$empleadoId': typeof CompanyEmpleadoEmpleadoIdRoute
   '/seguros/$polizaId': typeof CompanySegurosPolizaIdRoute
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
@@ -211,6 +219,7 @@ export interface FileRoutesByTo {
   '/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/consentimiento/ver': typeof ClientConsentimientoVerRoute
+  '/empleado/$empleadoId': typeof CompanyEmpleadoEmpleadoIdRoute
   '/seguros/$polizaId': typeof CompanySegurosPolizaIdRoute
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
@@ -240,6 +249,7 @@ export interface FileRoutesById {
   '/_admin/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/_admin/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/_client/consentimiento/ver': typeof ClientConsentimientoVerRoute
+  '/_company/empleado/$empleadoId': typeof CompanyEmpleadoEmpleadoIdRoute
   '/_company/seguros/$polizaId': typeof CompanySegurosPolizaIdRoute
   '/_admin/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/_admin/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
@@ -267,6 +277,7 @@ export interface FileRouteTypes {
     | '/cliente/$clienteId'
     | '/empresa/nueva'
     | '/consentimiento/ver'
+    | '/empleado/$empleadoId'
     | '/seguros/$polizaId'
     | '/empresa/poliza/$polizaId'
     | '/empresa/poliza/nueva'
@@ -292,6 +303,7 @@ export interface FileRouteTypes {
     | '/cliente/$clienteId'
     | '/empresa/nueva'
     | '/consentimiento/ver'
+    | '/empleado/$empleadoId'
     | '/seguros/$polizaId'
     | '/empresa/poliza/$polizaId'
     | '/empresa/poliza/nueva'
@@ -320,6 +332,7 @@ export interface FileRouteTypes {
     | '/_admin/cliente/$clienteId'
     | '/_admin/empresa/nueva'
     | '/_client/consentimiento/ver'
+    | '/_company/empleado/$empleadoId'
     | '/_company/seguros/$polizaId'
     | '/_admin/empresa/poliza/$polizaId'
     | '/_admin/empresa/poliza/nueva'
@@ -470,6 +483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompanySegurosPolizaIdRouteImport
       parentRoute: typeof CompanySegurosRoute
     }
+    '/_company/empleado/$empleadoId': {
+      id: '/_company/empleado/$empleadoId'
+      path: '/empleado/$empleadoId'
+      fullPath: '/empleado/$empleadoId'
+      preLoaderRoute: typeof CompanyEmpleadoEmpleadoIdRouteImport
+      parentRoute: typeof CompanyRoute
+    }
     '/_client/consentimiento/ver': {
       id: '/_client/consentimiento/ver'
       path: '/consentimiento/ver'
@@ -600,6 +620,7 @@ interface CompanyRouteChildren {
   CompanyPagosRoute: typeof CompanyPagosRoute
   CompanyPerfilRoute: typeof CompanyPerfilRoute
   CompanySegurosRoute: typeof CompanySegurosRouteWithChildren
+  CompanyEmpleadoEmpleadoIdRoute: typeof CompanyEmpleadoEmpleadoIdRoute
 }
 
 const CompanyRouteChildren: CompanyRouteChildren = {
@@ -608,6 +629,7 @@ const CompanyRouteChildren: CompanyRouteChildren = {
   CompanyPagosRoute: CompanyPagosRoute,
   CompanyPerfilRoute: CompanyPerfilRoute,
   CompanySegurosRoute: CompanySegurosRouteWithChildren,
+  CompanyEmpleadoEmpleadoIdRoute: CompanyEmpleadoEmpleadoIdRoute,
 }
 
 const CompanyRouteWithChildren =

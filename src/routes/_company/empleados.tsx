@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import {
   Search,
@@ -264,7 +264,15 @@ function EmpleadosPage() {
                   return (
                     <tr key={e.id} className="border-t border-border/60">
                       <td className="py-3 text-foreground/80">{e.trabajadorId}</td>
-                      <td className="py-3">{e.nombre}</td>
+                      <td className="py-3">
+                        <Link
+                          to="/empleado/$empleadoId"
+                          params={{ empleadoId: e.trabajadorId }}
+                          className="text-[color:var(--brand-blue)] hover:underline"
+                        >
+                          {e.nombre}
+                        </Link>
+                      </td>
                       <td className="py-3 text-foreground/80">{e.vigencia}</td>
                       <td className="py-3 text-foreground/80">{e.renovacion}</td>
                       <td className="py-3 text-foreground/80">{e.telefono}</td>
