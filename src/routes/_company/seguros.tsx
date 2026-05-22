@@ -144,29 +144,6 @@ function ServiciosAsistenciaCards() {
   );
 }
 
-const MEDICINA_PREVENTIVA = [
-  "Chequeos médicos periódicos",
-  "Estudios de laboratorio",
-  "Campañas educativas de salud",
-  "Detección oportuna de enfermedades",
-];
-
-function MedicinaPreventivaCards() {
-  return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-      {MEDICINA_PREVENTIVA.map((texto) => (
-        <div
-          key={texto}
-          className="relative overflow-hidden rounded-2xl bg-[#0b1d3a] p-5 pl-7 text-white"
-        >
-          <span className="absolute inset-y-2 left-2 w-1.5 rounded-full bg-[#c9a84c]" />
-          <p className="font-semibold">{texto}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function SumaAseguradaTable() {
   return (
     <div className="overflow-x-auto rounded-2xl border border-border">
@@ -212,9 +189,6 @@ function PolizasSecciones() {
         </Section>
         <Section title="Servicios de asistencia">
           <ServiciosAsistenciaCards />
-        </Section>
-        <Section title="Medicina preventiva">
-          <MedicinaPreventivaCards />
         </Section>
       </section>
 
