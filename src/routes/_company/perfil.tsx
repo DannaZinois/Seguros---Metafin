@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Pencil, Check, X, Info } from "lucide-react";
 import {
   Section,
   Grid,
@@ -9,6 +9,12 @@ import {
   Popup,
   type PopupState,
 } from "@/components/cotizador/shared";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useCompanyEmpresa } from "@/lib/company-context";
 import {
   saveEmpresa,
@@ -25,6 +31,15 @@ function PerfilEmpresaPage() {
   const empresa = useCompanyEmpresa();
   const [open, setOpen] = useState(false);
   const [popup, setPopup] = useState<PopupState>(null);
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    nombre: "",
+    rfc: "",
+    giro: "",
+    direccion: "",
+    codigoPostal: "",
+    correoInstitucional: "",
+  });
   const [form, setForm] = useState({
     nombre: "",
     contacto: "",
@@ -39,6 +54,38 @@ function PerfilEmpresaPage() {
       </div>
     );
   }
+
+  const startEdit = () => {
+    setEditForm({
+      nombre: empresa.nombre,
+      rfc: empresa.rfc,
+      giro: empresa.giro,
+      direccion: empresa.direccion,
+      codigoPostal: empresa.codigoPostal,
+      correoInstitucional: empresa.correoInstitucional ?? "",
+    });
+    setEditing(true);
+  };
+
+  const cancelEdit = () => setEditing(false);
+
+  const saveEdit = () => {
+    saveEmpresa({
+      ...empresa,
+      nombre: editForm.nombre.trim(),
+      rfc: editForm.rfc.trim(),
+      giro: editForm.giro.trim(),
+      direccion: editForm.direccion.trim(),
+      codigoPostal: editForm.codigoPostal.trim(),
+      correoInstitucional: editForm.correoInstitucional.trim(),
+    });
+    setEditing(false);
+    setPopup({
+      kind: "info",
+      title: "Datos actualizados",
+      message: "La información de tu empresa fue actualizada correctamente.",
+    });
+  };
 
   const resetForm = () =>
     setForm({ nombre: "", contacto: "", email: "", acceso: "Lectura" });
@@ -81,23 +128,105 @@ function PerfilEmpresaPage() {
         </p>
       </div>
 
-      <Section title="Datos generales">
+      <Section
+        title="Datos generales"
+        extra={
+          editing ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={cancelEdit}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-sm hover:bg-muted"
+              >
+                <X className="h-4 w-4" /> Cancelar
+              </button>
+              <button
+                onClick={saveEdit}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--brand-blue)] px-3.5 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+              >
+                <Check className="h-4 w-4" /> Guardar cambios
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={startEdit}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-sm hover:bg-muted"
+            >
+              <Pencil className="h-4 w-4" /> Editar
+            </button>
+          )
+        }
+      >
         <Grid>
           <Field label="Nombre de la empresa">
-            <TextInput value={empresa.nombre} readOnly />
+            <TextInput
+              value={editing ? editForm.nombre : empresa.nombre}
+              onChange={(v) => setEditForm({ ...editForm, nombre: v })}
+              readOnly={!editing}
+            />
           </Field>
           <Field label="RFC">
-            <TextInput value={empresa.rfc} readOnly />
+            <TextInput
+              value={editing ? editForm.rfc : empresa.rfc}
+              onChange={(v) => setEditForm({ ...editForm, rfc: v })}
+              readOnly={!editing}
+            />
           </Field>
           <Field label="Giro">
-            <TextInput value={empresa.giro} readOnly />
+            <TextInput
+              value={editing ? editForm.giro : empresa.giro}
+              onChange={(v) => setEditForm({ ...editForm, giro: v })}
+              readOnly={!editing}
+            />
           </Field>
           <Field label="Dirección">
-            <TextInput value={empresa.direccion} readOnly />
+            <TextInput
+              value={editing ? editForm.direccion : empresa.direccion}
+              onChange={(v) => setEditForm({ ...editForm, direccion: v })}
+              readOnly={!editing}
+            />
           </Field>
           <Field label="Código postal">
-            <TextInput value={empresa.codigoPostal} readOnly />
+            <TextInput
+              value={editing ? editForm.codigoPostal : empresa.codigoPostal}
+              onChange={(v) => setEditForm({ ...editForm, codigoPostal: v })}
+              readOnly={!editing}
+            />
           </Field>
+          <label className="flex flex-col gap-1.5">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+              Correo institucional
+              <TooltipProvider delayDuration={150}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={(e) => e.preventDefault()}
+                      className="inline-flex items-center text-muted-foreground hover:text-[color:var(--brand-blue)]"
+                      aria-label="Más información sobre el correo institucional"
+                    >
+                      <Info className="h-3.5 w-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs bg-foreground text-xs text-white">
+                    Este correo será utilizado para enviar avisos de manera
+                    interna a tus empleados.
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </span>
+            <TextInput
+              value={
+                editing
+                  ? editForm.correoInstitucional
+                  : empresa.correoInstitucional ?? ""
+              }
+              onChange={(v) =>
+                setEditForm({ ...editForm, correoInstitucional: v })
+              }
+              readOnly={!editing}
+              placeholder="avisos@empresa.com"
+            />
+          </label>
         </Grid>
       </Section>
 
@@ -162,7 +291,7 @@ function PerfilEmpresaPage() {
 
       <p className="mt-10 text-center text-xs text-muted-foreground">
         Copyrights ©{" "}
-        <span className="text-[color:var(--brand-blue)]">Zinois</span>
+        <span className="text-[color:var(--brand-blue)]">Orion Innovation</span>
       </p>
 
       {open && (

@@ -33,7 +33,7 @@ function AdminLayout() {
 
   return (
     <AppShell
-      brandTitle="Zinois Broker"
+      brandTitle="Orion Innovation Broker"
       brandSubtitle="Administración"
       navItems={navItems}
       onLogout={onLogout}
