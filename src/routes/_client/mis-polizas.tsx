@@ -1,16 +1,45 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ExternalLink, X } from "lucide-react";
-import { Section, Grid, Field, TextInput } from "@/components/cotizador/shared";
-import { useCurrentClient, ASEGURADORA_LINKS } from "@/lib/client-context";
-import type { PolizaData } from "@/lib/clientes-data";
+import { ExternalLink, X, Download, Eye, Upload, FileText } from "lucide-react";
+import { Section } from "@/components/cotizador/shared";
+import { ASEGURADORA_LINKS } from "@/lib/client-context";
 
 export const Route = createFileRoute("/_client/mis-polizas")({
   component: MisPolizasPage,
   head: () => ({ meta: [{ title: "Mis pólizas" }] }),
 });
 
-const statusClass: Record<PolizaData["status"], string> = {
+type RowStatus = "Activa" | "Cancelada" | "En revisión" | "Por renovar";
+
+interface PolizaRow {
+  id: string;
+  tipo: "GMM" | "Vida";
+  vigencia: string;
+  aseguradora: string;
+  contratante: string;
+  status: RowStatus;
+}
+
+const POLIZAS: PolizaRow[] = [
+  {
+    id: "P990234",
+    tipo: "GMM",
+    vigencia: "06/06/2025",
+    aseguradora: "Zurich",
+    contratante: "Orion Innovation",
+    status: "Activa",
+  },
+  {
+    id: "P990235",
+    tipo: "Vida",
+    vigencia: "06/06/2025",
+    aseguradora: "Mapfre",
+    contratante: "Orion Innovation",
+    status: "Activa",
+  },
+];
+
+const statusClass: Record<RowStatus, string> = {
   Activa: "bg-[color:var(--status-active)] text-[color:var(--status-active-fg)]",
   Cancelada: "bg-destructive/10 text-destructive",
   "En revisión": "bg-amber-100 text-amber-800",
@@ -18,10 +47,7 @@ const statusClass: Record<PolizaData["status"], string> = {
 };
 
 function MisPolizasPage() {
-  const cliente = useCurrentClient();
-  const [detail, setDetail] = useState<PolizaData | null>(null);
-
-  if (!cliente) return null;
+  const [detail, setDetail] = useState<PolizaRow | null>(null);
 
   return (
     <div className="pb-12">
@@ -35,22 +61,22 @@ function MisPolizasPage() {
         </p>
       </div>
 
-      <Section title={`Pólizas registradas (${cliente.polizas.length})`}>
+      <Section title={`Pólizas registradas (${POLIZAS.length})`}>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="text-xs text-muted-foreground">
               <tr>
                 <th className="py-3 font-medium">Póliza</th>
                 <th className="py-3 font-medium">Tipo</th>
-                <th className="py-3 font-medium">Aseguradora</th>
                 <th className="py-3 font-medium">Vigencia</th>
-                <th className="py-3 font-medium">Próximo pago</th>
+                <th className="py-3 font-medium">Aseguradora</th>
+                <th className="py-3 font-medium">Contratante</th>
                 <th className="py-3 font-medium">Estatus</th>
                 <th className="py-3 font-medium">Portal aseguradora</th>
               </tr>
             </thead>
             <tbody>
-              {cliente.polizas.map((p) => {
+              {POLIZAS.map((p) => {
                 const link = ASEGURADORA_LINKS[p.aseguradora];
                 return (
                   <tr
@@ -59,10 +85,10 @@ function MisPolizasPage() {
                     onClick={() => setDetail(p)}
                   >
                     <td className="py-3 font-medium text-foreground">{p.id}</td>
-                    <td className="py-3 text-foreground/80">{p.tipoSeguro}</td>
-                    <td className="py-3 text-foreground/80">{p.aseguradora}</td>
+                    <td className="py-3 text-foreground/80">{p.tipo}</td>
                     <td className="py-3 text-foreground/80">{p.vigencia}</td>
-                    <td className="py-3 text-foreground/80">{p.proximoPago}</td>
+                    <td className="py-3 text-foreground/80">{p.aseguradora}</td>
+                    <td className="py-3 text-foreground/80">{p.contratante}</td>
                     <td className="py-3">
                       <span
                         className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${statusClass[p.status]}`}
@@ -92,6 +118,43 @@ function MisPolizasPage() {
         </div>
       </Section>
 
+      <Section title="Formato de consentimiento">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="text-xs text-muted-foreground">
+              <tr>
+                <th className="py-3 font-medium">Póliza</th>
+                <th className="py-3 font-medium">Tipo</th>
+                <th className="py-3 font-medium">Vigencia</th>
+                <th className="py-3 font-medium">Aseguradora</th>
+                <th className="py-3 font-medium">Consentimiento</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-t border-border/60 hover:bg-muted/40">
+                <td className="py-3 font-medium text-foreground">P990235</td>
+                <td className="py-3 text-foreground/80">Vida</td>
+                <td className="py-3 text-foreground/80">06/06/2025</td>
+                <td className="py-3 text-foreground/80">Mapfre</td>
+                <td className="py-3">
+                  <div className="flex items-center gap-3 text-[color:var(--brand-blue)]">
+                    <button title="Ver" className="hover:opacity-70">
+                      <Eye className="h-4 w-4" />
+                    </button>
+                    <button title="Descargar" className="hover:opacity-70">
+                      <Download className="h-4 w-4" />
+                    </button>
+                    <button title="Cargar" className="hover:opacity-70">
+                      <Upload className="h-4 w-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </Section>
+
       {detail && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 p-4 backdrop-blur-md"
@@ -109,56 +172,46 @@ function MisPolizasPage() {
               <X className="h-4 w-4" />
             </button>
             <h3 className="text-lg font-bold text-foreground">
-              Póliza {detail.id} — {detail.tipoSeguro}
+              {detail.tipo} — {detail.aseguradora}
             </h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Datos generales de tu póliza con {detail.aseguradora}.
-            </p>
-            <div className="mt-4">
-              <Grid>
-                <Field label="Tipo de seguro">
-                  <TextInput value={detail.tipoSeguro} readOnly />
-                </Field>
-                <Field label="Aseguradora">
-                  <TextInput value={detail.aseguradora} readOnly />
-                </Field>
-                <Field label="Vigencia">
-                  <TextInput value={detail.vigencia} readOnly />
-                </Field>
-                <Field label="Renovación">
-                  <TextInput value={detail.renovacion} readOnly />
-                </Field>
-                <Field label="Próximo pago">
-                  <TextInput value={detail.proximoPago} readOnly />
-                </Field>
-                <Field label="Monto">
-                  <TextInput value={detail.cantidad} readOnly />
-                </Field>
-                <Field label="Estatus">
-                  <TextInput value={detail.status} readOnly />
-                </Field>
-                <Field label="Certificado">
-                  <TextInput value={detail.certificado ? "Sí" : "No"} readOnly />
-                </Field>
-              </Grid>
-            </div>
-            <div className="mt-6 flex justify-end gap-2">
-              {ASEGURADORA_LINKS[detail.aseguradora] && (
-                <a
-                  href={ASEGURADORA_LINKS[detail.aseguradora]}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
-                >
-                  <ExternalLink className="h-4 w-4" /> Ir al portal de {detail.aseguradora}
-                </a>
-              )}
-              <button
-                onClick={() => setDetail(null)}
-                className="rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
-              >
-                Cerrar
+
+            <div className={`mt-5 grid gap-3 ${detail.tipo === "Vida" ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+              <button className="flex flex-col items-start gap-2 rounded-2xl border border-border bg-muted/30 p-4 text-left hover:bg-muted/60">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--brand-blue)]/10 text-[color:var(--brand-blue)]">
+                  <FileText className="h-4 w-4" />
+                </div>
+                <span className="text-sm font-medium text-foreground">Condiciones generales</span>
+                <span className="inline-flex items-center gap-1 text-xs text-[color:var(--brand-blue)]">
+                  <Download className="h-3.5 w-3.5" /> Descargar
+                </span>
               </button>
+
+              <button className="flex flex-col items-start gap-2 rounded-2xl border border-border bg-muted/30 p-4 text-left hover:bg-muted/60">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--brand-blue)]/10 text-[color:var(--brand-blue)]">
+                  <FileText className="h-4 w-4" />
+                </div>
+                <span className="text-sm font-medium text-foreground">Mi póliza</span>
+                <span className="inline-flex items-center gap-1 text-xs text-[color:var(--brand-blue)]">
+                  <Download className="h-3.5 w-3.5" /> Descargar
+                </span>
+              </button>
+
+              {detail.tipo === "Vida" && (
+                <div className="flex flex-col items-start gap-2 rounded-2xl border border-border bg-muted/30 p-4">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--brand-blue)]/10 text-[color:var(--brand-blue)]">
+                    <FileText className="h-4 w-4" />
+                  </div>
+                  <span className="text-sm font-medium text-foreground">Formato de consentimiento</span>
+                  <div className="flex items-center gap-3 text-[color:var(--brand-blue)]">
+                    <button title="Ver" className="inline-flex items-center gap-1 text-xs hover:opacity-70">
+                      <Eye className="h-3.5 w-3.5" /> Ver
+                    </button>
+                    <button title="Cargar" className="inline-flex items-center gap-1 text-xs hover:opacity-70">
+                      <Upload className="h-3.5 w-3.5" /> Cargar
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
