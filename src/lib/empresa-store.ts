@@ -142,7 +142,9 @@ export function seedEmpresasIfEmpty(seeds: Empresa[]) {
       cur.direccion !== s.direccion ||
       cur.codigoPostal !== s.codigoPostal ||
       cur.polizas.length !== s.polizas.length ||
-      cur.polizas.some((p) => p.asegurados.length === 0)
+      cur.polizas.some((p) => p.asegurados.length === 0) ||
+      cur.encargados.length !== s.encargados.length ||
+      cur.encargados.some((e, i) => e.email !== s.encargados[i]?.email)
     );
   });
   if (needsRefresh) write([...userCreated, ...seeds]);
