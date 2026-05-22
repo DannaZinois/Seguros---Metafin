@@ -135,7 +135,7 @@ function PerfilEmpresaPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={cancelEdit}
-                className="inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-sm hover:bg-muted"
+                className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-3.5 py-2 text-sm font-medium text-white hover:bg-orange-600"
               >
                 <X className="h-4 w-4" /> Cancelar
               </button>
@@ -149,7 +149,7 @@ function PerfilEmpresaPage() {
           ) : (
             <button
               onClick={startEdit}
-              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-sm hover:bg-muted"
+              className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-3.5 py-2 text-sm font-medium text-white hover:bg-orange-600"
             >
               <Pencil className="h-4 w-4" /> Editar
             </button>
