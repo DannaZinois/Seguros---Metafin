@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Pencil, Check, X } from "lucide-react";
 import { Section, Grid, Field, TextInput } from "@/components/cotizador/shared";
 import { useCurrentClient } from "@/lib/client-context";
+import { FamiliaresBeneficiariosSection } from "@/components/familiares-beneficiarios";
 
 export const Route = createFileRoute("/_client/mi-perfil")({
   component: MiPerfilPage,
@@ -141,6 +142,8 @@ function MiPerfilPage() {
           </Field>
         </Grid>
       </Section>
+
+      <FamiliaresBeneficiariosSection editable={editing} />
     </div>
   );
 }
