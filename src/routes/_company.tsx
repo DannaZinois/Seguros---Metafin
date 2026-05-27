@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Building2, Shield, Users, ClipboardList } from "lucide-react";
+import { Building2, Shield, Users, ClipboardList, FileText } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useCompanyEmpresa } from "@/lib/company-context";
 import { HeaderProfile } from "@/components/layout/header-profile";
@@ -33,6 +33,7 @@ function CompanyLayout() {
     { to: "/seguros", label: "Seguros", icon: Shield },
     { to: "/empleados", label: "Empleados", icon: Users },
     { to: "/movimientos", label: "Movimientos", icon: ClipboardList },
+    { to: "/documentos", label: "Documentos", icon: FileText },
   ] as const;
 
   return (
