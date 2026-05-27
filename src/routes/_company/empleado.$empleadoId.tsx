@@ -4,6 +4,7 @@ import { ArrowLeft, Pencil, Check, X, ChevronDown, ChevronRight, Eye, Download, 
 import { Section, Grid, Field, TextInput } from "@/components/cotizador/shared";
 import { EMPLEADOS_NOMBRES } from "@/lib/empleados-nombres";
 import { useCompanyEmpresa } from "@/lib/company-context";
+import { useAseguradoDocs, getDocsByRfc, downloadDoc as downloadStored, viewDoc as viewStored } from "@/lib/asegurado-docs-store";
 
 import { FamiliaresBeneficiariosSection } from "@/components/familiares-beneficiarios";
 
@@ -105,6 +106,7 @@ function EmpleadoDetallePage() {
   const router = useRouter();
   const { empleadoId } = Route.useParams();
   const empresa = useCompanyEmpresa();
+  const allDocs = useAseguradoDocs();
 
   const nombre = nombreFromId(empleadoId);
   const [editing, setEditing] = useState(false);
@@ -127,6 +129,8 @@ function EmpleadoDetallePage() {
     { id: "P990234", tipo: "GMM", vigencia: "06/06/2025", aseguradora: "Zurich", contratante, status: "Activa" },
     { id: "P990235", tipo: "Vida", vigencia: "06/06/2025", aseguradora: "Mapfre", contratante, status: "Activa" },
   ];
+
+  const uploadedForEmpleado = getDocsByRfc(allDocs, form.rfc);
 
   return (
     <div className="pb-12">
