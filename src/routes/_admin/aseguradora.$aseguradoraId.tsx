@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, ImageIcon, Upload, Plus, Trash2, Pencil, Check, X } from "lucide-react";
+import { ArrowLeft, ImageIcon, Upload, Plus, Trash2, Pencil } from "lucide-react";
 import {
   useAseguradoras,
   type Aseguradora,
@@ -307,7 +307,3 @@ function Field({
     </label>
   );
 }
-
-// Unused but imported to suppress: imports kept for tree-shaking warnings
-void Check;
-void X;
