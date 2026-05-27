@@ -43,28 +43,9 @@ function docsFromAseguradoras(
   return out;
 }
 
-const tramitesVida: Documento[] = [
-  { nombre: "Solicitud de siniestro - Vida", descripcion: "Formato para iniciar el trámite por fallecimiento del asegurado.", formato: "PDF", tamano: "210 KB" },
-  { nombre: "Designación de beneficiarios", descripcion: "Actualiza o registra a los beneficiarios de la póliza de vida.", formato: "PDF", tamano: "180 KB" },
-  { nombre: "Aviso de invalidez total y permanente", descripcion: "Formato para reclamar el beneficio por invalidez.", formato: "PDF", tamano: "195 KB" },
-  { nombre: "Carta de instrucciones de pago", descripcion: "Indicaciones bancarias para el pago de la suma asegurada.", formato: "DOCX", tamano: "85 KB" },
-];
-
-const tramitesGMM: Documento[] = [
-  { nombre: "Solicitud de reembolso GMM", descripcion: "Formato para solicitar reembolso de gastos médicos.", formato: "PDF", tamano: "240 KB" },
-  { nombre: "Aviso de accidente o enfermedad", descripcion: "Notifica el inicio de un padecimiento o accidente cubierto.", formato: "PDF", tamano: "175 KB" },
-  { nombre: "Programación de cirugía", descripcion: "Solicitud para programar cirugía bajo cobertura GMM.", formato: "PDF", tamano: "200 KB" },
-  { nombre: "Carta médica del especialista", descripcion: "Formato para el médico tratante con diagnóstico y tratamiento.", formato: "DOCX", tamano: "95 KB" },
-  { nombre: "Reembolso de medicamentos", descripcion: "Anexo para solicitar reembolso de farmacia ambulatoria.", formato: "PDF", tamano: "150 KB" },
-];
-
-const informativos: Documento[] = [
-  { nombre: "Condiciones generales - GMM", descripcion: "Documento informativo con coberturas, exclusiones y deducible.", formato: "PDF", tamano: "1.2 MB" },
-  { nombre: "Condiciones generales - Vida", descripcion: "Información detallada de la póliza de vida grupo.", formato: "PDF", tamano: "950 KB" },
-  { nombre: "Directorio de hospitales en red", descripcion: "Listado actualizado de hospitales y clínicas en convenio.", formato: "PDF", tamano: "780 KB" },
-  { nombre: "Guía rápida para el asegurado", descripcion: "Pasos para hacer uso de tu póliza y contactos clave.", formato: "PDF", tamano: "420 KB" },
-  { nombre: "Tabulador de indemnizaciones", descripcion: "Tabla de pagos por accidente personal e invalidez.", formato: "PDF", tamano: "310 KB" },
-];
+const tramitesVida: Documento[] = [];
+const tramitesGMM: Documento[] = [];
+const informativos: Documento[] = [];
 
 function descargar(doc: Documento) {
   const contenido = `Documento: ${doc.nombre}\n\n${doc.descripcion}\n\nFormato: ${doc.formato}\nTamaño: ${doc.tamano}\n\n(Documento de demostración generado por el portal Metafin.)`;
