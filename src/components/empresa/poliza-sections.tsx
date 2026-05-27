@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, Trash2, Download, Search, Upload, FileUp } from "lucide-react";
+import { Plus, Trash2, Download, Search, Upload, FileUp, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Section } from "@/components/cotizador/shared";
 import type { Poliza } from "@/lib/empresa-store";
@@ -9,13 +9,6 @@ import {
   type UploadMode,
 } from "@/components/asegurado/upload-dialog";
 import { addAseguradoDocs, type AseguradoDoc } from "@/lib/asegurado-docs-store";
-
-const STATUS_COLORS: Record<string, string> = {
-  Activa: "bg-[color:var(--status-active)] text-[color:var(--status-active-fg)]",
-  Cancelada: "bg-[color:var(--status-cancelled)] text-[color:var(--status-cancelled-fg)]",
-  "En revisión": "bg-[color:var(--status-review)] text-[color:var(--status-review-fg)]",
-  "Por renovar": "bg-[color:var(--status-renew)] text-[color:var(--status-renew-fg)]",
-};
 
 export function AseguradosSection({
   poliza,
@@ -30,6 +23,8 @@ export function AseguradosSection({
 }) {
   const [query, setQuery] = useState("");
   const [uploadMode, setUploadMode] = useState<UploadMode | null>(null);
+  const [consentDialog, setConsentDialog] = useState<null | "choose" | "individual">(null);
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return poliza.asegurados;
@@ -39,24 +34,6 @@ export function AseguradosSection({
         a.nombre.toLowerCase().includes(q),
     );
   }, [poliza.asegurados, query]);
-
-  const addRow = () =>
-    onChange([
-      ...poliza.asegurados,
-      {
-        id: crypto.randomUUID(),
-        trabajadorId: `F-#${Math.floor(100000 + Math.random() * 900000)}`,
-        nombre: "",
-        poliza: poliza.tipo || "Póliza aquí",
-        vigencia: "00/00/0000",
-        renovacion: "00/00/0000",
-        correo: "",
-        telefono: "",
-        consentimiento: false,
-        certificado: false,
-        status: "Activa",
-      },
-    ]);
 
   const handleParsed = (files: ParsedAseguradoFile[]) => {
     const now = Date.now();
@@ -127,17 +104,12 @@ export function AseguradosSection({
               </button>
             </>
           )}
-          <button className="inline-flex items-center gap-1 rounded-full bg-[color:var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[color:var(--brand-blue-dark)]">
-            + Descargar consentimiento
+          <button
+            onClick={() => setConsentDialog("choose")}
+            className="inline-flex items-center gap-1 rounded-full bg-[color:var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+          >
+            <Download className="h-3.5 w-3.5" /> Descargar consentimiento
           </button>
-          {!readOnly && (
-            <button
-              onClick={addRow}
-              className="inline-flex items-center gap-1 rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-600"
-            >
-              <Plus className="h-3.5 w-3.5" /> Agregar persona
-            </button>
-          )}
         </div>
       }
     >
@@ -156,6 +128,23 @@ export function AseguradosSection({
         <table className="w-full min-w-[1100px] text-left text-sm">
           <thead className="text-xs text-muted-foreground">
             <tr>
+              {consentDialog === "individual" && (
+                <th className="py-3 font-medium w-8">
+                  <input
+                    type="checkbox"
+                    checked={
+                      poliza.asegurados.length > 0 &&
+                      poliza.asegurados.every((a) => selected[a.id])
+                    }
+                    onChange={(e) => {
+                      const all: Record<string, boolean> = {};
+                      if (e.target.checked)
+                        poliza.asegurados.forEach((a) => (all[a.id] = true));
+                      setSelected(all);
+                    }}
+                  />
+                </th>
+              )}
               <th className="py-3 font-medium">RFC</th>
               <th className="py-3 font-medium">Nombre</th>
               <th className="py-3 font-medium">Póliza</th>
@@ -165,14 +154,13 @@ export function AseguradosSection({
               <th className="py-3 font-medium">Teléfono</th>
               <th className="py-3 font-medium">Consentimiento</th>
               <th className="py-3 font-medium">Certificado</th>
-              <th className="py-3 font-medium">Status</th>
               {!readOnly && <th className="py-3 font-medium" />}
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={11} className="py-8 text-center text-sm text-muted-foreground">
+                <td colSpan={10} className="py-8 text-center text-sm text-muted-foreground">
                   {poliza.asegurados.length === 0
                     ? "Aún no hay asegurados. Carga el archivo o agrega una persona."
                     : "Sin resultados para tu búsqueda."}
@@ -181,6 +169,17 @@ export function AseguradosSection({
             )}
             {filtered.map((a) => (
               <tr key={a.id} className="border-t border-border/60">
+                {consentDialog === "individual" && (
+                  <td className="py-3">
+                    <input
+                      type="checkbox"
+                      checked={!!selected[a.id]}
+                      onChange={(e) =>
+                        setSelected({ ...selected, [a.id]: e.target.checked })
+                      }
+                    />
+                  </td>
+                )}
                 <td className="py-3 text-foreground/80">
                   {empresaId ? (
                     <Link
@@ -273,32 +272,6 @@ export function AseguradosSection({
                     {a.certificado ? "Descargar" : "-"}
                   </button>
                 </td>
-                <td className="py-3">
-                  {readOnly ? (
-                    <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLORS[a.status]}`}>
-                      {a.status}
-                    </span>
-                  ) : (
-                    <select
-                      value={a.status}
-                      onChange={(e) =>
-                        onChange(
-                          poliza.asegurados.map((x) =>
-                            x.id === a.id
-                              ? { ...x, status: e.target.value as typeof x.status }
-                              : x,
-                          ),
-                        )
-                      }
-                      className={`rounded-full px-3 py-1 text-xs font-medium outline-none ${STATUS_COLORS[a.status]}`}
-                    >
-                      <option>Activa</option>
-                      <option>Cancelada</option>
-                      <option>En revisión</option>
-                      <option>Por renovar</option>
-                    </select>
-                  )}
-                </td>
                 {!readOnly && (
                   <td className="py-3">
                     <button
@@ -317,6 +290,34 @@ export function AseguradosSection({
           </tbody>
         </table>
       </div>
+      {consentDialog === "individual" && (
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            onClick={() => {
+              setConsentDialog(null);
+              setSelected({});
+            }}
+            className="rounded-full border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={() => {
+              const ids = Object.keys(selected).filter((k) => selected[k]);
+              if (!ids.length) {
+                alert("Selecciona al menos un asegurado.");
+                return;
+              }
+              setConsentDialog(null);
+              setSelected({});
+              alert(`Descargando consentimientos de ${ids.length} asegurado(s).`);
+            }}
+            className="inline-flex items-center gap-1 rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+          >
+            <Download className="h-4 w-4" /> Descargar seleccionados
+          </button>
+        </div>
+      )}
       <AseguradoUploadDialog
         open={uploadMode !== null}
         mode={uploadMode ?? "zip"}
@@ -324,6 +325,49 @@ export function AseguradosSection({
         onClose={() => setUploadMode(null)}
         onConfirm={handleParsed}
       />
+      {consentDialog === "choose" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Descargar consentimiento</h3>
+              <button
+                onClick={() => setConsentDialog(null)}
+                className="rounded-full p-1 hover:bg-muted"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="mb-5 text-sm text-muted-foreground">
+              ¿Cómo quieres descargar los consentimientos?
+            </p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  setConsentDialog(null);
+                  alert(
+                    `Descargando consentimientos de los ${poliza.asegurados.length} asegurados.`,
+                  );
+                }}
+                className="rounded-xl border border-border p-4 text-left hover:border-[color:var(--brand-blue)] hover:bg-muted/40"
+              >
+                <div className="font-medium">Descarga masiva</div>
+                <div className="text-xs text-muted-foreground">
+                  Descarga los consentimientos de todos los asegurados en un solo archivo.
+                </div>
+              </button>
+              <button
+                onClick={() => setConsentDialog("individual")}
+                className="rounded-xl border border-border p-4 text-left hover:border-[color:var(--brand-blue)] hover:bg-muted/40"
+              >
+                <div className="font-medium">Uno por uno</div>
+                <div className="text-xs text-muted-foreground">
+                  Selecciona los perfiles específicos desde la tabla de asegurados.
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Section>
   );
 }
