@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Plus, Trash2, FileText, Upload, Pencil, X, ImageIcon, ChevronDown, ChevronUp, FileSpreadsheet } from "lucide-react";
+import { Plus, Trash2, FileText, Upload, Pencil, ImageIcon, ChevronDown, ChevronUp, FileSpreadsheet } from "lucide-react";
 import { useAseguradoras, type Aseguradora, type PolizaTipo, type TipoSeguro, type VariantePoliza } from "@/lib/store";
+import { PolizaBuilder, TIPOS_SEGURO, tipoLabel } from "@/components/aseguradora/poliza-builder";
 
 export const Route = createFileRoute("/_admin/aseguradoras")({
   component: AseguradorasPage,
@@ -106,20 +107,14 @@ const SEED: Aseguradora[] = [
 ];
 
 function AseguradorasPage() {
+  const router = useRouter();
   const [list, setList] = useAseguradoras();
   const imgRef = useRef<HTMLInputElement>(null);
   const empty: Aseguradora = { id: "", name: "" };
   const [draft, setDraft] = useState<Aseguradora>(empty);
-  const [editing, setEditing] = useState<Aseguradora | null>(null);
   const [open, setOpen] = useState(false);
   const [polizasMode, setPolizasMode] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [polizaDraft, setPolizaDraft] = useState<PolizaTipo>({
-    id: "",
-    tipo: "Auto",
-    variantes: [],
-  });
-  const [numVariantes, setNumVariantes] = useState(0);
 
   useEffect(() => {
     if (list.length === 0) setList(SEED);
@@ -150,52 +145,19 @@ function AseguradorasPage() {
   };
 
   const remove = (id: string) => setList(list.filter((a) => a.id !== id));
-  const save = (a: Aseguradora) => {
-    setList(list.map((x) => (x.id === a.id ? a : x)));
-    setEditing(null);
-  };
 
-  const openPolizas = () => {
-    setPolizaDraft({ id: crypto.randomUUID(), tipo: "Auto", variantes: [] });
-    setNumVariantes(0);
-    setPolizasMode(true);
-  };
-
-  const setNumVariantesAndRows = (n: number) => {
-    const safe = Math.max(0, Math.min(50, n || 0));
-    setNumVariantes(safe);
-    setPolizaDraft((p) => {
-      const cur = p.variantes;
-      const next: VariantePoliza[] = [];
-      for (let i = 0; i < safe; i++) {
-        next.push(cur[i] ?? { id: crypto.randomUUID(), nombre: "" });
+  const addPolizaToDraft = (tipo: TipoSeguro, variante: VariantePoliza) => {
+    setDraft((p) => {
+      const polizas = [...(p.polizas ?? [])];
+      const i = polizas.findIndex((x) => x.tipo === tipo);
+      if (i >= 0) {
+        polizas[i] = { ...polizas[i], variantes: [...polizas[i].variantes, variante] };
+      } else {
+        polizas.push({ id: crypto.randomUUID(), tipo, variantes: [variante] });
       }
-      return { ...p, variantes: next };
+      return { ...p, polizas };
     });
-  };
-
-  const updateVariante = (id: string, patch: Partial<VariantePoliza>) => {
-    setPolizaDraft((p) => ({
-      ...p,
-      variantes: p.variantes.map((v) => (v.id === id ? { ...v, ...patch } : v)),
-    }));
-  };
-
-  const removeVariante = (id: string) => {
-    setPolizaDraft((p) => ({ ...p, variantes: p.variantes.filter((v) => v.id !== id) }));
-    setNumVariantes((n) => Math.max(0, n - 1));
-  };
-
-  const cancelPolizas = () => {
     setPolizasMode(false);
-    setPolizaDraft({ id: "", tipo: "Auto", variantes: [] });
-    setNumVariantes(0);
-  };
-
-  const addPolizaToDraft = () => {
-    if (polizaDraft.variantes.length === 0) return;
-    setDraft((p) => ({ ...p, polizas: [...(p.polizas ?? []), polizaDraft] }));
-    cancelPolizas();
   };
 
   return (
@@ -263,16 +225,16 @@ function AseguradorasPage() {
         <div className="mt-6">
           <button
             type="button"
-            onClick={openPolizas}
+            onClick={() => setPolizasMode(true)}
             className="inline-flex items-center gap-2 rounded-full border border-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-[color:var(--brand-blue)] hover:bg-[color:var(--brand-blue)]/10"
           >
-            <Plus className="h-4 w-4" /> Agregar pólizas
+            <Plus className="h-4 w-4" /> Agregar póliza
           </button>
           {(draft.polizas?.length ?? 0) > 0 && (
             <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
               {draft.polizas!.map((p) => (
                 <li key={p.id}>
-                  • {p.tipo} — {p.variantes.length} variante(s)
+                  • {tipoLabel(p.tipo)} — {p.variantes.length} póliza(s)
                 </li>
               ))}
             </ul>
@@ -298,15 +260,9 @@ function AseguradorasPage() {
         </div>
         </>
         ) : (
-          <PolizasForm
-            draft={polizaDraft}
-            setTipo={(t) => setPolizaDraft((p) => ({ ...p, tipo: t }))}
-            numVariantes={numVariantes}
-            setNumVariantes={setNumVariantesAndRows}
-            updateVariante={updateVariante}
-            removeVariante={removeVariante}
-            onCancel={cancelPolizas}
-            onAdd={addPolizaToDraft}
+          <PolizaBuilder
+            onCancel={() => setPolizasMode(false)}
+            onSave={addPolizaToDraft}
           />
         )}
         </div>
@@ -366,7 +322,12 @@ function AseguradorasPage() {
                 <td className="px-6 py-4 text-right">
                   <div className="inline-flex items-center gap-1">
                     <button
-                      onClick={() => setEditing(a)}
+                      onClick={() =>
+                        router.navigate({
+                          to: "/aseguradora/$aseguradoraId",
+                          params: { aseguradoraId: a.id },
+                        })
+                      }
                       className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
                     >
                       <Pencil className="h-3.5 w-3.5" /> Editar
@@ -392,162 +353,11 @@ function AseguradorasPage() {
           </tbody>
         </table>
       </div>
-      {editing && (
-        <EditDialog
-          item={editing}
-          onClose={() => setEditing(null)}
-          onSave={save}
-        />
-      )}
     </div>
   );
 }
 
-const TIPOS_SEGURO: TipoSeguro[] = ["Auto", "Vida", "Gastos médicos mayores", "Exceso"];
 
-function tipoLabel(t: TipoSeguro): string {
-  return t === "Gastos médicos mayores" ? "GMM" : t;
-}
-
-function PolizasEditor({
-  polizas,
-  onChange,
-}: {
-  polizas: PolizaTipo[];
-  onChange: (next: PolizaTipo[]) => void;
-}) {
-  const ensureTipo = (tipo: TipoSeguro): PolizaTipo[] => {
-    if (polizas.find((p) => p.tipo === tipo)) return polizas;
-    return [...polizas, { id: crypto.randomUUID(), tipo, variantes: [] }];
-  };
-
-  const updateVariante = (tipo: TipoSeguro, vid: string, patch: Partial<VariantePoliza>) => {
-    onChange(
-      polizas.map((p) =>
-        p.tipo === tipo
-          ? { ...p, variantes: p.variantes.map((v) => (v.id === vid ? { ...v, ...patch } : v)) }
-          : p,
-      ),
-    );
-  };
-
-  const removeVariante = (tipo: TipoSeguro, vid: string) => {
-    onChange(
-      polizas.map((p) =>
-        p.tipo === tipo ? { ...p, variantes: p.variantes.filter((v) => v.id !== vid) } : p,
-      ),
-    );
-  };
-
-  const addVariante = (tipo: TipoSeguro) => {
-    const base = ensureTipo(tipo);
-    onChange(
-      base.map((p) =>
-        p.tipo === tipo
-          ? { ...p, variantes: [...p.variantes, { id: crypto.randomUUID(), nombre: "" }] }
-          : p,
-      ),
-    );
-  };
-
-  const onFile = (
-    tipo: TipoSeguro,
-    vid: string,
-    field: "pdfName" | "wordName",
-    file: File | undefined,
-  ) => {
-    if (!file) return;
-    updateVariante(tipo, vid, { [field]: file.name } as Partial<VariantePoliza>);
-  };
-
-  return (
-    <div className="mt-4 space-y-4">
-      {TIPOS_SEGURO.map((tipo) => {
-        const grupo = polizas.find((p) => p.tipo === tipo);
-        const variantes = grupo?.variantes ?? [];
-        return (
-          <div key={tipo} className="overflow-hidden rounded-2xl border border-border">
-            <div className="flex items-center justify-between border-b border-border bg-muted/40 px-4 py-2">
-              <span className="text-xs font-semibold text-foreground">
-                {tipoLabel(tipo)}{" "}
-                {variantes.length > 0 && (
-                  <span className="text-muted-foreground">({variantes.length})</span>
-                )}
-              </span>
-              <button
-                type="button"
-                onClick={() => addVariante(tipo)}
-                className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-3 py-1 text-xs font-medium text-foreground hover:bg-muted"
-              >
-                <Plus className="h-3 w-3" /> Variante
-              </button>
-            </div>
-            {variantes.length === 0 ? (
-              <div className="px-4 py-3 text-xs text-muted-foreground">Sin variantes.</div>
-            ) : (
-              <table className="w-full text-left text-sm">
-                <thead className="border-b border-border text-xs text-muted-foreground">
-                  <tr>
-                    <th className="px-4 py-2 font-medium">Nombre</th>
-                    <th className="px-4 py-2 font-medium">PDF</th>
-                    <th className="px-4 py-2 font-medium">Word</th>
-                    <th className="px-4 py-2 font-medium text-right">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {variantes.map((v, idx) => (
-                    <tr key={v.id} className="border-b border-border/60 last:border-0">
-                      <td className="px-4 py-2">
-                        <input
-                          value={v.nombre}
-                          placeholder={`Variante ${idx + 1}`}
-                          onChange={(e) => updateVariante(tipo, v.id, { nombre: e.target.value })}
-                          className="w-full rounded-md border border-border px-2 py-1 text-sm outline-none focus:border-[color:var(--brand-blue)]"
-                        />
-                      </td>
-                      <td className="px-4 py-2">
-                        <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted/40">
-                          <FileText className="h-3.5 w-3.5" />
-                          <span className="truncate max-w-[140px]">{v.pdfName || "Subir PDF"}</span>
-                          <input
-                            type="file"
-                            accept="application/pdf"
-                            className="hidden"
-                            onChange={(e) => onFile(tipo, v.id, "pdfName", e.target.files?.[0])}
-                          />
-                        </label>
-                      </td>
-                      <td className="px-4 py-2">
-                        <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted/40">
-                          <FileSpreadsheet className="h-3.5 w-3.5" />
-                          <span className="truncate max-w-[140px]">{v.wordName || "Subir Word"}</span>
-                          <input
-                            type="file"
-                            accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                            className="hidden"
-                            onChange={(e) => onFile(tipo, v.id, "wordName", e.target.files?.[0])}
-                          />
-                        </label>
-                      </td>
-                      <td className="px-4 py-2 text-right">
-                        <button
-                          onClick={() => removeVariante(tipo, v.id)}
-                          className="rounded-full p-2 text-destructive hover:bg-destructive/10"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 function RowGroup({ children }: { children: ReactNode }) {
   return <>{children}</>;
@@ -604,258 +414,7 @@ function PolizasResumen({ polizas }: { polizas: PolizaTipo[] }) {
   );
 }
 
-function PolizasForm({
-  draft,
-  setTipo,
-  numVariantes,
-  setNumVariantes,
-  updateVariante,
-  removeVariante,
-  onCancel,
-  onAdd,
-}: {
-  draft: PolizaTipo;
-  setTipo: (t: TipoSeguro) => void;
-  numVariantes: number;
-  setNumVariantes: (n: number) => void;
-  updateVariante: (id: string, patch: Partial<VariantePoliza>) => void;
-  removeVariante: (id: string) => void;
-  onCancel: () => void;
-  onAdd: () => void;
-}) {
-  const [editingId, setEditingId] = useState<string | null>(null);
 
-  const onFile = (
-    id: string,
-    field: "pdfName" | "wordName",
-    file: File | undefined,
-  ) => {
-    if (!file) return;
-    updateVariante(id, { [field]: file.name } as Partial<VariantePoliza>);
-  };
-
-  return (
-    <div>
-      <h3 className="text-base font-semibold text-foreground">Agregar pólizas</h3>
-
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <div>
-          <label className="text-xs font-medium text-foreground">Tipo de seguro</label>
-          <select
-            value={draft.tipo}
-            onChange={(e) => setTipo(e.target.value as TipoSeguro)}
-            className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-[color:var(--brand-blue)]"
-          >
-            {TIPOS_SEGURO.map((t) => (
-              <option key={t} value={t}>
-                {tipoLabel(t)}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="text-xs font-medium text-foreground">
-            Número de variantes para este seguro
-          </label>
-          <input
-            type="number"
-            min={0}
-            value={numVariantes}
-            onChange={(e) => setNumVariantes(parseInt(e.target.value, 10))}
-            className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-[color:var(--brand-blue)]"
-          />
-        </div>
-      </div>
-
-      {draft.variantes.length > 0 && (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-border">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
-              <tr>
-                <th className="px-4 py-2 font-medium">Nombre</th>
-                <th className="px-4 py-2 font-medium">PDF</th>
-                <th className="px-4 py-2 font-medium">Word</th>
-                <th className="px-4 py-2 font-medium text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {draft.variantes.map((v, idx) => {
-                const isEditing = editingId === v.id;
-                return (
-                  <tr key={v.id} className="border-b border-border/60 last:border-0">
-                    <td className="px-4 py-2">
-                      {isEditing ? (
-                        <input
-                          value={v.nombre}
-                          onChange={(e) => updateVariante(v.id, { nombre: e.target.value })}
-                          className="w-full rounded-md border border-border px-2 py-1 text-sm outline-none focus:border-[color:var(--brand-blue)]"
-                        />
-                      ) : (
-                        v.nombre || <span className="text-muted-foreground">Variante {idx + 1}</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2">
-                      <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted/40">
-                        <FileText className="h-3.5 w-3.5" />
-                        <span className="truncate max-w-[140px]">{v.pdfName || "Subir PDF"}</span>
-                        <input
-                          type="file"
-                          accept="application/pdf"
-                          className="hidden"
-                          onChange={(e) => onFile(v.id, "pdfName", e.target.files?.[0])}
-                        />
-                      </label>
-                    </td>
-                    <td className="px-4 py-2">
-                      <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted/40">
-                        <FileSpreadsheet className="h-3.5 w-3.5" />
-                        <span className="truncate max-w-[140px]">{v.wordName || "Subir Word"}</span>
-                        <input
-                          type="file"
-                          accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                          className="hidden"
-                          onChange={(e) => onFile(v.id, "wordName", e.target.files?.[0])}
-                        />
-                      </label>
-                    </td>
-                    <td className="px-4 py-2 text-right">
-                      <div className="inline-flex items-center gap-1">
-                        <button
-                          onClick={() => setEditingId(isEditing ? null : v.id)}
-                          className="rounded-full p-2 text-foreground hover:bg-muted"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                          onClick={() => removeVariante(v.id)}
-                          className="rounded-full p-2 text-destructive hover:bg-destructive/10"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      <div className="mt-6 flex justify-end gap-3">
-        <button
-          onClick={onCancel}
-          className="rounded-full border border-border px-5 py-2 text-sm font-medium text-foreground hover:bg-muted"
-        >
-          Cancelar
-        </button>
-        <button
-          onClick={onAdd}
-          className="inline-flex items-center gap-2 rounded-full bg-[color:var(--brand-blue)] px-5 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
-        >
-          <Plus className="h-4 w-4" /> Agregar
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function EditDialog({
-  item,
-  onClose,
-  onSave,
-}: {
-  item: Aseguradora;
-  onClose: () => void;
-  onSave: (a: Aseguradora) => void;
-}) {
-  const [form, setForm] = useState<Aseguradora>(item);
-  const set = <K extends keyof Aseguradora>(k: K, v: Aseguradora[K]) =>
-    setForm((p) => ({ ...p, [k]: v }));
-
-  const onImage = (file: File | undefined) => {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => set("imageDataUrl", reader.result as string);
-    reader.readAsDataURL(file);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-xl">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-foreground">Editar aseguradora</h2>
-          <button onClick={onClose} className="rounded-full p-2 hover:bg-muted">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
-        <div className="mt-6 flex items-center gap-4">
-          {form.imageDataUrl ? (
-            <img src={form.imageDataUrl} alt="" className="h-20 w-20 rounded-2xl object-cover" />
-          ) : (
-            <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-              <ImageIcon className="h-6 w-6" />
-            </div>
-          )}
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:bg-muted/40">
-            <Upload className="h-4 w-4" /> Subir imagen
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => onImage(e.target.files?.[0])}
-            />
-          </label>
-        </div>
-
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <Field label="Nombre" value={form.name} onChange={(v) => set("name", v)} />
-          <Field label="Abreviación" value={form.abreviacion ?? ""} onChange={(v) => set("abreviacion", v)} />
-          <Field label="RFC" value={form.rfc ?? ""} onChange={(v) => set("rfc", v)} />
-          <Field label="Ejecutivo" value={form.ejecutivo ?? ""} onChange={(v) => set("ejecutivo", v)} />
-          <Field label="Número de contacto" value={form.contactoTel ?? ""} onChange={(v) => set("contactoTel", v)} />
-          <Field label="Correo de contacto" value={form.contactoEmail ?? ""} onChange={(v) => set("contactoEmail", v)} />
-          <Field label="Link a página web" value={form.webUrl ?? ""} onChange={(v) => set("webUrl", v)} />
-          <Field label="Link para pago" value={form.pagoUrl ?? ""} onChange={(v) => set("pagoUrl", v)} />
-          <Field label="Link para descargar aplicación" value={form.appUrl ?? ""} onChange={(v) => set("appUrl", v)} className="sm:col-span-2" />
-        </div>
-
-        <div className="mt-8 border-t border-border pt-6">
-          <h3 className="text-lg font-semibold text-foreground">Datos personales</h3>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <Field label="Usuario" value={form.usuario ?? ""} onChange={(v) => set("usuario", v)} />
-            <Field label="Contraseña" value={form.contrasena ?? ""} onChange={(v) => set("contrasena", v)} type="password" />
-            <Field label="Clave agente en la aseguradora" value={form.claveAgente ?? ""} onChange={(v) => set("claveAgente", v)} className="sm:col-span-2" />
-          </div>
-        </div>
-
-        <div className="mt-8 border-t border-border pt-6">
-          <h3 className="text-lg font-semibold text-foreground">Pólizas</h3>
-          <PolizasEditor
-            polizas={form.polizas ?? []}
-            onChange={(next) => set("polizas", next)}
-          />
-        </div>
-
-        <div className="mt-8 flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="rounded-full border border-border px-5 py-2 text-sm font-medium text-foreground hover:bg-muted"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={() => onSave(form)}
-            className="rounded-full bg-[color:var(--brand-blue)] px-5 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
-          >
-            Guardar
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function Field({
   label,
