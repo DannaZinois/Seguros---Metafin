@@ -111,17 +111,12 @@ export function AseguradosSection({
               </button>
             </>
           )}
-          <button className="inline-flex items-center gap-1 rounded-full bg-[color:var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[color:var(--brand-blue-dark)]">
-            + Descargar consentimiento
+          <button
+            onClick={() => setConsentDialog("choose")}
+            className="inline-flex items-center gap-1 rounded-full bg-[color:var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+          >
+            <Download className="h-3.5 w-3.5" /> Descargar consentimiento
           </button>
-          {!readOnly && (
-            <button
-              onClick={addRow}
-              className="inline-flex items-center gap-1 rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-600"
-            >
-              <Plus className="h-3.5 w-3.5" /> Agregar persona
-            </button>
-          )}
         </div>
       }
     >
