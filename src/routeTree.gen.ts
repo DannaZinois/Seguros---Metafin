@@ -35,6 +35,8 @@ import { Route as ClientConsentimientoVerRouteImport } from './routes/_client/co
 import { Route as AdminEmpresaNuevaRouteImport } from './routes/_admin/empresa.nueva'
 import { Route as AdminClienteClienteIdRouteImport } from './routes/_admin/cliente.$clienteId'
 import { Route as AdminAseguradoraAseguradoraIdRouteImport } from './routes/_admin/aseguradora.$aseguradoraId'
+import { Route as ApiPublicAseguradosZipRouteImport } from './routes/api/public/asegurados.zip'
+import { Route as ApiPublicAseguradosPdfSplitRouteImport } from './routes/api/public/asegurados.pdf-split'
 import { Route as AdminEmpresaPolizaNuevaRouteImport } from './routes/_admin/empresa.poliza.nueva'
 import { Route as AdminEmpresaPolizaPolizaIdRouteImport } from './routes/_admin/empresa.poliza.$polizaId'
 import { Route as AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRouteImport } from './routes/_admin/empresa.$empresaId.empleado.$empleadoId'
@@ -169,6 +171,17 @@ const AdminAseguradoraAseguradoraIdRoute =
     path: '/aseguradora/$aseguradoraId',
     getParentRoute: () => AdminRoute,
   } as any)
+const ApiPublicAseguradosZipRoute = ApiPublicAseguradosZipRouteImport.update({
+  id: '/api/public/asegurados/zip',
+  path: '/api/public/asegurados/zip',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAseguradosPdfSplitRoute =
+  ApiPublicAseguradosPdfSplitRouteImport.update({
+    id: '/api/public/asegurados/pdf-split',
+    path: '/api/public/asegurados/pdf-split',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminEmpresaPolizaNuevaRoute = AdminEmpresaPolizaNuevaRouteImport.update({
   id: '/empresa/poliza/nueva',
   path: '/empresa/poliza/nueva',
@@ -219,6 +232,8 @@ export interface FileRoutesByFullPath {
   '/seguros/$polizaId': typeof CompanySegurosPolizaIdRoute
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
+  '/api/public/asegurados/pdf-split': typeof ApiPublicAseguradosPdfSplitRoute
+  '/api/public/asegurados/zip': typeof ApiPublicAseguradosZipRoute
   '/cliente/$clienteId/poliza/$polizaId': typeof AdminClienteClienteIdPolizaPolizaIdRoute
   '/empresa/$empresaId/empleado/$empleadoId': typeof AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRoute
 }
@@ -248,6 +263,8 @@ export interface FileRoutesByTo {
   '/seguros/$polizaId': typeof CompanySegurosPolizaIdRoute
   '/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
+  '/api/public/asegurados/pdf-split': typeof ApiPublicAseguradosPdfSplitRoute
+  '/api/public/asegurados/zip': typeof ApiPublicAseguradosZipRoute
   '/cliente/$clienteId/poliza/$polizaId': typeof AdminClienteClienteIdPolizaPolizaIdRoute
   '/empresa/$empresaId/empleado/$empleadoId': typeof AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRoute
 }
@@ -281,6 +298,8 @@ export interface FileRoutesById {
   '/_company/seguros/$polizaId': typeof CompanySegurosPolizaIdRoute
   '/_admin/empresa/poliza/$polizaId': typeof AdminEmpresaPolizaPolizaIdRoute
   '/_admin/empresa/poliza/nueva': typeof AdminEmpresaPolizaNuevaRoute
+  '/api/public/asegurados/pdf-split': typeof ApiPublicAseguradosPdfSplitRoute
+  '/api/public/asegurados/zip': typeof ApiPublicAseguradosZipRoute
   '/_admin/cliente/$clienteId/poliza/$polizaId': typeof AdminClienteClienteIdPolizaPolizaIdRoute
   '/_admin/empresa/$empresaId/empleado/$empleadoId': typeof AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRoute
 }
@@ -312,6 +331,8 @@ export interface FileRouteTypes {
     | '/seguros/$polizaId'
     | '/empresa/poliza/$polizaId'
     | '/empresa/poliza/nueva'
+    | '/api/public/asegurados/pdf-split'
+    | '/api/public/asegurados/zip'
     | '/cliente/$clienteId/poliza/$polizaId'
     | '/empresa/$empresaId/empleado/$empleadoId'
   fileRoutesByTo: FileRoutesByTo
@@ -341,6 +362,8 @@ export interface FileRouteTypes {
     | '/seguros/$polizaId'
     | '/empresa/poliza/$polizaId'
     | '/empresa/poliza/nueva'
+    | '/api/public/asegurados/pdf-split'
+    | '/api/public/asegurados/zip'
     | '/cliente/$clienteId/poliza/$polizaId'
     | '/empresa/$empresaId/empleado/$empleadoId'
   id:
@@ -373,6 +396,8 @@ export interface FileRouteTypes {
     | '/_company/seguros/$polizaId'
     | '/_admin/empresa/poliza/$polizaId'
     | '/_admin/empresa/poliza/nueva'
+    | '/api/public/asegurados/pdf-split'
+    | '/api/public/asegurados/zip'
     | '/_admin/cliente/$clienteId/poliza/$polizaId'
     | '/_admin/empresa/$empresaId/empleado/$empleadoId'
   fileRoutesById: FileRoutesById
@@ -383,6 +408,8 @@ export interface RootRouteChildren {
   ClientRoute: typeof ClientRouteWithChildren
   CompanyRoute: typeof CompanyRouteWithChildren
   LoginRoute: typeof LoginRoute
+  ApiPublicAseguradosPdfSplitRoute: typeof ApiPublicAseguradosPdfSplitRoute
+  ApiPublicAseguradosZipRoute: typeof ApiPublicAseguradosZipRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -569,6 +596,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAseguradoraAseguradoraIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/asegurados/zip': {
+      id: '/api/public/asegurados/zip'
+      path: '/api/public/asegurados/zip'
+      fullPath: '/api/public/asegurados/zip'
+      preLoaderRoute: typeof ApiPublicAseguradosZipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/asegurados/pdf-split': {
+      id: '/api/public/asegurados/pdf-split'
+      path: '/api/public/asegurados/pdf-split'
+      fullPath: '/api/public/asegurados/pdf-split'
+      preLoaderRoute: typeof ApiPublicAseguradosPdfSplitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_admin/empresa/poliza/nueva': {
       id: '/_admin/empresa/poliza/nueva'
       path: '/empresa/poliza/nueva'
@@ -705,6 +746,8 @@ const rootRouteChildren: RootRouteChildren = {
   ClientRoute: ClientRouteWithChildren,
   CompanyRoute: CompanyRouteWithChildren,
   LoginRoute: LoginRoute,
+  ApiPublicAseguradosPdfSplitRoute: ApiPublicAseguradosPdfSplitRoute,
+  ApiPublicAseguradosZipRoute: ApiPublicAseguradosZipRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
