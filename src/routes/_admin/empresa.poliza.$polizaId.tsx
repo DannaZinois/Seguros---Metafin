@@ -134,7 +134,7 @@ function VerPolizaPage() {
           <Field label="Tipo de póliza*">
             <Select
               value={poliza.tipo}
-              onChange={(v) => updatePoliza({ tipo: v })}
+              onChange={(v) => updatePoliza({ tipo: v, variante: "" })}
               options={["Auto", "Gastos Médicos Mayores", "Vida", "Exceso GMM"]}
               placeholder="Selecciona"
             />
@@ -142,9 +142,27 @@ function VerPolizaPage() {
           <Field label="Aseguradora">
             <Select
               value={poliza.aseguradora}
-              onChange={(v) => updatePoliza({ aseguradora: v })}
+              onChange={(v) => updatePoliza({ aseguradora: v, variante: "" })}
               options={aseguradoras.map((a) => a.name)}
               placeholder="Selecciona"
+            />
+          </Field>
+          <Field label="Nombre de póliza">
+            <Select
+              value={poliza.variante ?? ""}
+              onChange={(v) => updatePoliza({ variante: v })}
+              options={(() => {
+                const aseg = aseguradoras.find((a) => a.name === poliza.aseguradora);
+                if (!aseg?.polizas) return [];
+                return aseg.polizas
+                  .filter((pt) => normalizeTipoSeguro(poliza.tipo) === pt.tipo)
+                  .flatMap((pt) => (pt.variantes ?? []).map((v) => v.nombre));
+              })()}
+              placeholder={
+                poliza.aseguradora
+                  ? "Selecciona la variante"
+                  : "Selecciona aseguradora primero"
+              }
             />
           </Field>
           <Field label="Nombre completo del contratante*">
