@@ -143,6 +143,26 @@ function CoberturasBasicasTable({
   );
 }
 
+function CoberturasBasicasBlock() {
+  const [selected, setSelected] = useState<string | null>(null);
+  return (
+    <div className="space-y-3">
+      <CoberturasBasicasTable
+        selected={selected}
+        onSelect={(label) => setSelected((s) => (s === label ? null : label))}
+      />
+      {selected && (
+        <div className="rounded-2xl border border-sky-200 bg-sky-50/60 p-4">
+          <p className="text-sm font-semibold text-sky-700">{selected}</p>
+          <p className="mt-1 text-sm text-foreground/80">
+            {COBERTURAS_DETALLES[selected] ?? "Información detallada no disponible."}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const SERVICIOS_ASISTENCIA: Array<{ texto: string; detalle: string }> = [
   {
     texto: "Asistencia médica, nutricional y psicológica vía telefónica o App, ilimitada y sin costo.",
