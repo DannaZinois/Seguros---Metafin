@@ -1,8 +1,14 @@
 import { useMemo, useState } from "react";
-import { Plus, Trash2, Download, Search } from "lucide-react";
+import { Plus, Trash2, Download, Search, Upload, FileUp } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Section } from "@/components/cotizador/shared";
 import type { Poliza } from "@/lib/empresa-store";
+import {
+  AseguradoUploadDialog,
+  type ParsedAseguradoFile,
+  type UploadMode,
+} from "@/components/asegurado/upload-dialog";
+import { addAseguradoDocs, type AseguradoDoc } from "@/lib/asegurado-docs-store";
 
 const STATUS_COLORS: Record<string, string> = {
   Activa: "bg-[color:var(--status-active)] text-[color:var(--status-active-fg)]",
@@ -23,6 +29,7 @@ export function AseguradosSection({
   empresaId?: string;
 }) {
   const [query, setQuery] = useState("");
+  const [uploadMode, setUploadMode] = useState<UploadMode | null>(null);
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return poliza.asegurados;
@@ -51,14 +58,75 @@ export function AseguradosSection({
       },
     ]);
 
+  const handleParsed = (files: ParsedAseguradoFile[]) => {
+    const now = Date.now();
+    const docs: AseguradoDoc[] = [];
+    const updatedAsegurados = [...poliza.asegurados];
+    const isCertificadoMode = uploadMode === "pdf-split";
+
+    for (const f of files) {
+      const rfc = (f.detectedRfc ?? "").toUpperCase();
+      const match = updatedAsegurados.find(
+        (a) =>
+          (rfc && a.trabajadorId.toUpperCase() === rfc) ||
+          (f.detectedNombre &&
+            a.nombre &&
+            a.nombre.toLowerCase().includes(f.detectedNombre.toLowerCase())),
+      );
+
+      docs.push({
+        id: crypto.randomUUID(),
+        rfc: rfc || match?.trabajadorId || "SIN-RFC",
+        nombre: f.detectedNombre ?? match?.nombre,
+        polizaId: poliza.id,
+        aseguradoId: match?.id,
+        fileName: f.fileName,
+        mime: f.mime,
+        size: f.size,
+        dataUrl: f.dataUrl,
+        source: uploadMode === "zip" ? "zip" : "pdf-split",
+        esCertificado: isCertificadoMode,
+        esConsentimiento: !!f.esConsentimiento,
+        createdAt: now,
+      });
+
+      if (match) {
+        const idx = updatedAsegurados.findIndex((a) => a.id === match.id);
+        updatedAsegurados[idx] = {
+          ...updatedAsegurados[idx],
+          certificado:
+            updatedAsegurados[idx].certificado || isCertificadoMode,
+          consentimiento:
+            updatedAsegurados[idx].consentimiento || !!f.esConsentimiento,
+        };
+      }
+    }
+    if (docs.length) addAseguradoDocs(docs);
+    onChange(updatedAsegurados);
+    setUploadMode(null);
+  };
+
   return (
     <Section
       title="Asegurados bajo esta póliza"
       extra={
         <div className="flex gap-2">
-          <button className="inline-flex items-center gap-1 rounded-full bg-violet-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-600">
-            + Cargar certificados
-          </button>
+          {!readOnly && (
+            <>
+              <button
+                onClick={() => setUploadMode("zip")}
+                className="inline-flex items-center gap-1 rounded-full bg-amber-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-600"
+              >
+                <FileUp className="h-3.5 w-3.5" /> Archivos del asegurado
+              </button>
+              <button
+                onClick={() => setUploadMode("pdf-split")}
+                className="inline-flex items-center gap-1 rounded-full bg-violet-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-600"
+              >
+                <Upload className="h-3.5 w-3.5" /> Cargar certificados
+              </button>
+            </>
+          )}
           <button className="inline-flex items-center gap-1 rounded-full bg-[color:var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[color:var(--brand-blue-dark)]">
             + Descargar consentimiento
           </button>
@@ -79,7 +147,7 @@ export function AseguradosSection({
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar por ID o nombre del trabajador"
+            placeholder="Buscar por RFC o nombre del trabajador"
             className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-[color:var(--brand-blue)]"
           />
         </div>
@@ -88,7 +156,7 @@ export function AseguradosSection({
         <table className="w-full min-w-[1100px] text-left text-sm">
           <thead className="text-xs text-muted-foreground">
             <tr>
-              <th className="py-3 font-medium">ID de trabajador</th>
+              <th className="py-3 font-medium">RFC</th>
               <th className="py-3 font-medium">Nombre</th>
               <th className="py-3 font-medium">Póliza</th>
               <th className="py-3 font-medium">Vigencia</th>
@@ -249,6 +317,13 @@ export function AseguradosSection({
           </tbody>
         </table>
       </div>
+      <AseguradoUploadDialog
+        open={uploadMode !== null}
+        mode={uploadMode ?? "zip"}
+        polizaId={poliza.id}
+        onClose={() => setUploadMode(null)}
+        onConfirm={handleParsed}
+      />
     </Section>
   );
 }
