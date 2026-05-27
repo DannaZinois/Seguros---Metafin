@@ -171,6 +171,11 @@ const SERVICIOS_ASISTENCIA: Array<{ texto: string; detalle: string }> = [
 ];
 
 function ServiciosAsistenciaCards() {
+  // see below
+  return ServiciosAsistenciaCardsImpl();
+}
+
+function ServiciosAsistenciaCardsImpl() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   return (
     <div className="grid grid-cols-1 gap-3">
