@@ -177,7 +177,7 @@ function PerfilEmpleadoPage() {
           <Field label="Tipo de asegurado">
             <Select value={tipoAsegurado} onChange={setTipoAsegurado} options={tipos} />
           </Field>
-          <Field label="Número de empleado*">
+          <Field label="RFC*">
             <TextInput value={numEmpleado} onChange={setNumEmpleado} />
           </Field>
           <Field label="Sexo">
@@ -200,7 +200,7 @@ function PerfilEmpleadoPage() {
           <table className="w-full min-w-[1100px] text-left text-sm">
             <thead className="text-xs text-muted-foreground">
               <tr>
-                <th className="py-3 font-medium">Número de empleado</th>
+                <th className="py-3 font-medium">RFC</th>
                 <th className="py-3 font-medium">Contratante</th>
                 <th className="py-3 font-medium">Asegurado</th>
                 <th className="py-3 font-medium">

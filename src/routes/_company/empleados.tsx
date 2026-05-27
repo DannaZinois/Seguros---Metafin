@@ -175,7 +175,7 @@ function EmpleadosPage() {
       setPopup({
         kind: "error",
         title: "Datos incompletos",
-        message: "Nombre, ID de trabajador y tipo de póliza son obligatorios.",
+        message: "Nombre, RFC y tipo de póliza son obligatorios.",
       });
       return;
     }
@@ -301,7 +301,7 @@ function EmpleadosPage() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar por ID o nombre"
+              placeholder="Buscar por RFC o nombre"
               className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-[color:var(--brand-blue)]"
             />
           </div>
@@ -319,7 +319,7 @@ function EmpleadosPage() {
           <table className="w-full min-w-[1100px] text-left text-sm">
             <thead className="text-xs text-muted-foreground">
               <tr>
-                <th className="py-3 font-medium">ID</th>
+                <th className="py-3 font-medium">RFC</th>
                 <th className="py-3 font-medium">Nombre</th>
                 <th className="py-3 font-medium">Vigencia</th>
                 <th className="py-3 font-medium">Renovación</th>
@@ -611,7 +611,7 @@ function EmpleadosPage() {
                   <Field label="Nombre completo">
                     <TextInput value={form.nombre} onChange={(v) => setForm({ ...form, nombre: v })} />
                   </Field>
-                  <Field label="ID de trabajador">
+                  <Field label="RFC">
                     <TextInput value={form.trabajadorId} onChange={(v) => setForm({ ...form, trabajadorId: v })} />
                   </Field>
                   <Field label="Número de contacto">
