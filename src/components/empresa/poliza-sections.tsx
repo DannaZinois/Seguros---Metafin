@@ -135,6 +135,23 @@ export function AseguradosSection({
         <table className="w-full min-w-[1100px] text-left text-sm">
           <thead className="text-xs text-muted-foreground">
             <tr>
+              {consentDialog === "individual" && (
+                <th className="py-3 font-medium w-8">
+                  <input
+                    type="checkbox"
+                    checked={
+                      poliza.asegurados.length > 0 &&
+                      poliza.asegurados.every((a) => selected[a.id])
+                    }
+                    onChange={(e) => {
+                      const all: Record<string, boolean> = {};
+                      if (e.target.checked)
+                        poliza.asegurados.forEach((a) => (all[a.id] = true));
+                      setSelected(all);
+                    }}
+                  />
+                </th>
+              )}
               <th className="py-3 font-medium">RFC</th>
               <th className="py-3 font-medium">Nombre</th>
               <th className="py-3 font-medium">Póliza</th>
@@ -144,14 +161,13 @@ export function AseguradosSection({
               <th className="py-3 font-medium">Teléfono</th>
               <th className="py-3 font-medium">Consentimiento</th>
               <th className="py-3 font-medium">Certificado</th>
-              <th className="py-3 font-medium">Status</th>
               {!readOnly && <th className="py-3 font-medium" />}
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={11} className="py-8 text-center text-sm text-muted-foreground">
+                <td colSpan={10} className="py-8 text-center text-sm text-muted-foreground">
                   {poliza.asegurados.length === 0
                     ? "Aún no hay asegurados. Carga el archivo o agrega una persona."
                     : "Sin resultados para tu búsqueda."}
@@ -160,6 +176,17 @@ export function AseguradosSection({
             )}
             {filtered.map((a) => (
               <tr key={a.id} className="border-t border-border/60">
+                {consentDialog === "individual" && (
+                  <td className="py-3">
+                    <input
+                      type="checkbox"
+                      checked={!!selected[a.id]}
+                      onChange={(e) =>
+                        setSelected({ ...selected, [a.id]: e.target.checked })
+                      }
+                    />
+                  </td>
+                )}
                 <td className="py-3 text-foreground/80">
                   {empresaId ? (
                     <Link
