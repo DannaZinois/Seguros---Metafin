@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { ArrowLeft, Pencil, Check, X, ChevronDown, ChevronRight, Eye, Download, FileText } from "lucide-react";
 import { Section, Grid, Field, TextInput } from "@/components/cotizador/shared";
 import { EMPLEADOS_NOMBRES } from "@/lib/empleados-nombres";
@@ -280,9 +280,8 @@ function EmpleadoDetallePage() {
                 const isOpen = openPoliza === p.id;
                 const docs = documentosFor(p, form.nombre);
                 return (
-                  <>
+                  <Fragment key={p.id}>
                     <tr
-                      key={p.id}
                       onClick={() => setOpenPoliza(isOpen ? null : p.id)}
                       className={`cursor-pointer border-t border-border/60 transition-colors ${
                         isOpen ? "bg-sky-50" : "hover:bg-muted/40"
@@ -305,7 +304,7 @@ function EmpleadoDetallePage() {
                       </td>
                     </tr>
                     {isOpen && (
-                      <tr key={`${p.id}-docs`} className="border-t border-border/60 bg-sky-50/40">
+                      <tr className="border-t border-border/60 bg-sky-50/40">
                         <td colSpan={7} className="px-4 py-4">
                           <div className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                             Documentos de {form.nombre} · Póliza {p.id}
@@ -361,7 +360,7 @@ function EmpleadoDetallePage() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>
