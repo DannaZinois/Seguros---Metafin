@@ -42,6 +42,7 @@ export interface Poliza {
   id: string;
   tipo: string;
   aseguradora: string;
+  variante?: string;
   contratante: string;
   contacto: string;
   codigoPostal: string;
