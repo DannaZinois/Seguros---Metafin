@@ -34,6 +34,7 @@ import { Route as CompanyEmpleadoEmpleadoIdRouteImport } from './routes/_company
 import { Route as ClientConsentimientoVerRouteImport } from './routes/_client/consentimiento.ver'
 import { Route as AdminEmpresaNuevaRouteImport } from './routes/_admin/empresa.nueva'
 import { Route as AdminClienteClienteIdRouteImport } from './routes/_admin/cliente.$clienteId'
+import { Route as AdminAseguradoraAseguradoraIdRouteImport } from './routes/_admin/aseguradora.$aseguradoraId'
 import { Route as AdminEmpresaPolizaNuevaRouteImport } from './routes/_admin/empresa.poliza.nueva'
 import { Route as AdminEmpresaPolizaPolizaIdRouteImport } from './routes/_admin/empresa.poliza.$polizaId'
 import { Route as AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRouteImport } from './routes/_admin/empresa.$empresaId.empleado.$empleadoId'
@@ -162,6 +163,12 @@ const AdminClienteClienteIdRoute = AdminClienteClienteIdRouteImport.update({
   path: '/cliente/$clienteId',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAseguradoraAseguradoraIdRoute =
+  AdminAseguradoraAseguradoraIdRouteImport.update({
+    id: '/aseguradora/$aseguradoraId',
+    path: '/aseguradora/$aseguradoraId',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AdminEmpresaPolizaNuevaRoute = AdminEmpresaPolizaNuevaRouteImport.update({
   id: '/empresa/poliza/nueva',
   path: '/empresa/poliza/nueva',
@@ -204,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/pagos': typeof CompanyPagosRoute
   '/perfil': typeof CompanyPerfilRoute
   '/seguros': typeof CompanySegurosRouteWithChildren
+  '/aseguradora/$aseguradoraId': typeof AdminAseguradoraAseguradoraIdRoute
   '/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/consentimiento/ver': typeof ClientConsentimientoVerRoute
@@ -232,6 +240,7 @@ export interface FileRoutesByTo {
   '/pagos': typeof CompanyPagosRoute
   '/perfil': typeof CompanyPerfilRoute
   '/seguros': typeof CompanySegurosRouteWithChildren
+  '/aseguradora/$aseguradoraId': typeof AdminAseguradoraAseguradoraIdRoute
   '/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/consentimiento/ver': typeof ClientConsentimientoVerRoute
@@ -264,6 +273,7 @@ export interface FileRoutesById {
   '/_company/pagos': typeof CompanyPagosRoute
   '/_company/perfil': typeof CompanyPerfilRoute
   '/_company/seguros': typeof CompanySegurosRouteWithChildren
+  '/_admin/aseguradora/$aseguradoraId': typeof AdminAseguradoraAseguradoraIdRoute
   '/_admin/cliente/$clienteId': typeof AdminClienteClienteIdRouteWithChildren
   '/_admin/empresa/nueva': typeof AdminEmpresaNuevaRoute
   '/_client/consentimiento/ver': typeof ClientConsentimientoVerRoute
@@ -294,6 +304,7 @@ export interface FileRouteTypes {
     | '/pagos'
     | '/perfil'
     | '/seguros'
+    | '/aseguradora/$aseguradoraId'
     | '/cliente/$clienteId'
     | '/empresa/nueva'
     | '/consentimiento/ver'
@@ -322,6 +333,7 @@ export interface FileRouteTypes {
     | '/pagos'
     | '/perfil'
     | '/seguros'
+    | '/aseguradora/$aseguradoraId'
     | '/cliente/$clienteId'
     | '/empresa/nueva'
     | '/consentimiento/ver'
@@ -353,6 +365,7 @@ export interface FileRouteTypes {
     | '/_company/pagos'
     | '/_company/perfil'
     | '/_company/seguros'
+    | '/_admin/aseguradora/$aseguradoraId'
     | '/_admin/cliente/$clienteId'
     | '/_admin/empresa/nueva'
     | '/_client/consentimiento/ver'
@@ -549,6 +562,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminClienteClienteIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/aseguradora/$aseguradoraId': {
+      id: '/_admin/aseguradora/$aseguradoraId'
+      path: '/aseguradora/$aseguradoraId'
+      fullPath: '/aseguradora/$aseguradoraId'
+      preLoaderRoute: typeof AdminAseguradoraAseguradoraIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/empresa/poliza/nueva': {
       id: '/_admin/empresa/poliza/nueva'
       path: '/empresa/poliza/nueva'
@@ -600,6 +620,7 @@ interface AdminRouteChildren {
   AdminCotizadoresRoute: typeof AdminCotizadoresRoute
   AdminCuestionarioRoute: typeof AdminCuestionarioRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminAseguradoraAseguradoraIdRoute: typeof AdminAseguradoraAseguradoraIdRoute
   AdminClienteClienteIdRoute: typeof AdminClienteClienteIdRouteWithChildren
   AdminEmpresaNuevaRoute: typeof AdminEmpresaNuevaRoute
   AdminEmpresaPolizaPolizaIdRoute: typeof AdminEmpresaPolizaPolizaIdRoute
@@ -613,6 +634,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCotizadoresRoute: AdminCotizadoresRoute,
   AdminCuestionarioRoute: AdminCuestionarioRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminAseguradoraAseguradoraIdRoute: AdminAseguradoraAseguradoraIdRoute,
   AdminClienteClienteIdRoute: AdminClienteClienteIdRouteWithChildren,
   AdminEmpresaNuevaRoute: AdminEmpresaNuevaRoute,
   AdminEmpresaPolizaPolizaIdRoute: AdminEmpresaPolizaPolizaIdRoute,
