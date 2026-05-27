@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Download, FileText, HeartPulse, Stethoscope, Info } from "lucide-react";
 import { Section } from "@/components/cotizador/shared";
 import { useCurrentClient } from "@/lib/client-context";
+import { useAseguradoras, type PolizaTipo, type DocumentoPoliza, type Aseguradora } from "@/lib/store";
+import { useMemo } from "react";
 
 export const Route = createFileRoute("/_client/mis-documentos")({
   component: DocumentosClientPage,
@@ -13,6 +15,32 @@ interface Documento {
   descripcion: string;
   formato: string;
   tamano: string;
+}
+
+function docsFromAseguradoras(
+  aseguradoras: Aseguradora[],
+  tipoMatch: (t: PolizaTipo["tipo"]) => boolean,
+  audienciaFilter?: DocumentoPoliza["audiencia"],
+): Documento[] {
+  const out: Documento[] = [];
+  for (const a of aseguradoras) {
+    for (const p of a.polizas ?? []) {
+      if (!tipoMatch(p.tipo)) continue;
+      for (const v of p.variantes ?? []) {
+        for (const d of v.documentos ?? []) {
+          if (audienciaFilter && d.audiencia !== audienciaFilter) continue;
+          const formato = d.pdfName ? "PDF" : d.wordName ? "DOCX" : "PDF";
+          out.push({
+            nombre: d.nombre,
+            descripcion: `${a.name} · ${v.nombre}`,
+            formato,
+            tamano: "—",
+          });
+        }
+      }
+    }
+  }
+  return out;
 }
 
 const tramitesVida: Documento[] = [
@@ -95,6 +123,15 @@ function DocumentosTable({ docs }: { docs: Documento[] }) {
 
 function DocumentosClientPage() {
   const cliente = useCurrentClient();
+  const [aseguradoras] = useAseguradoras();
+  const extraVida = useMemo(
+    () => docsFromAseguradoras(aseguradoras, (t) => t === "Vida", "Cliente"),
+    [aseguradoras],
+  );
+  const extraGMM = useMemo(
+    () => docsFromAseguradoras(aseguradoras, (t) => t === "Gastos médicos mayores", "Cliente"),
+    [aseguradoras],
+  );
   return (
     <div className="mx-auto max-w-6xl">
       <header>
@@ -110,7 +147,7 @@ function DocumentosClientPage() {
         subtitle="Formatos necesarios para iniciar y dar seguimiento a trámites de la póliza de vida."
         extra={<HeartPulse className="h-5 w-5 text-muted-foreground" />}
       >
-        <DocumentosTable docs={tramitesVida} />
+        <DocumentosTable docs={[...tramitesVida, ...extraVida]} />
       </Section>
 
       <Section
@@ -118,7 +155,7 @@ function DocumentosClientPage() {
         subtitle="Formatos para reembolsos, programación de cirugías y avisos de siniestro GMM."
         extra={<Stethoscope className="h-5 w-5 text-muted-foreground" />}
       >
-        <DocumentosTable docs={tramitesGMM} />
+        <DocumentosTable docs={[...tramitesGMM, ...extraGMM]} />
       </Section>
 
       <Section
