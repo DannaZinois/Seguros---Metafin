@@ -45,7 +45,7 @@ export interface PolizaTipo {
   variantes: VariantePoliza[];
 }
 
-const AS_KEY = "zinois.aseguradoras";
+const AS_KEY = "zinois.aseguradoras.v2";
 const CHAT_KEY = "zinois.whatsapp";
 
 const DUMMY_ASEGURADORAS: Aseguradora[] = [

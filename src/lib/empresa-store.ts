@@ -70,7 +70,7 @@ export interface Empresa {
   createdAt: number;
 }
 
-const KEY = "zinois.empresas";
+const KEY = "zinois.empresas.v2";
 
 function read(): Empresa[] {
   if (typeof window === "undefined") return [];
