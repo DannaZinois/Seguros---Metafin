@@ -1,20 +1,14 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import {
-  ArrowLeft,
-  MessageCircle,
-  FileText as FileIcon,
-  Pencil,
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { z } from "zod";
-import { useAseguradoras, appendChat } from "@/lib/store";
+import { useAseguradoras } from "@/lib/store";
 import {
   Section,
   Grid,
   Field,
   TextInput,
   Select,
-  EnvioOption,
   Dropzone,
   Popup,
   type PopupState,
@@ -24,7 +18,6 @@ import {
   saveEmpresa,
   type Empresa,
   type Poliza,
-  type EnvioType,
 } from "@/lib/empresa-store";
 import {
   AseguradosSection,
@@ -97,35 +90,6 @@ function VerPolizaPage() {
 
   const persist = () => {
     if (empresa) saveEmpresa(empresa);
-  };
-
-  const handleEnvio = (type: Exclude<EnvioType, null>) => {
-    if (type === "whatsapp" || type === "pdf") {
-      if (!poliza.contratante.trim() || !poliza.contacto.trim()) {
-        setPopup({
-          kind: "error",
-          title: "Datos requeridos",
-          message:
-            "Captura nombre del contratante y número de contacto antes de usar WhatsApp o PDF.",
-        });
-        return;
-      }
-    }
-    updatePoliza({ envio: type });
-    if (type === "whatsapp") {
-      appendChat(poliza.contacto, {
-        from: "bot",
-        text: `Hola ${poliza.contratante}, soy el asistente. Te haré algunas preguntas para la póliza de ${empresa.nombre}.`,
-      });
-    } else if (type === "pdf") {
-      const pdf =
-        aseguradoras.find((a) => a.name === poliza.aseguradora)?.pdfName ??
-        "formato_cotizacion.pdf";
-      appendChat(poliza.contacto, {
-        from: "bot",
-        text: `Hola ${poliza.contratante}, te envío el siguiente formato: ${pdf}`,
-      });
-    }
   };
 
   return (
