@@ -10,13 +10,6 @@ import {
 } from "@/components/asegurado/upload-dialog";
 import { addAseguradoDocs, type AseguradoDoc } from "@/lib/asegurado-docs-store";
 
-const STATUS_COLORS: Record<string, string> = {
-  Activa: "bg-[color:var(--status-active)] text-[color:var(--status-active-fg)]",
-  Cancelada: "bg-[color:var(--status-cancelled)] text-[color:var(--status-cancelled-fg)]",
-  "En revisión": "bg-[color:var(--status-review)] text-[color:var(--status-review-fg)]",
-  "Por renovar": "bg-[color:var(--status-renew)] text-[color:var(--status-renew-fg)]",
-};
-
 export function AseguradosSection({
   poliza,
   onChange,
