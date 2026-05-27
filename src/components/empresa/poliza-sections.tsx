@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Trash2, Download, Search, Upload, FileUp, X } from "lucide-react";
+import { Plus, Trash2, Download, Search, Upload, FileUp, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Section } from "@/components/cotizador/shared";
 import type { Poliza } from "@/lib/empresa-store";
