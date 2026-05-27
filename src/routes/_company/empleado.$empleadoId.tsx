@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowLeft, Pencil, Check, X } from "lucide-react";
+import { Fragment, useState } from "react";
+import { ArrowLeft, Pencil, Check, X, ChevronDown, ChevronRight, Eye, Download, FileText } from "lucide-react";
 import { Section, Grid, Field, TextInput } from "@/components/cotizador/shared";
 import { EMPLEADOS_NOMBRES } from "@/lib/empleados-nombres";
 import { useCompanyEmpresa } from "@/lib/company-context";
@@ -59,6 +59,48 @@ interface PolizaRow {
   status: "Activa";
 }
 
+interface DocItem {
+  nombre: string;
+  formato: string;
+  tamano: string;
+}
+
+function documentosFor(p: PolizaRow, nombre: string): DocItem[] {
+  const base: DocItem[] = [
+    { nombre: `Carátula de póliza ${p.id}.pdf`, formato: "PDF", tamano: "210 KB" },
+    { nombre: `Certificado individual - ${nombre}.pdf`, formato: "PDF", tamano: "180 KB" },
+    { nombre: `Condiciones generales ${p.aseguradora}.pdf`, formato: "PDF", tamano: "1.2 MB" },
+    { nombre: `Consentimiento firmado - ${nombre}.pdf`, formato: "PDF", tamano: "95 KB" },
+  ];
+  if (p.tipo === "GMM") {
+    base.push(
+      { nombre: "Directorio de hospitales.pdf", formato: "PDF", tamano: "640 KB" },
+      { nombre: "Cuadro médico y coberturas.pdf", formato: "PDF", tamano: "320 KB" },
+    );
+  } else {
+    base.push({ nombre: "Designación de beneficiarios.pdf", formato: "PDF", tamano: "120 KB" });
+  }
+  return base;
+}
+
+function descargarDoc(d: DocItem) {
+  const blob = new Blob([`Documento simulado: ${d.nombre}`], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = d.nombre;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function verDoc(d: DocItem) {
+  const blob = new Blob([`Documento simulado: ${d.nombre}`], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
 function EmpleadoDetallePage() {
   const router = useRouter();
   const { empleadoId } = Route.useParams();
@@ -66,6 +108,7 @@ function EmpleadoDetallePage() {
 
   const nombre = nombreFromId(empleadoId);
   const [editing, setEditing] = useState(false);
+  const [openPoliza, setOpenPoliza] = useState<string | null>(null);
   const [form, setForm] = useState({
     nombre,
     correo: correoFromNombre(nombre),
@@ -223,6 +266,7 @@ function EmpleadoDetallePage() {
           <table className="w-full text-left text-sm">
             <thead className="text-xs text-muted-foreground">
               <tr>
+                <th className="w-6 py-3"></th>
                 <th className="py-3 font-medium">Póliza</th>
                 <th className="py-3 font-medium">Tipo</th>
                 <th className="py-3 font-medium">Vigencia</th>
@@ -233,19 +277,90 @@ function EmpleadoDetallePage() {
             </thead>
             <tbody>
               {polizas.map((p) => {
+                const isOpen = openPoliza === p.id;
+                const docs = documentosFor(p, form.nombre);
                 return (
-                  <tr key={p.id} className="border-t border-border/60 hover:bg-muted/40">
-                    <td className="py-3 font-medium text-foreground">{p.id}</td>
-                    <td className="py-3 text-foreground/80">{p.tipo}</td>
-                    <td className="py-3 text-foreground/80">{p.vigencia}</td>
-                    <td className="py-3 text-foreground/80">{p.aseguradora}</td>
-                    <td className="py-3 text-foreground/80">{p.contratante}</td>
-                    <td className="py-3">
-                      <span className="inline-flex rounded-full bg-[color:var(--status-active)] px-3 py-1 text-xs font-medium text-[color:var(--status-active-fg)]">
-                        {p.status}
-                      </span>
-                    </td>
-                  </tr>
+                  <Fragment key={p.id}>
+                    <tr
+                      onClick={() => setOpenPoliza(isOpen ? null : p.id)}
+                      className={`cursor-pointer border-t border-border/60 transition-colors ${
+                        isOpen ? "bg-sky-50" : "hover:bg-muted/40"
+                      }`}
+                    >
+                      <td className="py-3 pl-2 text-muted-foreground">
+                        {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                      </td>
+                      <td className="py-3 font-medium text-[color:var(--brand-blue)] underline-offset-4 hover:underline">
+                        {p.id}
+                      </td>
+                      <td className="py-3 text-foreground/80">{p.tipo}</td>
+                      <td className="py-3 text-foreground/80">{p.vigencia}</td>
+                      <td className="py-3 text-foreground/80">{p.aseguradora}</td>
+                      <td className="py-3 text-foreground/80">{p.contratante}</td>
+                      <td className="py-3">
+                        <span className="inline-flex rounded-full bg-[color:var(--status-active)] px-3 py-1 text-xs font-medium text-[color:var(--status-active-fg)]">
+                          {p.status}
+                        </span>
+                      </td>
+                    </tr>
+                    {isOpen && (
+                      <tr className="border-t border-border/60 bg-sky-50/40">
+                        <td colSpan={7} className="px-4 py-4">
+                          <div className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                            Documentos de {form.nombre} · Póliza {p.id}
+                          </div>
+                          <div className="overflow-hidden rounded-xl border border-border bg-white">
+                            <table className="w-full text-left text-sm">
+                              <thead className="bg-muted/40 text-xs text-muted-foreground">
+                                <tr>
+                                  <th className="px-3 py-2 font-medium">Documento</th>
+                                  <th className="px-3 py-2 font-medium">Formato</th>
+                                  <th className="px-3 py-2 font-medium">Tamaño</th>
+                                  <th className="px-3 py-2 text-right font-medium">Acciones</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {docs.map((d) => (
+                                  <tr key={d.nombre} className="border-t border-border/60">
+                                    <td className="px-3 py-2">
+                                      <span className="inline-flex items-center gap-2 text-foreground">
+                                        <FileText className="h-4 w-4 text-[color:var(--brand-blue)]" />
+                                        {d.nombre}
+                                      </span>
+                                    </td>
+                                    <td className="px-3 py-2 text-foreground/80">{d.formato}</td>
+                                    <td className="px-3 py-2 text-foreground/80">{d.tamano}</td>
+                                    <td className="px-3 py-2">
+                                      <div className="flex justify-end gap-2">
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            verDoc(d);
+                                          }}
+                                          className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-3 py-1 text-xs font-medium text-foreground hover:bg-muted"
+                                        >
+                                          <Eye className="h-3.5 w-3.5" /> Ver
+                                        </button>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            descargarDoc(d);
+                                          }}
+                                          className="inline-flex items-center gap-1 rounded-full bg-[color:var(--brand-blue)] px-3 py-1 text-xs font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+                                        >
+                                          <Download className="h-3.5 w-3.5" /> Descargar
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 );
               })}
             </tbody>
