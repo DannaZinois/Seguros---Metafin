@@ -40,6 +40,31 @@ export interface Cliente {
 
 export const CLIENTES: Cliente[] = [
   {
+    clienteId: "E880101",
+    tipo: "Empresa",
+    profile: {
+      nombre: "Orion Innovation",
+      contacto: "+52 55 4422 1100",
+      correo: "contacto@orioninnovation.com",
+      tipoAsegurado: "Colectivo",
+      rfc: "GIA050912XY8",
+      sexo: "N/A",
+      direccion: "Calle Lucerna 80, Juárez, Cuauhtémoc, Ciudad de México, CDMX, Mexico",
+      codigoPostal: "06600",
+      fechaNacimiento: "2005-09-12",
+      fechaAntiguedad: "2018-02-20",
+      tipoPersona: "Persona Moral",
+    },
+    polizas: [
+      { id: "E880101", tipoSeguro: "GMM", aseguradora: "Mapfre", vigencia: "02/28/2024", renovacion: "02/28/2025", proximoPago: "02/28/2025", cantidad: "$48,200", hasComprobante: false, consentimiento: false, certificado: false, status: "Activa" },
+      { id: "E880102", tipoSeguro: "Vida", aseguradora: "Zurich", vigencia: "06/15/2024", renovacion: "06/15/2025", proximoPago: "03/15/2025", cantidad: "$31,900", hasComprobante: false, consentimiento: false, certificado: false, status: "Activa" },
+    ],
+  },
+];
+
+// Placeholder arrays kept for backwards compatibility with other modules.
+const _UNUSED_OLD_CLIENTES: Cliente[] = [
+  {
     clienteId: "P990234",
     tipo: "Personal",
     profile: {
