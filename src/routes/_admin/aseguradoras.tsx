@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Plus, Trash2, FileText, Upload, Pencil, X, ImageIcon, ChevronDown, ChevronUp, FileSpreadsheet } from "lucide-react";
+import { Plus, Trash2, FileText, Upload, Pencil, ImageIcon, ChevronDown, ChevronUp, FileSpreadsheet } from "lucide-react";
 import { useAseguradoras, type Aseguradora, type PolizaTipo, type TipoSeguro, type VariantePoliza } from "@/lib/store";
+import { PolizaBuilder, TIPOS_SEGURO, tipoLabel } from "@/components/aseguradora/poliza-builder";
 
 export const Route = createFileRoute("/_admin/aseguradoras")({
   component: AseguradorasPage,
@@ -106,20 +107,14 @@ const SEED: Aseguradora[] = [
 ];
 
 function AseguradorasPage() {
+  const router = useRouter();
   const [list, setList] = useAseguradoras();
   const imgRef = useRef<HTMLInputElement>(null);
   const empty: Aseguradora = { id: "", name: "" };
   const [draft, setDraft] = useState<Aseguradora>(empty);
-  const [editing, setEditing] = useState<Aseguradora | null>(null);
   const [open, setOpen] = useState(false);
   const [polizasMode, setPolizasMode] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [polizaDraft, setPolizaDraft] = useState<PolizaTipo>({
-    id: "",
-    tipo: "Auto",
-    variantes: [],
-  });
-  const [numVariantes, setNumVariantes] = useState(0);
 
   useEffect(() => {
     if (list.length === 0) setList(SEED);
@@ -150,52 +145,19 @@ function AseguradorasPage() {
   };
 
   const remove = (id: string) => setList(list.filter((a) => a.id !== id));
-  const save = (a: Aseguradora) => {
-    setList(list.map((x) => (x.id === a.id ? a : x)));
-    setEditing(null);
-  };
 
-  const openPolizas = () => {
-    setPolizaDraft({ id: crypto.randomUUID(), tipo: "Auto", variantes: [] });
-    setNumVariantes(0);
-    setPolizasMode(true);
-  };
-
-  const setNumVariantesAndRows = (n: number) => {
-    const safe = Math.max(0, Math.min(50, n || 0));
-    setNumVariantes(safe);
-    setPolizaDraft((p) => {
-      const cur = p.variantes;
-      const next: VariantePoliza[] = [];
-      for (let i = 0; i < safe; i++) {
-        next.push(cur[i] ?? { id: crypto.randomUUID(), nombre: "" });
+  const addPolizaToDraft = (tipo: TipoSeguro, variante: VariantePoliza) => {
+    setDraft((p) => {
+      const polizas = [...(p.polizas ?? [])];
+      const i = polizas.findIndex((x) => x.tipo === tipo);
+      if (i >= 0) {
+        polizas[i] = { ...polizas[i], variantes: [...polizas[i].variantes, variante] };
+      } else {
+        polizas.push({ id: crypto.randomUUID(), tipo, variantes: [variante] });
       }
-      return { ...p, variantes: next };
+      return { ...p, polizas };
     });
-  };
-
-  const updateVariante = (id: string, patch: Partial<VariantePoliza>) => {
-    setPolizaDraft((p) => ({
-      ...p,
-      variantes: p.variantes.map((v) => (v.id === id ? { ...v, ...patch } : v)),
-    }));
-  };
-
-  const removeVariante = (id: string) => {
-    setPolizaDraft((p) => ({ ...p, variantes: p.variantes.filter((v) => v.id !== id) }));
-    setNumVariantes((n) => Math.max(0, n - 1));
-  };
-
-  const cancelPolizas = () => {
     setPolizasMode(false);
-    setPolizaDraft({ id: "", tipo: "Auto", variantes: [] });
-    setNumVariantes(0);
-  };
-
-  const addPolizaToDraft = () => {
-    if (polizaDraft.variantes.length === 0) return;
-    setDraft((p) => ({ ...p, polizas: [...(p.polizas ?? []), polizaDraft] }));
-    cancelPolizas();
   };
 
   return (
@@ -263,16 +225,16 @@ function AseguradorasPage() {
         <div className="mt-6">
           <button
             type="button"
-            onClick={openPolizas}
+            onClick={() => setPolizasMode(true)}
             className="inline-flex items-center gap-2 rounded-full border border-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-[color:var(--brand-blue)] hover:bg-[color:var(--brand-blue)]/10"
           >
-            <Plus className="h-4 w-4" /> Agregar pólizas
+            <Plus className="h-4 w-4" /> Agregar póliza
           </button>
           {(draft.polizas?.length ?? 0) > 0 && (
             <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
               {draft.polizas!.map((p) => (
                 <li key={p.id}>
-                  • {p.tipo} — {p.variantes.length} variante(s)
+                  • {tipoLabel(p.tipo)} — {p.variantes.length} póliza(s)
                 </li>
               ))}
             </ul>
@@ -298,15 +260,9 @@ function AseguradorasPage() {
         </div>
         </>
         ) : (
-          <PolizasForm
-            draft={polizaDraft}
-            setTipo={(t) => setPolizaDraft((p) => ({ ...p, tipo: t }))}
-            numVariantes={numVariantes}
-            setNumVariantes={setNumVariantesAndRows}
-            updateVariante={updateVariante}
-            removeVariante={removeVariante}
-            onCancel={cancelPolizas}
-            onAdd={addPolizaToDraft}
+          <PolizaBuilder
+            onCancel={() => setPolizasMode(false)}
+            onSave={addPolizaToDraft}
           />
         )}
         </div>
@@ -366,7 +322,12 @@ function AseguradorasPage() {
                 <td className="px-6 py-4 text-right">
                   <div className="inline-flex items-center gap-1">
                     <button
-                      onClick={() => setEditing(a)}
+                      onClick={() =>
+                        router.navigate({
+                          to: "/aseguradora/$aseguradoraId",
+                          params: { aseguradoraId: a.id },
+                        })
+                      }
                       className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
                     >
                       <Pencil className="h-3.5 w-3.5" /> Editar
@@ -392,22 +353,10 @@ function AseguradorasPage() {
           </tbody>
         </table>
       </div>
-      {editing && (
-        <EditDialog
-          item={editing}
-          onClose={() => setEditing(null)}
-          onSave={save}
-        />
-      )}
     </div>
   );
 }
 
-const TIPOS_SEGURO: TipoSeguro[] = ["Auto", "Vida", "Gastos médicos mayores", "Exceso"];
-
-function tipoLabel(t: TipoSeguro): string {
-  return t === "Gastos médicos mayores" ? "GMM" : t;
-}
 
 function PolizasEditor({
   polizas,
