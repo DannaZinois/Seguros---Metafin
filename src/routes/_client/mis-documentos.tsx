@@ -124,11 +124,17 @@ function DocumentosTable({ docs }: { docs: Documento[] }) {
 function DocumentosClientPage() {
   const cliente = useCurrentClient();
   const [aseguradoras] = useAseguradoras();
-  const extraVida = useMemo(
+  const tipos = useMemo(
+    () => new Set((cliente?.polizas ?? []).map((p) => p.tipoSeguro)),
+    [cliente],
+  );
+  const showVida = tipos.has("Vida");
+  const showGMM = tipos.has("GMM");
+  const docsVida = useMemo(
     () => docsFromAseguradoras(aseguradoras, (t) => t === "Vida", "Cliente"),
     [aseguradoras],
   );
-  const extraGMM = useMemo(
+  const docsGMM = useMemo(
     () => docsFromAseguradoras(aseguradoras, (t) => t === "Gastos médicos mayores", "Cliente"),
     [aseguradoras],
   );
@@ -142,21 +148,25 @@ function DocumentosClientPage() {
         </p>
       </header>
 
-      <Section
-        title="Trámites · Seguro de Vida"
-        subtitle="Formatos necesarios para iniciar y dar seguimiento a trámites de la póliza de vida."
-        extra={<HeartPulse className="h-5 w-5 text-muted-foreground" />}
-      >
-        <DocumentosTable docs={[...tramitesVida, ...extraVida]} />
-      </Section>
+      {showVida && (
+        <Section
+          title="Trámites · Seguro de Vida"
+          subtitle="Formatos necesarios para iniciar y dar seguimiento a trámites de la póliza de vida."
+          extra={<HeartPulse className="h-5 w-5 text-muted-foreground" />}
+        >
+          <DocumentosTable docs={[...tramitesVida, ...docsVida]} />
+        </Section>
+      )}
 
-      <Section
-        title="Trámites · Gastos Médicos Mayores"
-        subtitle="Formatos para reembolsos, programación de cirugías y avisos de siniestro GMM."
-        extra={<Stethoscope className="h-5 w-5 text-muted-foreground" />}
-      >
-        <DocumentosTable docs={[...tramitesGMM, ...extraGMM]} />
-      </Section>
+      {showGMM && (
+        <Section
+          title="Trámites · Gastos Médicos Mayores"
+          subtitle="Formatos para reembolsos, programación de cirugías y avisos de siniestro GMM."
+          extra={<Stethoscope className="h-5 w-5 text-muted-foreground" />}
+        >
+          <DocumentosTable docs={[...tramitesGMM, ...docsGMM]} />
+        </Section>
+      )}
 
       <Section
         title="Documentos informativos"
