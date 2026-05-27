@@ -3,7 +3,7 @@ import { Download, FileText, HeartPulse, Stethoscope, Info } from "lucide-react"
 import { Section } from "@/components/cotizador/shared";
 import { useCurrentClient } from "@/lib/client-context";
 
-export const Route = createFileRoute("/_client/documentos")({
+export const Route = createFileRoute("/_client/mis-documentos")({
   component: DocumentosClientPage,
   head: () => ({ meta: [{ title: "Documentos" }] }),
 });
