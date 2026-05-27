@@ -78,6 +78,19 @@ const COBERTURAS_BASICAS: Array<{
   { label: "Asistencia integral", directores: "Amparado", empleados: "Amparado", nuevoIng: "Amparado", variant: "amparado-excluido" },
 ];
 
+const COBERTURAS_DETALLES: Record<string, string> = {
+  "Suma asegurada": "Monto máximo que la aseguradora pagará por evento o padecimiento cubierto durante la vigencia de la póliza.",
+  "Deducible": "Cantidad fija que el asegurado debe cubrir antes de que la aseguradora comience a pagar los gastos del padecimiento.",
+  "Coaseguro": "Porcentaje de los gastos médicos que el asegurado paga después de cubrir el deducible.",
+  "Tope de coaseguro": "Límite máximo que el asegurado pagará por concepto de coaseguro por padecimiento.",
+  "Nivel hospitalario": "Categoría de hospitales en convenio a los que el asegurado tiene acceso bajo cobertura directa.",
+  "Cobertura internacional": "Atención médica fuera de México por padecimientos cubiertos, sujeta a condiciones de la póliza.",
+  "Emergencia extranjero": "Cobertura para urgencias médicas durante viajes al extranjero hasta el monto indicado.",
+  "Asistencia dental": "Servicios odontológicos básicos y preventivos incluidos como beneficio adicional de la póliza.",
+  "Asistencia visión": "Beneficios para examen visual y descuentos en lentes; aplica solo si se indica como amparado.",
+  "Asistencia integral": "Paquete de servicios complementarios: orientación médica, nutricional, psicológica y telemedicina.",
+};
+
 function CoberturaCell({ value, variant }: { value: string; variant?: "default" | "amparado-excluido" }) {
   if (variant === "amparado-excluido") {
     const color = value.toLowerCase() === "amparado" ? "text-emerald-600" : "text-red-600";
@@ -86,7 +99,13 @@ function CoberturaCell({ value, variant }: { value: string; variant?: "default" 
   return <span className="text-sm text-foreground/80">{value}</span>;
 }
 
-function CoberturasBasicasTable() {
+function CoberturasBasicasTable({
+  selected,
+  onSelect,
+}: {
+  selected: string | null;
+  onSelect: (label: string) => void;
+}) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-border">
       <table className="w-full text-sm">
@@ -105,7 +124,14 @@ function CoberturasBasicasTable() {
         <tbody>
           {COBERTURAS_BASICAS.map((r) => (
             <tr key={r.label} className="border-t border-border">
-              <td className="bg-[#0b1d3a] p-3 text-sm font-semibold text-white">{r.label}</td>
+              <td
+                onClick={() => onSelect(r.label)}
+                className={`bg-[#0b1d3a] p-3 text-sm font-semibold text-white cursor-pointer transition-colors hover:bg-[#13294f] hover:text-sky-300 ${
+                  selected === r.label ? "bg-[#13294f] text-sky-300" : ""
+                }`}
+              >
+                {r.label}
+              </td>
               <td className="p-3 text-center"><CoberturaCell value={r.directores} variant={r.variant} /></td>
               <td className="p-3 text-center"><CoberturaCell value={r.empleados} variant={r.variant} /></td>
               <td className="p-3 text-center"><CoberturaCell value={r.nuevoIng} variant={r.variant} /></td>
@@ -117,29 +143,72 @@ function CoberturasBasicasTable() {
   );
 }
 
-const SERVICIOS_ASISTENCIA = [
-  "Asistencia médica, nutricional y psicológica vía telefónica o App, ilimitada y sin costo.",
-  "Ambulancia terrestre: 3 por vigencia (2 primeras sin costo, la 3ª con costo preferencial).",
-  "Videoconsulta de médico general, ilimitada y sin costo.",
-  "Consulta médica a domicilio ilimitada con costo preferencial.",
-  "Coordinación de servicios auxiliares (laboratorio, gabinete, imagen, farmacia) con costo preferencial.",
-  "Urgencias dentales y servicios básicos dentales con copago del 20%.",
+const SERVICIOS_ASISTENCIA: Array<{ texto: string; detalle: string }> = [
+  {
+    texto: "Asistencia médica, nutricional y psicológica vía telefónica o App, ilimitada y sin costo.",
+    detalle: "Orientación profesional 24/7 con médicos generales, nutriólogos y psicólogos. Sin límite de llamadas ni costo adicional para el asegurado y sus dependientes registrados.",
+  },
+  {
+    texto: "Ambulancia terrestre: 3 por vigencia (2 primeras sin costo, la 3ª con costo preferencial).",
+    detalle: "Traslado en ambulancia terrestre por emergencia médica dentro de la zona de cobertura. A partir del tercer evento aplica una tarifa preferencial negociada con el proveedor.",
+  },
+  {
+    texto: "Videoconsulta de médico general, ilimitada y sin costo.",
+    detalle: "Consultas médicas a través de la App, disponibles las 24 horas. Incluye receta digital y seguimiento del padecimiento sin cargo adicional.",
+  },
+  {
+    texto: "Consulta médica a domicilio ilimitada con costo preferencial.",
+    detalle: "Visita de médico general al domicilio del asegurado con tarifa especial. Disponible las 24 horas dentro de las principales zonas metropolitanas.",
+  },
+  {
+    texto: "Coordinación de servicios auxiliares (laboratorio, gabinete, imagen, farmacia) con costo preferencial.",
+    detalle: "Red de proveedores con descuentos en estudios de laboratorio, imagenología, gabinete y farmacia. La coordinación se realiza directamente desde la App o vía telefónica.",
+  },
+  {
+    texto: "Urgencias dentales y servicios básicos dentales con copago del 20%.",
+    detalle: "Atención de urgencias odontológicas y servicios básicos (limpieza, extracciones, obturaciones) con un copago del 20% sobre la tarifa de la red dental.",
+  },
 ];
 
 function ServiciosAsistenciaCards() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
   return (
     <div className="grid grid-cols-1 gap-3">
-      {SERVICIOS_ASISTENCIA.map((texto, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-4 rounded-2xl border border-border bg-muted/30 p-4"
-        >
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#0b1d3a] text-sm font-bold text-white">
-            {i + 1}
+      {SERVICIOS_ASISTENCIA.map((item, i) => {
+        const open = openIndex === i;
+        return (
+          <div
+            key={i}
+            className={`rounded-2xl border bg-muted/30 transition-colors ${
+              open ? "border-sky-400" : "border-border"
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => setOpenIndex(open ? null : i)}
+              className={`flex w-full items-center gap-4 rounded-2xl p-4 text-left transition-colors hover:bg-sky-50 ${
+                open ? "bg-sky-50" : ""
+              }`}
+            >
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#0b1d3a] text-sm font-bold text-white">
+                {i + 1}
+              </div>
+              <p
+                className={`text-sm transition-colors ${
+                  open ? "text-sky-700" : "text-foreground/85"
+                } group-hover:text-sky-700`}
+              >
+                {item.texto}
+              </p>
+            </button>
+            {open && (
+              <div className="border-t border-sky-200 bg-sky-50/60 px-4 py-3 pl-[4.5rem] text-sm text-foreground/80">
+                {item.detalle}
+              </div>
+            )}
           </div>
-          <p className="text-sm text-foreground/85">{texto}</p>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
