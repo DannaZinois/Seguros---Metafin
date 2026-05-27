@@ -19,6 +19,7 @@ import { Route as CompanyPerfilRouteImport } from './routes/_company/perfil'
 import { Route as CompanyPagosRouteImport } from './routes/_company/pagos'
 import { Route as CompanyMovimientosRouteImport } from './routes/_company/movimientos'
 import { Route as CompanyEmpleadosRouteImport } from './routes/_company/empleados'
+import { Route as CompanyDocumentosRouteImport } from './routes/_company/documentos'
 import { Route as ClientMisPolizasRouteImport } from './routes/_client/mis-polizas'
 import { Route as ClientMisPagosRouteImport } from './routes/_client/mis-pagos'
 import { Route as ClientMiPerfilRouteImport } from './routes/_client/mi-perfil'
@@ -82,6 +83,11 @@ const CompanyMovimientosRoute = CompanyMovimientosRouteImport.update({
 const CompanyEmpleadosRoute = CompanyEmpleadosRouteImport.update({
   id: '/empleados',
   path: '/empleados',
+  getParentRoute: () => CompanyRoute,
+} as any)
+const CompanyDocumentosRoute = CompanyDocumentosRouteImport.update({
+  id: '/documentos',
+  path: '/documentos',
   getParentRoute: () => CompanyRoute,
 } as any)
 const ClientMisPolizasRoute = ClientMisPolizasRouteImport.update({
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/mi-perfil': typeof ClientMiPerfilRoute
   '/mis-pagos': typeof ClientMisPagosRoute
   '/mis-polizas': typeof ClientMisPolizasRoute
+  '/documentos': typeof CompanyDocumentosRoute
   '/empleados': typeof CompanyEmpleadosRoute
   '/movimientos': typeof CompanyMovimientosRoute
   '/pagos': typeof CompanyPagosRoute
@@ -211,6 +218,7 @@ export interface FileRoutesByTo {
   '/mi-perfil': typeof ClientMiPerfilRoute
   '/mis-pagos': typeof ClientMisPagosRoute
   '/mis-polizas': typeof ClientMisPolizasRoute
+  '/documentos': typeof CompanyDocumentosRoute
   '/empleados': typeof CompanyEmpleadosRoute
   '/movimientos': typeof CompanyMovimientosRoute
   '/pagos': typeof CompanyPagosRoute
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/_client/mi-perfil': typeof ClientMiPerfilRoute
   '/_client/mis-pagos': typeof ClientMisPagosRoute
   '/_client/mis-polizas': typeof ClientMisPolizasRoute
+  '/_company/documentos': typeof CompanyDocumentosRoute
   '/_company/empleados': typeof CompanyEmpleadosRoute
   '/_company/movimientos': typeof CompanyMovimientosRoute
   '/_company/pagos': typeof CompanyPagosRoute
@@ -269,6 +278,7 @@ export interface FileRouteTypes {
     | '/mi-perfil'
     | '/mis-pagos'
     | '/mis-polizas'
+    | '/documentos'
     | '/empleados'
     | '/movimientos'
     | '/pagos'
@@ -295,6 +305,7 @@ export interface FileRouteTypes {
     | '/mi-perfil'
     | '/mis-pagos'
     | '/mis-polizas'
+    | '/documentos'
     | '/empleados'
     | '/movimientos'
     | '/pagos'
@@ -324,6 +335,7 @@ export interface FileRouteTypes {
     | '/_client/mi-perfil'
     | '/_client/mis-pagos'
     | '/_client/mis-polizas'
+    | '/_company/documentos'
     | '/_company/empleados'
     | '/_company/movimientos'
     | '/_company/pagos'
@@ -418,6 +430,13 @@ declare module '@tanstack/react-router' {
       path: '/empleados'
       fullPath: '/empleados'
       preLoaderRoute: typeof CompanyEmpleadosRouteImport
+      parentRoute: typeof CompanyRoute
+    }
+    '/_company/documentos': {
+      id: '/_company/documentos'
+      path: '/documentos'
+      fullPath: '/documentos'
+      preLoaderRoute: typeof CompanyDocumentosRouteImport
       parentRoute: typeof CompanyRoute
     }
     '/_client/mis-polizas': {
@@ -615,6 +634,7 @@ const CompanySegurosRouteWithChildren = CompanySegurosRoute._addFileChildren(
 )
 
 interface CompanyRouteChildren {
+  CompanyDocumentosRoute: typeof CompanyDocumentosRoute
   CompanyEmpleadosRoute: typeof CompanyEmpleadosRoute
   CompanyMovimientosRoute: typeof CompanyMovimientosRoute
   CompanyPagosRoute: typeof CompanyPagosRoute
@@ -624,6 +644,7 @@ interface CompanyRouteChildren {
 }
 
 const CompanyRouteChildren: CompanyRouteChildren = {
+  CompanyDocumentosRoute: CompanyDocumentosRoute,
   CompanyEmpleadosRoute: CompanyEmpleadosRoute,
   CompanyMovimientosRoute: CompanyMovimientosRoute,
   CompanyPagosRoute: CompanyPagosRoute,
