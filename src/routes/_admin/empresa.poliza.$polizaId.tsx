@@ -19,6 +19,15 @@ import {
   type Empresa,
   type Poliza,
 } from "@/lib/empresa-store";
+
+function normalizeTipoSeguro(t: string): string {
+  const x = (t ?? "").trim().toLowerCase();
+  if (x === "vida") return "Vida";
+  if (x === "auto") return "Auto";
+  if (x === "gmm" || x.startsWith("gastos")) return "Gastos médicos mayores";
+  if (x.startsWith("exceso")) return "Exceso";
+  return t;
+}
 import {
   AseguradosSection,
   ComprobantesSection,
