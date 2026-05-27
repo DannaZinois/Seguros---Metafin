@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { User, Shield, Mail } from "lucide-react";
+import { User, Shield, Mail, FileText } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useCurrentClient } from "@/lib/client-context";
 import { HeaderProfile } from "@/components/layout/header-profile";
@@ -30,6 +30,7 @@ function ClientLayout() {
   const navItems = [
     { to: "/mi-perfil", label: "Mi perfil", icon: User },
     { to: "/mis-polizas", label: "Mis pólizas", icon: Shield },
+    { to: "/mis-documentos", label: "Documentos", icon: FileText },
   ] as const;
 
   return (

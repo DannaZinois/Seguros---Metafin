@@ -22,6 +22,7 @@ import { Route as CompanyEmpleadosRouteImport } from './routes/_company/empleado
 import { Route as CompanyDocumentosRouteImport } from './routes/_company/documentos'
 import { Route as ClientMisPolizasRouteImport } from './routes/_client/mis-polizas'
 import { Route as ClientMisPagosRouteImport } from './routes/_client/mis-pagos'
+import { Route as ClientMisDocumentosRouteImport } from './routes/_client/mis-documentos'
 import { Route as ClientMiPerfilRouteImport } from './routes/_client/mi-perfil'
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
 import { Route as AdminCuestionarioRouteImport } from './routes/_admin/cuestionario'
@@ -98,6 +99,11 @@ const ClientMisPolizasRoute = ClientMisPolizasRouteImport.update({
 const ClientMisPagosRoute = ClientMisPagosRouteImport.update({
   id: '/mis-pagos',
   path: '/mis-pagos',
+  getParentRoute: () => ClientRoute,
+} as any)
+const ClientMisDocumentosRoute = ClientMisDocumentosRouteImport.update({
+  id: '/mis-documentos',
+  path: '/mis-documentos',
   getParentRoute: () => ClientRoute,
 } as any)
 const ClientMiPerfilRoute = ClientMiPerfilRouteImport.update({
@@ -189,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
   '/mi-perfil': typeof ClientMiPerfilRoute
+  '/mis-documentos': typeof ClientMisDocumentosRoute
   '/mis-pagos': typeof ClientMisPagosRoute
   '/mis-polizas': typeof ClientMisPolizasRoute
   '/documentos': typeof CompanyDocumentosRoute
@@ -216,6 +223,7 @@ export interface FileRoutesByTo {
   '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
   '/mi-perfil': typeof ClientMiPerfilRoute
+  '/mis-documentos': typeof ClientMisDocumentosRoute
   '/mis-pagos': typeof ClientMisPagosRoute
   '/mis-polizas': typeof ClientMisPolizasRoute
   '/documentos': typeof CompanyDocumentosRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/_admin/cuestionario': typeof AdminCuestionarioRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
   '/_client/mi-perfil': typeof ClientMiPerfilRoute
+  '/_client/mis-documentos': typeof ClientMisDocumentosRoute
   '/_client/mis-pagos': typeof ClientMisPagosRoute
   '/_client/mis-polizas': typeof ClientMisPolizasRoute
   '/_company/documentos': typeof CompanyDocumentosRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/cuestionario'
     | '/dashboard'
     | '/mi-perfil'
+    | '/mis-documentos'
     | '/mis-pagos'
     | '/mis-polizas'
     | '/documentos'
@@ -303,6 +313,7 @@ export interface FileRouteTypes {
     | '/cuestionario'
     | '/dashboard'
     | '/mi-perfil'
+    | '/mis-documentos'
     | '/mis-pagos'
     | '/mis-polizas'
     | '/documentos'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/_admin/cuestionario'
     | '/_admin/dashboard'
     | '/_client/mi-perfil'
+    | '/_client/mis-documentos'
     | '/_client/mis-pagos'
     | '/_client/mis-polizas'
     | '/_company/documentos'
@@ -451,6 +463,13 @@ declare module '@tanstack/react-router' {
       path: '/mis-pagos'
       fullPath: '/mis-pagos'
       preLoaderRoute: typeof ClientMisPagosRouteImport
+      parentRoute: typeof ClientRoute
+    }
+    '/_client/mis-documentos': {
+      id: '/_client/mis-documentos'
+      path: '/mis-documentos'
+      fullPath: '/mis-documentos'
+      preLoaderRoute: typeof ClientMisDocumentosRouteImport
       parentRoute: typeof ClientRoute
     }
     '/_client/mi-perfil': {
@@ -606,6 +625,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface ClientRouteChildren {
   ClientMiPerfilRoute: typeof ClientMiPerfilRoute
+  ClientMisDocumentosRoute: typeof ClientMisDocumentosRoute
   ClientMisPagosRoute: typeof ClientMisPagosRoute
   ClientMisPolizasRoute: typeof ClientMisPolizasRoute
   ClientConsentimientoVerRoute: typeof ClientConsentimientoVerRoute
@@ -613,6 +633,7 @@ interface ClientRouteChildren {
 
 const ClientRouteChildren: ClientRouteChildren = {
   ClientMiPerfilRoute: ClientMiPerfilRoute,
+  ClientMisDocumentosRoute: ClientMisDocumentosRoute,
   ClientMisPagosRoute: ClientMisPagosRoute,
   ClientMisPolizasRoute: ClientMisPolizasRoute,
   ClientConsentimientoVerRoute: ClientConsentimientoVerRoute,
