@@ -43,6 +43,11 @@ function docsFromAseguradoras(
   return out;
 }
 
+function hasTipo(tipos: Set<string>, label: "Vida" | "GMM"): boolean {
+  if (label === "Vida") return tipos.has("Vida");
+  return tipos.has("GMM") || tipos.has("Gastos médicos mayores");
+}
+
 const tramitesVida: Documento[] = [
   { nombre: "Solicitud de siniestro - Vida", descripcion: "Formato para iniciar el trámite por fallecimiento del asegurado.", formato: "PDF", tamano: "210 KB" },
   { nombre: "Designación de beneficiarios", descripcion: "Actualiza o registra a los beneficiarios de la póliza de vida.", formato: "PDF", tamano: "180 KB" },
@@ -124,12 +129,18 @@ function DocumentosTable({ docs }: { docs: Documento[] }) {
 function DocumentosPage() {
   const empresa = useCompanyEmpresa();
   const [aseguradoras] = useAseguradoras();
-  const extraVida = useMemo(
-    () => docsFromAseguradoras(aseguradoras, (t) => t === "Vida"),
+  const tipos = useMemo(
+    () => new Set((empresa?.polizas ?? []).map((p) => p.tipo)),
+    [empresa],
+  );
+  const showVida = hasTipo(tipos, "Vida");
+  const showGMM = hasTipo(tipos, "GMM");
+  const docsVida = useMemo(
+    () => docsFromAseguradoras(aseguradoras, (t) => t === "Vida", "Cliente"),
     [aseguradoras],
   );
-  const extraGMM = useMemo(
-    () => docsFromAseguradoras(aseguradoras, (t) => t === "Gastos médicos mayores"),
+  const docsGMM = useMemo(
+    () => docsFromAseguradoras(aseguradoras, (t) => t === "Gastos médicos mayores", "Cliente"),
     [aseguradoras],
   );
   return (
@@ -142,21 +153,25 @@ function DocumentosPage() {
         </p>
       </header>
 
-      <Section
-        title="Trámites · Seguro de Vida"
-        subtitle="Formatos necesarios para iniciar y dar seguimiento a trámites de la póliza de vida."
-        extra={<HeartPulse className="h-5 w-5 text-muted-foreground" />}
-      >
-        <DocumentosTable docs={[...tramitesVida, ...extraVida]} />
-      </Section>
+      {showVida && (
+        <Section
+          title="Trámites · Seguro de Vida"
+          subtitle="Formatos necesarios para iniciar y dar seguimiento a trámites de la póliza de vida."
+          extra={<HeartPulse className="h-5 w-5 text-muted-foreground" />}
+        >
+          <DocumentosTable docs={[...tramitesVida, ...docsVida]} />
+        </Section>
+      )}
 
-      <Section
-        title="Trámites · Gastos Médicos Mayores"
-        subtitle="Formatos para reembolsos, programación de cirugías y avisos de siniestro GMM."
-        extra={<Stethoscope className="h-5 w-5 text-muted-foreground" />}
-      >
-        <DocumentosTable docs={[...tramitesGMM, ...extraGMM]} />
-      </Section>
+      {showGMM && (
+        <Section
+          title="Trámites · Gastos Médicos Mayores"
+          subtitle="Formatos para reembolsos, programación de cirugías y avisos de siniestro GMM."
+          extra={<Stethoscope className="h-5 w-5 text-muted-foreground" />}
+        >
+          <DocumentosTable docs={[...tramitesGMM, ...docsGMM]} />
+        </Section>
+      )}
 
       <Section
         title="Documentos informativos"
