@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Download, FileText, HeartPulse, Stethoscope, Info } from "lucide-react";
 import { Section } from "@/components/cotizador/shared";
 import { useCurrentClient } from "@/lib/client-context";
-import { useAseguradoras, type PolizaTipo, type DocumentoPoliza, type Aseguradora } from "@/lib/store";
+import { useAseguradoras, type PolizaTipo, type Aseguradora } from "@/lib/store";
+import { useCompanyEmpresa } from "@/lib/company-context";
 import { useMemo } from "react";
 
 export const Route = createFileRoute("/_client/mis-documentos")({
@@ -17,23 +18,45 @@ interface Documento {
   tamano: string;
 }
 
-function docsFromAseguradoras(
+function normalizeTipo(t: string): PolizaTipo["tipo"] | "" {
+  const x = (t ?? "").trim().toLowerCase();
+  if (x === "vida") return "Vida";
+  if (x === "auto") return "Auto";
+  if (x === "gmm" || x.startsWith("gastos")) return "Gastos médicos mayores";
+  if (x.startsWith("exceso")) return "Exceso";
+  return "";
+}
+
+interface PolizaRef {
+  aseguradora: string;
+  tipo: string;
+  variante?: string;
+}
+
+function docsForPolizas(
   aseguradoras: Aseguradora[],
-  tipoMatch: (t: PolizaTipo["tipo"]) => boolean,
-  audienciaFilter?: DocumentoPoliza["audiencia"],
+  polizas: PolizaRef[],
+  tipoFilter: PolizaTipo["tipo"],
 ): Documento[] {
   const out: Documento[] = [];
-  for (const a of aseguradoras) {
-    for (const p of a.polizas ?? []) {
-      if (!tipoMatch(p.tipo)) continue;
-      for (const v of p.variantes ?? []) {
+  const seen = new Set<string>();
+  for (const pol of polizas) {
+    if (normalizeTipo(pol.tipo) !== tipoFilter) continue;
+    const a = aseguradoras.find((x) => x.name === pol.aseguradora);
+    if (!a) continue;
+    for (const pt of a.polizas ?? []) {
+      if (pt.tipo !== tipoFilter) continue;
+      for (const v of pt.variantes ?? []) {
+        if (pol.variante && v.nombre !== pol.variante) continue;
         for (const d of v.documentos ?? []) {
-          if (audienciaFilter && d.audiencia !== audienciaFilter) continue;
-          const formato = d.pdfName ? "PDF" : d.wordName ? "DOCX" : "PDF";
+          if (d.audiencia !== "Cliente") continue;
+          const key = `${a.id}-${v.id}-${d.id}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
           out.push({
             nombre: d.nombre,
             descripcion: `${a.name} · ${v.nombre}`,
-            formato,
+            formato: d.pdfName ? "PDF" : d.wordName ? "DOCX" : "PDF",
             tamano: "—",
           });
         }
@@ -104,20 +127,24 @@ function DocumentosTable({ docs }: { docs: Documento[] }) {
 
 function DocumentosClientPage() {
   const cliente = useCurrentClient();
+  const empresa = useCompanyEmpresa();
   const [aseguradoras] = useAseguradoras();
-  const tipos = useMemo(
-    () => new Set((cliente?.polizas ?? []).map((p) => p.tipoSeguro)),
-    [cliente],
-  );
+  const polizaRefs: PolizaRef[] = useMemo(() => {
+    if (cliente?.polizas?.length) {
+      return cliente.polizas.map((p) => ({ aseguradora: p.aseguradora, tipo: p.tipoSeguro }));
+    }
+    return (empresa?.polizas ?? []).map((p) => ({ aseguradora: p.aseguradora, tipo: p.tipo, variante: p.variante }));
+  }, [cliente, empresa]);
+  const tipos = useMemo(() => new Set(polizaRefs.map((p) => normalizeTipo(p.tipo))), [polizaRefs]);
   const showVida = tipos.has("Vida");
-  const showGMM = tipos.has("GMM");
+  const showGMM = tipos.has("Gastos médicos mayores");
   const docsVida = useMemo(
-    () => docsFromAseguradoras(aseguradoras, (t) => t === "Vida", "Cliente"),
-    [aseguradoras],
+    () => docsForPolizas(aseguradoras, polizaRefs, "Vida"),
+    [aseguradoras, polizaRefs],
   );
   const docsGMM = useMemo(
-    () => docsFromAseguradoras(aseguradoras, (t) => t === "Gastos médicos mayores", "Cliente"),
-    [aseguradoras],
+    () => docsForPolizas(aseguradoras, polizaRefs, "Gastos médicos mayores"),
+    [aseguradoras, polizaRefs],
   );
   return (
     <div className="mx-auto max-w-6xl">

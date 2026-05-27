@@ -19,6 +19,15 @@ import {
   type Empresa,
   type Poliza,
 } from "@/lib/empresa-store";
+
+function normalizeTipoSeguro(t: string): string {
+  const x = (t ?? "").trim().toLowerCase();
+  if (x === "vida") return "Vida";
+  if (x === "auto") return "Auto";
+  if (x === "gmm" || x.startsWith("gastos")) return "Gastos médicos mayores";
+  if (x.startsWith("exceso")) return "Exceso";
+  return t;
+}
 import {
   AseguradosSection,
   ComprobantesSection,
@@ -134,7 +143,7 @@ function VerPolizaPage() {
           <Field label="Tipo de póliza*">
             <Select
               value={poliza.tipo}
-              onChange={(v) => updatePoliza({ tipo: v })}
+              onChange={(v) => updatePoliza({ tipo: v, variante: "" })}
               options={["Auto", "Gastos Médicos Mayores", "Vida", "Exceso GMM"]}
               placeholder="Selecciona"
             />
@@ -142,9 +151,27 @@ function VerPolizaPage() {
           <Field label="Aseguradora">
             <Select
               value={poliza.aseguradora}
-              onChange={(v) => updatePoliza({ aseguradora: v })}
+              onChange={(v) => updatePoliza({ aseguradora: v, variante: "" })}
               options={aseguradoras.map((a) => a.name)}
               placeholder="Selecciona"
+            />
+          </Field>
+          <Field label="Nombre de póliza">
+            <Select
+              value={poliza.variante ?? ""}
+              onChange={(v) => updatePoliza({ variante: v })}
+              options={(() => {
+                const aseg = aseguradoras.find((a) => a.name === poliza.aseguradora);
+                if (!aseg?.polizas) return [];
+                return aseg.polizas
+                  .filter((pt) => normalizeTipoSeguro(poliza.tipo) === pt.tipo)
+                  .flatMap((pt) => (pt.variantes ?? []).map((v) => v.nombre));
+              })()}
+              placeholder={
+                poliza.aseguradora
+                  ? "Selecciona la variante"
+                  : "Selecciona aseguradora primero"
+              }
             />
           </Field>
           <Field label="Nombre completo del contratante*">
