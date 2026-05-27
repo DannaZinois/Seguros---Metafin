@@ -58,37 +58,6 @@ function NuevaPolizaPage() {
   const updatePoliza = (patch: Partial<Poliza>) =>
     setPoliza((p) => ({ ...p, ...patch }));
 
-  const handleEnvio = (type: Exclude<EnvioType, null>) => {
-    if (type === "whatsapp" || type === "pdf") {
-      if (!poliza.contratante.trim() || !poliza.contacto.trim()) {
-        setPopup({
-          kind: "error",
-          title: "Datos requeridos",
-          message:
-            "Captura el nombre del contratante y el número de contacto antes de usar WhatsApp o PDF.",
-        });
-        return;
-      }
-    }
-    updatePoliza({ envio: type });
-    if (type === "whatsapp") {
-      appendChat(poliza.contacto, {
-        from: "bot",
-        text: `Hola ${poliza.contratante}, soy el asistente. Te haré algunas preguntas para la póliza${
-          empresa ? ` de ${empresa.nombre}` : ""
-        }.`,
-      });
-    } else if (type === "pdf") {
-      const pdf =
-        aseguradoras.find((a) => a.name === poliza.aseguradora)?.pdfName ??
-        "formato_cotizacion.pdf";
-      appendChat(poliza.contacto, {
-        from: "bot",
-        text: `Hola ${poliza.contratante}, te envío el siguiente formato: ${pdf}`,
-      });
-    }
-  };
-
   const persist = () => {
     if (!empresa) {
       setPopup({
