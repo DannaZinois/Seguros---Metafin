@@ -254,7 +254,7 @@ function PolizasSecciones() {
           />
         </Section>
         <Section title="Coberturas básicas">
-          <CoberturasBasicasTable />
+          <CoberturasBasicasBlock />
         </Section>
         <Section title="Servicios de asistencia">
           <ServiciosAsistenciaCards />
