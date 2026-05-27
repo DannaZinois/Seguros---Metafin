@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, MessageCircle, FileText as FileIcon, Pencil } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
 import { z } from "zod";
 import { useAseguradoras, appendChat } from "@/lib/store";
 import {
@@ -9,7 +9,6 @@ import {
   Field,
   TextInput,
   Select,
-  EnvioOption,
   Dropzone,
   Popup,
   type PopupState,
@@ -20,12 +19,12 @@ import {
   newPoliza,
   type Empresa,
   type Poliza,
-  type EnvioType,
 } from "@/lib/empresa-store";
 import {
   AseguradosSection,
   ComprobantesSection,
 } from "@/components/empresa/poliza-sections";
+import { downloadAseguradosTemplate } from "@/lib/asegurados-template";
 
 const searchSchema = z.object({
   empresaId: z.string().optional(),
@@ -58,37 +57,6 @@ function NuevaPolizaPage() {
 
   const updatePoliza = (patch: Partial<Poliza>) =>
     setPoliza((p) => ({ ...p, ...patch }));
-
-  const handleEnvio = (type: Exclude<EnvioType, null>) => {
-    if (type === "whatsapp" || type === "pdf") {
-      if (!poliza.contratante.trim() || !poliza.contacto.trim()) {
-        setPopup({
-          kind: "error",
-          title: "Datos requeridos",
-          message:
-            "Captura el nombre del contratante y el número de contacto antes de usar WhatsApp o PDF.",
-        });
-        return;
-      }
-    }
-    updatePoliza({ envio: type });
-    if (type === "whatsapp") {
-      appendChat(poliza.contacto, {
-        from: "bot",
-        text: `Hola ${poliza.contratante}, soy el asistente. Te haré algunas preguntas para la póliza${
-          empresa ? ` de ${empresa.nombre}` : ""
-        }.`,
-      });
-    } else if (type === "pdf") {
-      const pdf =
-        aseguradoras.find((a) => a.name === poliza.aseguradora)?.pdfName ??
-        "formato_cotizacion.pdf";
-      appendChat(poliza.contacto, {
-        from: "bot",
-        text: `Hola ${poliza.contratante}, te envío el siguiente formato: ${pdf}`,
-      });
-    }
-  };
 
   const persist = () => {
     if (!empresa) {
@@ -290,48 +258,27 @@ function NuevaPolizaPage() {
         </Grid>
       </Section>
 
-      {/* Tipo de envío */}
-      <Section
-        title="Tipo de envio"
-        subtitle="Selecciona cómo quieres recopilar la información"
-      >
-        <div className="mt-2 grid grid-cols-1 gap-6 md:grid-cols-3">
-          <EnvioOption
-            label="Recolección por chatbot de WhatsApp"
-            active={poliza.envio === "whatsapp"}
-            onClick={() => handleEnvio("whatsapp")}
-            color="bg-green-500 hover:bg-green-600"
-            icon={<MessageCircle className="h-4 w-4" />}
-            text="WhatsApp"
-          />
-          <EnvioOption
-            label="Recolección manual"
-            active={poliza.envio === "manual"}
-            onClick={() => handleEnvio("manual")}
-            color="bg-blue-500 hover:bg-blue-600"
-            icon={<Pencil className="h-4 w-4" />}
-            text="Manual"
-          />
-          <EnvioOption
-            label="Recolección por lectura de pdf por IA"
-            active={poliza.envio === "pdf"}
-            onClick={() => handleEnvio("pdf")}
-            color="bg-red-500 hover:bg-red-600"
-            icon={<FileIcon className="h-4 w-4" />}
-            text="pdf"
-          />
-        </div>
-      </Section>
-
-      {/* Carga masiva + Comentarios */}
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      {/* Carga masiva */}
+      <div className="mt-6">
         <div className="rounded-3xl border border-border bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-bold text-foreground">
-            Carga masiva de asegurados
-          </h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Carga un solo archivo para registrar a tus asegurados.
-          </p>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-bold text-foreground">
+                Carga masiva de asegurados
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Carga un solo archivo para registrar a tus asegurados.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => downloadAseguradosTemplate()}
+              className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600"
+            >
+              <Download className="h-4 w-4" />
+              Descargar plantilla Excel
+            </button>
+          </div>
           {poliza.cargaFileName && (
             <div className="mt-4">
               <div className="flex items-center justify-between text-sm">
@@ -346,22 +293,6 @@ function NuevaPolizaPage() {
           <Dropzone
             className="mt-4"
             onFile={(f) => updatePoliza({ cargaFileName: f.name })}
-          />
-        </div>
-        <div className="rounded-3xl border border-border bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-bold text-foreground">
-            Comentarios del cliente
-          </h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Recibe feedback del cliente y edita a sus especificaciones si es
-            necesario.
-          </p>
-          <textarea
-            value={poliza.comentarios}
-            onChange={(e) => updatePoliza({ comentarios: e.target.value })}
-            rows={6}
-            className="mt-3 w-full rounded-2xl border border-border bg-white p-3 text-sm outline-none focus:border-[color:var(--brand-blue)]"
-            placeholder="Sin comentarios"
           />
         </div>
       </div>
