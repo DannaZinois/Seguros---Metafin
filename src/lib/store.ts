@@ -21,11 +21,22 @@ export interface Aseguradora {
 
 export type TipoSeguro = "Auto" | "Vida" | "Gastos médicos mayores" | "Exceso";
 
+export type AudienciaDocumento = "Interno" | "Cliente";
+
+export interface DocumentoPoliza {
+  id: string;
+  nombre: string;
+  audiencia: AudienciaDocumento;
+  pdfName?: string;
+  wordName?: string;
+}
+
 export interface VariantePoliza {
   id: string;
   nombre: string;
   pdfName?: string;
   wordName?: string;
+  documentos?: DocumentoPoliza[];
 }
 
 export interface PolizaTipo {
