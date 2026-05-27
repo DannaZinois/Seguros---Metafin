@@ -30,6 +30,8 @@ export function AseguradosSection({
 }) {
   const [query, setQuery] = useState("");
   const [uploadMode, setUploadMode] = useState<UploadMode | null>(null);
+  const [consentDialog, setConsentDialog] = useState<null | "choose" | "individual">(null);
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return poliza.asegurados;
@@ -39,24 +41,6 @@ export function AseguradosSection({
         a.nombre.toLowerCase().includes(q),
     );
   }, [poliza.asegurados, query]);
-
-  const addRow = () =>
-    onChange([
-      ...poliza.asegurados,
-      {
-        id: crypto.randomUUID(),
-        trabajadorId: `F-#${Math.floor(100000 + Math.random() * 900000)}`,
-        nombre: "",
-        poliza: poliza.tipo || "Póliza aquí",
-        vigencia: "00/00/0000",
-        renovacion: "00/00/0000",
-        correo: "",
-        telefono: "",
-        consentimiento: false,
-        certificado: false,
-        status: "Activa",
-      },
-    ]);
 
   const handleParsed = (files: ParsedAseguradoFile[]) => {
     const now = Date.now();
