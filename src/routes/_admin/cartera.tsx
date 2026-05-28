@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
-import { Search, Download, Plus, ChevronLeft, ChevronRight, X, User, Building2 } from "lucide-react";
+import { Search, Download, Plus, ChevronLeft, ChevronRight, X, Building2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { CLIENTES, buildEmpresaSeeds, type ClienteStatus, type TipoCliente } from "@/lib/clientes-data";
 import { seedEmpresasIfEmpty } from "@/lib/empresa-store";

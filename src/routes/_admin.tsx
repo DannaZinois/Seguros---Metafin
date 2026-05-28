@@ -28,7 +28,6 @@ function AdminLayout() {
 
   const navItems = [
     { to: "/cartera", label: "Cartera", icon: Users },
-    { to: "/cotizadores", label: "Cotizadores", icon: FileText },
     { to: "/aseguradoras", label: "Aseguradoras", icon: ShieldCheck },
   ] as const;
 
