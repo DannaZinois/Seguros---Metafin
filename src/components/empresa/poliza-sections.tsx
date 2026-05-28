@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, Trash2, Download, Search, Upload, FileUp, X } from "lucide-react";
+import { Plus, Trash2, Download, Search, Upload, FileUp, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Section } from "@/components/cotizador/shared";
 import type { Poliza } from "@/lib/empresa-store";
@@ -25,6 +25,8 @@ export function AseguradosSection({
   const [uploadMode, setUploadMode] = useState<UploadMode | null>(null);
   const [consentDialog, setConsentDialog] = useState<null | "choose" | "individual">(null);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return poliza.asegurados;
@@ -34,6 +36,10 @@ export function AseguradosSection({
         a.nombre.toLowerCase().includes(q),
     );
   }, [poliza.asegurados, query]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const pageRows = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const showPagination = filtered.length > pageSize;
 
   const handleParsed = (files: ParsedAseguradoFile[]) => {
     const now = Date.now();
@@ -167,7 +173,7 @@ export function AseguradosSection({
                 </td>
               </tr>
             )}
-            {filtered.map((a) => (
+            {pageRows.map((a) => (
               <tr key={a.id} className="border-t border-border/60">
                 {consentDialog === "individual" && (
                   <td className="py-3">
@@ -290,6 +296,35 @@ export function AseguradosSection({
           </tbody>
         </table>
       </div>
+      {showPagination && (
+        <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+          <span>
+            Mostrando {(safePage - 1) * pageSize + 1}-
+            {Math.min(safePage * pageSize, filtered.length)} de {filtered.length}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={safePage === 1}
+              className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-40"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" /> Anterior
+            </button>
+            <span className="text-foreground">
+              Página {safePage} de {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safePage === totalPages}
+              className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-40"
+            >
+              Siguiente <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
       {consentDialog === "individual" && (
         <div className="mt-4 flex justify-end gap-2">
           <button
