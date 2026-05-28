@@ -25,8 +25,6 @@ import { Route as ClientMisPagosRouteImport } from './routes/_client/mis-pagos'
 import { Route as ClientMisDocumentosRouteImport } from './routes/_client/mis-documentos'
 import { Route as ClientMiPerfilRouteImport } from './routes/_client/mi-perfil'
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
-import { Route as AdminCuestionarioRouteImport } from './routes/_admin/cuestionario'
-import { Route as AdminCotizadoresRouteImport } from './routes/_admin/cotizadores'
 import { Route as AdminCarteraRouteImport } from './routes/_admin/cartera'
 import { Route as AdminAseguradorasRouteImport } from './routes/_admin/aseguradoras'
 import { Route as CompanySegurosPolizaIdRouteImport } from './routes/_company/seguros.$polizaId'
@@ -119,16 +117,6 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminCuestionarioRoute = AdminCuestionarioRouteImport.update({
-  id: '/cuestionario',
-  path: '/cuestionario',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCotizadoresRoute = AdminCotizadoresRouteImport.update({
-  id: '/cotizadores',
-  path: '/cotizadores',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminCarteraRoute = AdminCarteraRouteImport.update({
   id: '/cartera',
   path: '/cartera',
@@ -211,8 +199,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/aseguradoras': typeof AdminAseguradorasRoute
   '/cartera': typeof AdminCarteraRoute
-  '/cotizadores': typeof AdminCotizadoresRoute
-  '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
   '/mi-perfil': typeof ClientMiPerfilRoute
   '/mis-documentos': typeof ClientMisDocumentosRoute
@@ -242,8 +228,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/aseguradoras': typeof AdminAseguradorasRoute
   '/cartera': typeof AdminCarteraRoute
-  '/cotizadores': typeof AdminCotizadoresRoute
-  '/cuestionario': typeof AdminCuestionarioRoute
   '/dashboard': typeof AdminDashboardRoute
   '/mi-perfil': typeof ClientMiPerfilRoute
   '/mis-documentos': typeof ClientMisDocumentosRoute
@@ -277,8 +261,6 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_admin/aseguradoras': typeof AdminAseguradorasRoute
   '/_admin/cartera': typeof AdminCarteraRoute
-  '/_admin/cotizadores': typeof AdminCotizadoresRoute
-  '/_admin/cuestionario': typeof AdminCuestionarioRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
   '/_client/mi-perfil': typeof ClientMiPerfilRoute
   '/_client/mis-documentos': typeof ClientMisDocumentosRoute
@@ -310,8 +292,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/aseguradoras'
     | '/cartera'
-    | '/cotizadores'
-    | '/cuestionario'
     | '/dashboard'
     | '/mi-perfil'
     | '/mis-documentos'
@@ -341,8 +321,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/aseguradoras'
     | '/cartera'
-    | '/cotizadores'
-    | '/cuestionario'
     | '/dashboard'
     | '/mi-perfil'
     | '/mis-documentos'
@@ -375,8 +353,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/_admin/aseguradoras'
     | '/_admin/cartera'
-    | '/_admin/cotizadores'
-    | '/_admin/cuestionario'
     | '/_admin/dashboard'
     | '/_client/mi-perfil'
     | '/_client/mis-documentos'
@@ -526,20 +502,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/_admin/cuestionario': {
-      id: '/_admin/cuestionario'
-      path: '/cuestionario'
-      fullPath: '/cuestionario'
-      preLoaderRoute: typeof AdminCuestionarioRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/_admin/cotizadores': {
-      id: '/_admin/cotizadores'
-      path: '/cotizadores'
-      fullPath: '/cotizadores'
-      preLoaderRoute: typeof AdminCotizadoresRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/_admin/cartera': {
       id: '/_admin/cartera'
       path: '/cartera'
@@ -658,8 +620,6 @@ const AdminClienteClienteIdRouteWithChildren =
 interface AdminRouteChildren {
   AdminAseguradorasRoute: typeof AdminAseguradorasRoute
   AdminCarteraRoute: typeof AdminCarteraRoute
-  AdminCotizadoresRoute: typeof AdminCotizadoresRoute
-  AdminCuestionarioRoute: typeof AdminCuestionarioRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminAseguradoraAseguradoraIdRoute: typeof AdminAseguradoraAseguradoraIdRoute
   AdminClienteClienteIdRoute: typeof AdminClienteClienteIdRouteWithChildren
@@ -672,8 +632,6 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAseguradorasRoute: AdminAseguradorasRoute,
   AdminCarteraRoute: AdminCarteraRoute,
-  AdminCotizadoresRoute: AdminCotizadoresRoute,
-  AdminCuestionarioRoute: AdminCuestionarioRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminAseguradoraAseguradoraIdRoute: AdminAseguradoraAseguradoraIdRoute,
   AdminClienteClienteIdRoute: AdminClienteClienteIdRouteWithChildren,

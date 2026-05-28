@@ -96,15 +96,6 @@ function NuevaPolizaPage() {
       });
   };
 
-  const onEnviar = () => {
-    if (persist())
-      router.navigate({
-        to: "/empresa/poliza/$polizaId",
-        params: { polizaId: poliza.id },
-        search: { empresaId: empresa!.id },
-      });
-  };
-
   const onBorrar = () => {
     setPopup({
       kind: "confirm",
@@ -115,18 +106,6 @@ function NuevaPolizaPage() {
         setPopup(null);
       },
     });
-  };
-
-  const onVerWhatsapp = () => {
-    if (!poliza.contacto.trim()) {
-      setPopup({
-        kind: "error",
-        title: "Sin número de contacto",
-        message: "Captura primero el número de contacto del contratante.",
-      });
-      return;
-    }
-    setPopup({ kind: "chat", phone: poliza.contacto });
   };
 
   return (
@@ -309,22 +288,10 @@ function NuevaPolizaPage() {
 
       <div className="mt-10 flex flex-wrap items-center justify-end gap-3">
         <button
-          onClick={onVerWhatsapp}
-          className="rounded-full bg-green-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-green-600"
-        >
-          Ver whatsapp
-        </button>
-        <button
           onClick={onGuardar}
           className="rounded-full bg-violet-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-violet-600"
         >
           + Guardar cambios
-        </button>
-        <button
-          onClick={onEnviar}
-          className="rounded-full bg-blue-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-600"
-        >
-          Enviar
         </button>
         <button
           onClick={onBorrar}

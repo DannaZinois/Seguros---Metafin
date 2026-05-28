@@ -1,7 +1,6 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { ArrowLeft, Download } from "lucide-react";
 import { DatosGeneralesReadonly } from "@/components/cotizador/datos-generales-readonly";
-import { emptyDraft, saveDraft } from "@/lib/cotizador-draft";
 import { findClienteByAnyId, type ClienteStatus } from "@/lib/clientes-data";
 
 export const Route = createFileRoute("/_admin/cliente/$clienteId")({
@@ -22,22 +21,6 @@ function PerfilCliente() {
   const cliente = findClienteByAnyId(clienteId);
   const profile = cliente?.profile;
   const polizas = cliente?.polizas ?? [];
-
-  const nuevaPoliza = () => {
-    saveDraft({
-      ...emptyDraft(),
-      nombre: profile?.nombre ?? "",
-      contacto: profile?.contacto ?? "",
-      correoContacto: profile?.correo ?? "",
-      tipoAsegurado: profile?.tipoAsegurado ?? "",
-      sexo: profile?.sexo ?? "",
-      codigoPostal: profile?.codigoPostal ?? "",
-      fechaNacimiento: profile?.fechaNacimiento ?? "",
-      fechaAntiguedad: profile?.fechaAntiguedad ?? "",
-      tipoPersona: profile?.tipoPersona ?? "",
-    });
-    router.navigate({ to: "/cotizadores" });
-  };
 
   return (
     <div>
@@ -63,9 +46,6 @@ function PerfilCliente() {
       <section className="mt-6 rounded-3xl border border-border bg-white p-6 shadow-sm">
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-bold text-foreground">Pólizas del cliente</h2>
-          <button onClick={nuevaPoliza} className="inline-flex items-center gap-1 rounded-full bg-violet-500 px-4 py-1.5 text-xs font-medium text-white hover:bg-violet-600">
-            + Nueva póliza
-          </button>
         </div>
 
         <div className="mt-5 overflow-x-auto">
@@ -120,9 +100,6 @@ function PerfilCliente() {
       </section>
 
       <div className="mt-8 flex justify-end gap-3">
-        <button className="rounded-full bg-emerald-500 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-600">
-          Ver whatsapp
-        </button>
         <button className="rounded-full bg-violet-500 px-5 py-2 text-sm font-medium text-white hover:bg-violet-600">
           + Guardar cambios
         </button>

@@ -1,8 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { ArrowLeft, Pencil, Trash2, CloudDownload } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
 import { Section } from "@/components/cotizador/shared";
 import { DatosGeneralesReadonly } from "@/components/cotizador/datos-generales-readonly";
-import { emptyDraft, saveDraft } from "@/lib/cotizador-draft";
 import { findPoliza } from "@/lib/clientes-data";
 
 export const Route = createFileRoute("/_admin/cliente/$clienteId/poliza/$polizaId")({
@@ -27,32 +26,6 @@ function VerPolizaCliente() {
   const profile = found?.cliente.profile;
   const poliza = found?.poliza;
 
-  const prefillDraft = () => {
-    saveDraft({
-      ...emptyDraft(),
-      nombre: profile?.nombre ?? "",
-      contacto: profile?.contacto ?? "",
-      correoContacto: profile?.correo ?? "",
-      tipoAsegurado: profile?.tipoAsegurado ?? "",
-      sexo: profile?.sexo ?? "",
-      codigoPostal: profile?.codigoPostal ?? "",
-      fechaNacimiento: profile?.fechaNacimiento ?? "",
-      fechaAntiguedad: profile?.fechaAntiguedad ?? "",
-      tipoSeguro: poliza?.tipoSeguro ?? "",
-      tipoPersona: profile?.tipoPersona ?? "",
-    });
-  };
-
-  const goToCotizacion = () => {
-    prefillDraft();
-    router.navigate({ to: "/cotizadores" });
-  };
-
-  const goToCuestionario = () => {
-    prefillDraft();
-    router.navigate({ to: "/cuestionario" });
-  };
-
   return (
     <div>
       <div className="flex items-start gap-4">
@@ -71,30 +44,6 @@ function VerPolizaCliente() {
       </div>
 
       <DatosGeneralesReadonly profile={profile} tipoSeguro={poliza?.tipoSeguro} aseguradora={poliza?.aseguradora} />
-
-      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-        {[
-          { title: "Cotización de póliza", subtitle: "Última edición el 00/00/0000 a las 00:00:00 por John Doe", onOpen: goToCotizacion },
-          { title: "Cuestionario de póliza", subtitle: "Última edición el 00/00/0000 a las 00:00:00 por John Doe", onOpen: goToCuestionario },
-        ].map((c) => (
-          <div key={c.title} className="rounded-2xl border border-border bg-white p-5 shadow-sm transition hover:border-[color:var(--brand-blue)]/40 hover:shadow-md">
-            <div className="flex items-start justify-between gap-4">
-              <button onClick={c.onOpen} className="text-left">
-                <h3 className="font-bold text-foreground hover:text-[color:var(--brand-blue)]">{c.title}</h3>
-                <p className="mt-1 text-xs text-muted-foreground">{c.subtitle}</p>
-              </button>
-              <div className="text-right">
-                <p className="text-xs text-muted-foreground">Acciones</p>
-                <div className="mt-1 flex items-center gap-2">
-                  <button onClick={c.onOpen} className="rounded-full p-1.5 text-amber-500 hover:bg-amber-50" aria-label="Editar"><Pencil className="h-4 w-4" /></button>
-                  <button className="rounded-full p-1.5 text-destructive hover:bg-destructive/10" aria-label="Borrar"><Trash2 className="h-4 w-4" /></button>
-                  <button className="rounded-full p-1.5 text-[color:var(--brand-blue)] hover:bg-muted" aria-label="Descargar"><CloudDownload className="h-4 w-4" /></button>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
 
       <Section
         title="Documentos cargados"
@@ -145,7 +94,6 @@ function VerPolizaCliente() {
       </Section>
 
       <div className="mt-8 flex justify-end gap-3">
-        <button className="rounded-full bg-emerald-500 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-600">Ver whatsapp</button>
         <button className="rounded-full bg-violet-500 px-5 py-2 text-sm font-medium text-white hover:bg-violet-600">+ Guardar cambios</button>
         <button className="rounded-full bg-destructive px-5 py-2 text-sm font-medium text-white hover:opacity-90">Borrar</button>
       </div>
