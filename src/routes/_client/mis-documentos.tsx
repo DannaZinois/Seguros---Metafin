@@ -55,7 +55,7 @@ function docsForPolizas(
           seen.add(key);
           out.push({
             nombre: d.nombre,
-            descripcion: `${a.name} · ${v.nombre}`,
+            descripcion: d.descripcion?.trim() || `${a.name} · ${v.nombre}`,
             formato: d.pdfName ? "PDF" : d.wordName ? "DOCX" : "PDF",
             tamano: "—",
           });
@@ -68,7 +68,6 @@ function docsForPolizas(
 
 const tramitesVida: Documento[] = [];
 const tramitesGMM: Documento[] = [];
-const informativos: Documento[] = [];
 
 function descargar(doc: Documento) {
   const contenido = `Documento: ${doc.nombre}\n\n${doc.descripcion}\n\nFormato: ${doc.formato}\nTamaño: ${doc.tamano}\n\n(Documento de demostración generado por el portal Metafin.)`;
