@@ -96,15 +96,6 @@ function NuevaPolizaPage() {
       });
   };
 
-  const onEnviar = () => {
-    if (persist())
-      router.navigate({
-        to: "/empresa/poliza/$polizaId",
-        params: { polizaId: poliza.id },
-        search: { empresaId: empresa!.id },
-      });
-  };
-
   const onBorrar = () => {
     setPopup({
       kind: "confirm",
@@ -115,18 +106,6 @@ function NuevaPolizaPage() {
         setPopup(null);
       },
     });
-  };
-
-  const onVerWhatsapp = () => {
-    if (!poliza.contacto.trim()) {
-      setPopup({
-        kind: "error",
-        title: "Sin número de contacto",
-        message: "Captura primero el número de contacto del contratante.",
-      });
-      return;
-    }
-    setPopup({ kind: "chat", phone: poliza.contacto });
   };
 
   return (
