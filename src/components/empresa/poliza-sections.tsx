@@ -479,12 +479,13 @@ export function ComprobantesSection({
               <th className="py-3 font-medium">Fecha de carga</th>
               <th className="py-3 font-medium">Comprobante</th>
               <th className="py-3 font-medium">Estatus</th>
+              {!readOnly && <th className="py-3 font-medium" />}
             </tr>
           </thead>
           <tbody>
             {poliza.comprobantes.length === 0 && (
               <tr>
-                <td colSpan={7} className="py-6 text-center text-sm text-muted-foreground">
+                <td colSpan={readOnly ? 7 : 8} className="py-6 text-center text-sm text-muted-foreground">
                   Sin comprobantes registrados.
                 </td>
               </tr>
@@ -518,6 +519,19 @@ export function ComprobantesSection({
                     {c.estatus}
                   </span>
                 </td>
+                {!readOnly && (
+                  <td className="py-3">
+                    <button
+                      onClick={() =>
+                        onChange(poliza.comprobantes.filter((x) => x.id !== c.id))
+                      }
+                      className="rounded-full p-1.5 text-destructive hover:bg-destructive/10"
+                      title="Eliminar recibo"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
