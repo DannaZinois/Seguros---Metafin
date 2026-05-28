@@ -145,6 +145,20 @@ function DocumentosClientPage() {
     () => docsForPolizas(aseguradoras, polizaRefs, "Gastos médicos mayores"),
     [aseguradoras, polizaRefs],
   );
+  const informativos: Documento[] = useMemo(() => {
+    const out: Documento[] = [];
+    for (const p of empresa?.polizas ?? []) {
+      for (const d of p.documentosInformativos ?? []) {
+        out.push({
+          nombre: d.nombre,
+          descripcion: d.descripcion || `${p.aseguradora}${p.variante ? ` · ${p.variante}` : ""}`,
+          formato: /\.docx?$/i.test(d.fileName) ? "DOCX" : /\.pdf$/i.test(d.fileName) ? "PDF" : "Archivo",
+          tamano: "—",
+        });
+      }
+    }
+    return out;
+  }, [empresa]);
   return (
     <div className="mx-auto max-w-6xl">
       <header>
