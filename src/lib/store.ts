@@ -27,6 +27,7 @@ export interface DocumentoPoliza {
   id: string;
   nombre: string;
   audiencia: AudienciaDocumento;
+  descripcion?: string;
   pdfName?: string;
   wordName?: string;
 }
