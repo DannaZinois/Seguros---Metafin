@@ -256,14 +256,12 @@ function CarteraPage() {
 }
 
 function NewRegistroModal({ onClose }: { onClose: () => void }) {
-  const [selected, setSelected] = useState<"personal" | "empresa" | null>(null);
+  const [selected, setSelected] = useState<"empresa" | null>(null);
   const router = useRouter();
 
   const confirm = () => {
     onClose();
-    if (selected === "personal") {
-      router.navigate({ to: "/cotizadores" });
-    } else if (selected === "empresa") {
+    if (selected === "empresa") {
       router.navigate({ to: "/empresa/nueva" });
     }
   };
@@ -288,24 +286,7 @@ function NewRegistroModal({ onClose }: { onClose: () => void }) {
           Selecciona el tipo de cliente que deseas registrar.
         </p>
 
-        <div className="mt-6 grid grid-cols-2 gap-4">
-          <button
-            onClick={() => setSelected("personal")}
-            className={`flex flex-col items-center gap-3 rounded-2xl border-2 p-6 transition-all ${
-              selected === "personal"
-                ? "border-[color:var(--brand-blue)] bg-[color:var(--brand-bg-soft)] shadow-md"
-                : "border-border hover:border-[color:var(--brand-blue)]/50"
-            }`}
-          >
-            <div className="rounded-full bg-[color:var(--brand-bg-soft)] p-3">
-              <User className="h-6 w-6 text-[color:var(--brand-blue)]" />
-            </div>
-            <span className="text-sm font-semibold text-foreground">Personal</span>
-            <span className="text-xs text-muted-foreground text-center">
-              Cliente individual con datos personales
-            </span>
-          </button>
-
+        <div className="mt-6 grid grid-cols-1 gap-4">
           <button
             onClick={() => setSelected("empresa")}
             className={`flex flex-col items-center gap-3 rounded-2xl border-2 p-6 transition-all ${
