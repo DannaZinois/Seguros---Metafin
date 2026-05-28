@@ -262,7 +262,8 @@ function VerPolizaPage() {
             setPopup({
               kind: "info",
               title: "Cambios guardados",
-              message: "La información de la póliza se guardó correctamente.",
+              message:
+                "La información de la póliza se guardó y se actualizó en los perfiles de empresa y cliente.",
             });
           }}
           className="rounded-full bg-violet-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-violet-600"
@@ -273,15 +274,19 @@ function VerPolizaPage() {
           onClick={() =>
             setPopup({
               kind: "confirm",
-              title: "¿Borrar póliza?",
-              message: "Esto eliminará esta póliza de la empresa.",
+              title: "¿Descartar cambios?",
+              message:
+                "Se revertirán los datos modificados a la última versión guardada.",
               onConfirm: () => {
-                const e: Empresa = {
-                  ...empresa,
-                  polizas: empresa.polizas.filter((p) => p.id !== poliza.id),
-                };
-                saveEmpresa(e);
-                router.navigate({ to: "/cartera" });
+                if (found) {
+                  setEmpresa(found.empresa);
+                  setPoliza(found.poliza);
+                }
+                setPopup({
+                  kind: "info",
+                  title: "Cambios descartados",
+                  message: "Se restauró la última versión guardada.",
+                });
               },
             })
           }
