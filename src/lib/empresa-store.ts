@@ -38,6 +38,14 @@ export interface Comprobante {
   estatus: "Cargado" | "Sin archivo";
 }
 
+export interface DocumentoInformativo {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  fileName: string;
+  uploadedAt: number;
+}
+
 export interface Poliza {
   id: string;
   tipo: string;
@@ -52,6 +60,7 @@ export interface Poliza {
   envio: EnvioType;
   asegurados: Asegurado[];
   comprobantes: Comprobante[];
+  documentosInformativos?: DocumentoInformativo[];
   comentarios: string;
   cargaFileName?: string;
   vigencia?: string;

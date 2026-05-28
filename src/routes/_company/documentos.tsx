@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Download, FileText, HeartPulse, Stethoscope, Info } from "lucide-react";
 import { Section } from "@/components/cotizador/shared";
 import { useCompanyEmpresa } from "@/lib/company-context";
-import { useAseguradoras, type PolizaTipo, type DocumentoPoliza, type Aseguradora } from "@/lib/store";
+import { useAseguradoras, type PolizaTipo, type Aseguradora } from "@/lib/store";
 import { useMemo } from "react";
 
 export const Route = createFileRoute("/_company/documentos")({
@@ -54,7 +54,7 @@ function docsForPolizas(
           seen.add(key);
           out.push({
             nombre: d.nombre,
-            descripcion: `${a.name} · ${v.nombre}`,
+            descripcion: d.descripcion?.trim() || `${a.name} · ${v.nombre}`,
             formato: d.pdfName ? "PDF" : d.wordName ? "DOCX" : "PDF",
             tamano: "—",
           });
@@ -72,7 +72,6 @@ function hasTipo(tipos: Set<string>, label: "Vida" | "GMM"): boolean {
 
 const tramitesVida: Documento[] = [];
 const tramitesGMM: Documento[] = [];
-const informativos: Documento[] = [];
 
 function descargar(doc: Documento) {
   const contenido = `Documento: ${doc.nombre}\n\n${doc.descripcion}\n\nFormato: ${doc.formato}\nTamaño: ${doc.tamano}\n\n(Documento de demostración generado por el portal Metafin.)`;
@@ -150,6 +149,20 @@ function DocumentosPage() {
     () => docsForPolizas(aseguradoras, polizaRefs, "Gastos médicos mayores"),
     [aseguradoras, polizaRefs],
   );
+  const informativos: Documento[] = useMemo(() => {
+    const out: Documento[] = [];
+    for (const p of empresa?.polizas ?? []) {
+      for (const d of p.documentosInformativos ?? []) {
+        out.push({
+          nombre: d.nombre,
+          descripcion: d.descripcion || `${p.aseguradora}${p.variante ? ` · ${p.variante}` : ""}`,
+          formato: /\.docx?$/i.test(d.fileName) ? "DOCX" : /\.pdf$/i.test(d.fileName) ? "PDF" : "Archivo",
+          tamano: "—",
+        });
+      }
+    }
+    return out;
+  }, [empresa]);
   return (
     <div className="mx-auto max-w-6xl">
       <header>

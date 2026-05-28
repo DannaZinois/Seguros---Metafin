@@ -35,6 +35,7 @@ export function DocumentosTabla({
         <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
           <tr>
             <th className="px-3 py-2 font-medium">Nombre del documento</th>
+            <th className="px-3 py-2 font-medium">Descripción</th>
             <th className="px-3 py-2 font-medium">Audiencia</th>
             <th className="px-3 py-2 font-medium">PDF</th>
             <th className="px-3 py-2 font-medium">Word</th>
@@ -44,7 +45,7 @@ export function DocumentosTabla({
         <tbody>
           {docs.length === 0 && (
             <tr>
-              <td colSpan={5} className="px-3 py-4 text-center text-xs text-muted-foreground">
+              <td colSpan={6} className="px-3 py-4 text-center text-xs text-muted-foreground">
                 Sin documentos.
               </td>
             </tr>
@@ -67,6 +68,14 @@ export function DocumentosTabla({
                       {d.nombre || <span className="text-muted-foreground">Sin nombre</span>}
                     </span>
                   )}
+                </td>
+                <td className="px-3 py-2">
+                  <input
+                    value={d.descripcion ?? ""}
+                    onChange={(e) => onUpdate(d.id, { descripcion: e.target.value })}
+                    placeholder="Descripción breve"
+                    className="w-full rounded-md border border-border px-2 py-1 text-sm outline-none focus:border-[color:var(--brand-blue)]"
+                  />
                 </td>
                 <td className="px-3 py-2">
                   <select

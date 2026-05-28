@@ -32,6 +32,7 @@ function normalizeTipoSeguro(t: string): string {
 import {
   AseguradosSection,
   ComprobantesSection,
+  DocumentosInformativosSection,
 } from "@/components/empresa/poliza-sections";
 
 const searchSchema = z.object({
@@ -253,6 +254,13 @@ function VerPolizaPage() {
       <ComprobantesSection
         poliza={poliza}
         onChange={(comprobantes) => updatePoliza({ comprobantes })}
+      />
+
+      <DocumentosInformativosSection
+        poliza={poliza}
+        onChange={(documentosInformativos) =>
+          updatePoliza({ documentosInformativos })
+        }
       />
 
       <div className="mt-10 flex flex-wrap items-center justify-end gap-3">
