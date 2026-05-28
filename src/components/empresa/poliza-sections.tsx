@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Plus, Trash2, Download, Search, Upload, FileUp, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Section } from "@/components/cotizador/shared";
-import type { Poliza } from "@/lib/empresa-store";
+import type { Poliza, DocumentoInformativo } from "@/lib/empresa-store";
 import {
   AseguradoUploadDialog,
   type ParsedAseguradoFile,
