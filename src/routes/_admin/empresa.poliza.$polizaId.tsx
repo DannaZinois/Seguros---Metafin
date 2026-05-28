@@ -1,8 +1,9 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
 import { z } from "zod";
 import { useAseguradoras } from "@/lib/store";
+import { downloadAseguradosTemplate } from "@/lib/asegurados-template";
 import {
   Section,
   Grid,
@@ -217,12 +218,23 @@ function VerPolizaPage() {
 
       <div className="mt-6">
         <div className="rounded-3xl border border-border bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-bold text-foreground">
-            Carga de asegurados
-          </h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Carga un solo archivo para registrar a tus asegurados.
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-bold text-foreground">
+                Carga de asegurados
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Carga un solo archivo para registrar a tus asegurados.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => downloadAseguradosTemplate()}
+              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-xs font-medium text-foreground hover:bg-muted"
+            >
+              <Download className="h-3.5 w-3.5" /> Descargar plantilla Excel
+            </button>
+          </div>
           <Dropzone
             className="mt-4"
             onFile={(f) => updatePoliza({ cargaFileName: f.name })}
@@ -246,22 +258,6 @@ function VerPolizaPage() {
       <div className="mt-10 flex flex-wrap items-center justify-end gap-3">
         <button
           onClick={() => {
-            if (!poliza.contacto.trim()) {
-              setPopup({
-                kind: "error",
-                title: "Sin número de contacto",
-                message: "Captura primero el número de contacto del contratante.",
-              });
-              return;
-            }
-            setPopup({ kind: "chat", phone: poliza.contacto });
-          }}
-          className="rounded-full bg-green-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-green-600"
-        >
-          Ver whatsapp
-        </button>
-        <button
-          onClick={() => {
             persist();
             setPopup({
               kind: "info",
@@ -272,19 +268,6 @@ function VerPolizaPage() {
           className="rounded-full bg-violet-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-violet-600"
         >
           + Guardar cambios
-        </button>
-        <button
-          onClick={() => {
-            persist();
-            setPopup({
-              kind: "info",
-              title: "Póliza enviada",
-              message: "La póliza se actualizó correctamente.",
-            });
-          }}
-          className="rounded-full bg-blue-500 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-600"
-        >
-          Enviar
         </button>
         <button
           onClick={() =>
