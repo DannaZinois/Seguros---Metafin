@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, Trash2, Download, Search, Upload, FileUp, X } from "lucide-react";
+import { Plus, Trash2, Download, Search, Upload, FileUp, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Section } from "@/components/cotizador/shared";
 import type { Poliza } from "@/lib/empresa-store";
@@ -25,6 +25,8 @@ export function AseguradosSection({
   const [uploadMode, setUploadMode] = useState<UploadMode | null>(null);
   const [consentDialog, setConsentDialog] = useState<null | "choose" | "individual">(null);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return poliza.asegurados;
@@ -34,6 +36,10 @@ export function AseguradosSection({
         a.nombre.toLowerCase().includes(q),
     );
   }, [poliza.asegurados, query]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const pageRows = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const showPagination = filtered.length > pageSize;
 
   const handleParsed = (files: ParsedAseguradoFile[]) => {
     const now = Date.now();
@@ -167,7 +173,7 @@ export function AseguradosSection({
                 </td>
               </tr>
             )}
-            {filtered.map((a) => (
+            {pageRows.map((a) => (
               <tr key={a.id} className="border-t border-border/60">
                 {consentDialog === "individual" && (
                   <td className="py-3">
@@ -290,6 +296,35 @@ export function AseguradosSection({
           </tbody>
         </table>
       </div>
+      {showPagination && (
+        <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+          <span>
+            Mostrando {(safePage - 1) * pageSize + 1}-
+            {Math.min(safePage * pageSize, filtered.length)} de {filtered.length}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={safePage === 1}
+              className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-40"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" /> Anterior
+            </button>
+            <span className="text-foreground">
+              Página {safePage} de {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safePage === totalPages}
+              className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-40"
+            >
+              Siguiente <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
       {consentDialog === "individual" && (
         <div className="mt-4 flex justify-end gap-2">
           <button
@@ -381,20 +416,42 @@ export function ComprobantesSection({
   onChange: (c: Poliza["comprobantes"]) => void;
   readOnly?: boolean;
 }) {
-  const addRow = () =>
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [fechaPago, setFechaPago] = useState("");
+  const [tipoPago, setTipoPago] = useState<"Cliente" | "Asesor">("Cliente");
+  const [fileName, setFileName] = useState<string>("");
+
+  const reset = () => {
+    setFechaPago("");
+    setTipoPago("Cliente");
+    setFileName("");
+  };
+
+  const submit = () => {
+    if (!fechaPago || !fileName) {
+      alert("Captura la fecha de pago y selecciona el archivo del recibo.");
+      return;
+    }
+    const today = new Date();
+    const fechaCarga = `${String(today.getMonth() + 1).padStart(2, "0")}/${String(today.getDate()).padStart(2, "0")}/${today.getFullYear()}`;
     onChange([
       ...poliza.comprobantes,
       {
         id: crypto.randomUUID(),
-        poliza: `GMM - ${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
-        tipoPago: "Cliente",
-        fechaPago: "00/00/0000",
-        recibo: false,
-        fechaCarga: "00/00/0000",
-        comprobante: false,
-        estatus: "Sin archivo",
+        poliza: poliza.tipo
+          ? `${poliza.tipo} - ${Math.random().toString(36).slice(2, 8).toUpperCase()}`
+          : `Recibo - ${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+        tipoPago,
+        fechaPago,
+        recibo: true,
+        fechaCarga,
+        comprobante: true,
+        estatus: "Cargado",
       },
     ]);
+    setUploadOpen(false);
+    reset();
+  };
 
   return (
     <Section
@@ -403,7 +460,7 @@ export function ComprobantesSection({
       extra={
         !readOnly && (
           <button
-            onClick={addRow}
+            onClick={() => setUploadOpen(true)}
             className="inline-flex items-center gap-1 rounded-full bg-violet-500 px-4 py-2 text-sm font-medium text-white hover:bg-violet-600"
           >
             <Plus className="h-4 w-4" /> Cargar recibos
@@ -466,6 +523,94 @@ export function ComprobantesSection({
           </tbody>
         </table>
       </div>
+      {uploadOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => {
+            setUploadOpen(false);
+            reset();
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Cargar recibo</h3>
+              <button
+                onClick={() => {
+                  setUploadOpen(false);
+                  reset();
+                }}
+                className="rounded-full p-1 hover:bg-muted"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <label className="block">
+                <span className="text-xs font-medium text-foreground">
+                  Fecha de pago
+                </span>
+                <input
+                  type="date"
+                  value={fechaPago}
+                  onChange={(e) => setFechaPago(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[color:var(--brand-blue)]"
+                />
+              </label>
+              <label className="block">
+                <span className="text-xs font-medium text-foreground">
+                  Tipo de pago
+                </span>
+                <select
+                  value={tipoPago}
+                  onChange={(e) => setTipoPago(e.target.value as "Cliente" | "Asesor")}
+                  className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[color:var(--brand-blue)]"
+                >
+                  <option value="Cliente">Cliente</option>
+                  <option value="Asesor">Asesor</option>
+                </select>
+              </label>
+              <label className="block">
+                <span className="text-xs font-medium text-foreground">
+                  Archivo del recibo
+                </span>
+                <label className="mt-1 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-muted/30 px-3 py-4 text-xs text-muted-foreground hover:bg-muted/60">
+                  <Upload className="h-4 w-4" />
+                  {fileName || "Selecciona un archivo (PDF, imagen)"}
+                  <input
+                    type="file"
+                    accept=".pdf,image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) setFileName(f.name);
+                    }}
+                  />
+                </label>
+              </label>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setUploadOpen(false);
+                  reset();
+                }}
+                className="rounded-full border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={submit}
+                className="rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+              >
+                Cargar recibo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Section>
   );
 }
