@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/lib/auth";
 
@@ -108,6 +108,14 @@ function LoginPage() {
             >
               Ingresar
             </button>
+          </div>
+          <div className="mt-3 flex justify-center">
+            <Link
+              to="/forgot-password"
+              className="text-xs text-[color:var(--brand-blue)] hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
           </div>
         </form>
       </main>
