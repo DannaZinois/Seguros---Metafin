@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as CompanyRouteImport } from './routes/_company'
 import { Route as ClientRouteImport } from './routes/_client'
 import { Route as AdminRouteImport } from './routes/_admin'
@@ -40,9 +42,19 @@ import { Route as AdminEmpresaPolizaPolizaIdRouteImport } from './routes/_admin/
 import { Route as AdminEmpresaEmpresaIdEmpleadoEmpleadoIdRouteImport } from './routes/_admin/empresa.$empresaId.empleado.$empleadoId'
 import { Route as AdminClienteClienteIdPolizaPolizaIdRouteImport } from './routes/_admin/cliente.$clienteId.poliza.$polizaId'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompanyRoute = CompanyRouteImport.update({
@@ -196,7 +208,9 @@ const AdminClienteClienteIdPolizaPolizaIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/aseguradoras': typeof AdminAseguradorasRoute
   '/cartera': typeof AdminCarteraRoute
   '/dashboard': typeof AdminDashboardRoute
@@ -225,7 +239,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/aseguradoras': typeof AdminAseguradorasRoute
   '/cartera': typeof AdminCarteraRoute
   '/dashboard': typeof AdminDashboardRoute
@@ -258,7 +274,9 @@ export interface FileRoutesById {
   '/_admin': typeof AdminRouteWithChildren
   '/_client': typeof ClientRouteWithChildren
   '/_company': typeof CompanyRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_admin/aseguradoras': typeof AdminAseguradorasRoute
   '/_admin/cartera': typeof AdminCarteraRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
@@ -289,7 +307,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/aseguradoras'
     | '/cartera'
     | '/dashboard'
@@ -318,7 +338,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/aseguradoras'
     | '/cartera'
     | '/dashboard'
@@ -350,7 +372,9 @@ export interface FileRouteTypes {
     | '/_admin'
     | '/_client'
     | '/_company'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/_admin/aseguradoras'
     | '/_admin/cartera'
     | '/_admin/dashboard'
@@ -383,18 +407,34 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   ClientRoute: typeof ClientRouteWithChildren
   CompanyRoute: typeof CompanyRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicAseguradosPdfSplitRoute: typeof ApiPublicAseguradosPdfSplitRoute
   ApiPublicAseguradosZipRoute: typeof ApiPublicAseguradosZipRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_company': {
@@ -703,7 +743,9 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   ClientRoute: ClientRouteWithChildren,
   CompanyRoute: CompanyRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicAseguradosPdfSplitRoute: ApiPublicAseguradosPdfSplitRoute,
   ApiPublicAseguradosZipRoute: ApiPublicAseguradosZipRoute,
 }

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Pencil, Check, X } from "lucide-react";
+import { Pencil, Check, X, KeyRound } from "lucide-react";
 import { Section, Grid, Field, TextInput } from "@/components/cotizador/shared";
 import { useCurrentClient } from "@/lib/client-context";
 import { FamiliaresBeneficiariosSection } from "@/components/familiares-beneficiarios";
@@ -205,6 +205,117 @@ function MiPerfilPage() {
       </Section>
 
       <FamiliaresBeneficiariosSection />
+      <CambiarPasswordSection />
     </div>
+  );
+}
+
+function CambiarPasswordSection() {
+  const [open, setOpen] = useState(false);
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [msg, setMsg] = useState<{ type: "ok" | "error"; text: string } | null>(
+    null,
+  );
+
+  const reset = () => {
+    setCurrent("");
+    setNext("");
+    setConfirm("");
+    setMsg(null);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (next.length < 8) {
+      setMsg({ type: "error", text: "La nueva contraseña debe tener al menos 8 caracteres." });
+      return;
+    }
+    if (next !== confirm) {
+      setMsg({ type: "error", text: "Las contraseñas no coinciden." });
+      return;
+    }
+    setMsg({ type: "ok", text: "Contraseña actualizada correctamente." });
+    setCurrent("");
+    setNext("");
+    setConfirm("");
+  };
+
+  return (
+    <Section
+      title="Seguridad"
+      extra={
+        open ? (
+          <button
+            onClick={() => { setOpen(false); reset(); }}
+            className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-3.5 py-2 text-sm font-medium text-white hover:bg-orange-600"
+          >
+            <X className="h-4 w-4" /> Cerrar
+          </button>
+        ) : (
+          <button
+            onClick={() => setOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-3.5 py-2 text-sm font-medium text-white hover:bg-orange-600"
+          >
+            <KeyRound className="h-4 w-4" /> Cambiar contraseña
+          </button>
+        )
+      }
+    >
+      {open ? (
+        <form onSubmit={handleSubmit} className="max-w-lg space-y-4">
+          <Field label="Contraseña actual">
+            <input
+              type="password"
+              required
+              value={current}
+              onChange={(e) => setCurrent(e.target.value)}
+              className="w-full rounded-xl border border-border bg-white px-3 py-2 text-sm"
+            />
+          </Field>
+          <Field label="Nueva contraseña">
+            <input
+              type="password"
+              required
+              value={next}
+              onChange={(e) => setNext(e.target.value)}
+              placeholder="Mínimo 8 caracteres"
+              className="w-full rounded-xl border border-border bg-white px-3 py-2 text-sm"
+            />
+          </Field>
+          <Field label="Confirmar nueva contraseña">
+            <input
+              type="password"
+              required
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              className="w-full rounded-xl border border-border bg-white px-3 py-2 text-sm"
+            />
+          </Field>
+          {msg && (
+            <p
+              className={
+                msg.type === "ok"
+                  ? "text-sm text-emerald-600"
+                  : "text-sm text-destructive"
+              }
+            >
+              {msg.text}
+            </p>
+          )}
+          <button
+            type="submit"
+            className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+          >
+            <Check className="h-4 w-4" /> Guardar nueva contraseña
+          </button>
+        </form>
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          Mantén tu cuenta segura actualizando periódicamente tu contraseña.
+        </p>
+      )}
+    </Section>
   );
 }
