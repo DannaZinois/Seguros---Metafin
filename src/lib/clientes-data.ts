@@ -40,6 +40,27 @@ export interface Cliente {
 
 export const CLIENTES: Cliente[] = [
   {
+    clienteId: "P990101",
+    tipo: "Personal",
+    profile: {
+      nombre: "María González",
+      contacto: "+52 55 1234 5678",
+      correo: "client@gmail.com",
+      tipoAsegurado: "Individual",
+      rfc: "GOMM850412AB1",
+      sexo: "Femenino",
+      direccion: "Av. Reforma 123, Cuauhtémoc, Ciudad de México, CDMX, Mexico",
+      codigoPostal: "06500",
+      fechaNacimiento: "1985-04-12",
+      fechaAntiguedad: "2020-06-01",
+      tipoPersona: "Persona Física",
+    },
+    polizas: [
+      { id: "P990101", tipoSeguro: "GMM", aseguradora: "GNP", vigencia: "01/15/2025", renovacion: "01/15/2026", proximoPago: "07/15/2025", cantidad: "$24,800", hasComprobante: true, consentimiento: true, certificado: true, status: "Activa" },
+      { id: "P990102", tipoSeguro: "Auto", aseguradora: "Qualitas", vigencia: "03/20/2025", renovacion: "03/20/2026", proximoPago: "09/20/2025", cantidad: "$12,400", hasComprobante: true, consentimiento: true, certificado: false, status: "Activa" },
+    ],
+  },
+  {
     clienteId: "E880101",
     tipo: "Empresa",
     profile: {
