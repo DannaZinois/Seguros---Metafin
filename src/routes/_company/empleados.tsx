@@ -24,6 +24,7 @@ import {
 import { useCompanyEmpresa } from "@/lib/company-context";
 import { EMPLEADOS_NOMBRES } from "@/lib/empleados-nombres";
 import { logMovimiento } from "@/lib/movimientos-log";
+import { downloadAseguradosTemplate } from "@/lib/asegurados-template";
 
 export const Route = createFileRoute("/_company/empleados")({
   component: EmpleadosPage,
@@ -562,10 +563,21 @@ function EmpleadosPage() {
 
             {mode === "bulk" && (
               <>
-                <h3 className="text-lg font-bold text-foreground">Carga masiva</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Sube un archivo .csv o .xlsx con los empleados a registrar.
-                </p>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground">Carga masiva</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Sube un archivo .csv o .xlsx con los empleados a registrar.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => downloadAseguradosTemplate()}
+                    className="inline-flex shrink-0 items-center gap-2 rounded-full bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600"
+                  >
+                    <Download className="h-4 w-4" /> Descargar plantilla Excel
+                  </button>
+                </div>
                 <div
                   onClick={() => bulkRef.current?.click()}
                   className="mt-5 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border p-10 hover:border-[color:var(--brand-blue)] hover:bg-muted/30"
