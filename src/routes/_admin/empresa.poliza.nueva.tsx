@@ -24,6 +24,7 @@ import {
   AseguradosSection,
   ComprobantesSection,
 } from "@/components/empresa/poliza-sections";
+import { GmmFieldsSection } from "@/components/empresa/gmm-fields";
 import { downloadAseguradosTemplate } from "@/lib/asegurados-template";
 
 const searchSchema = z.object({
