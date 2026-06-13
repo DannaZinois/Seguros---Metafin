@@ -46,6 +46,46 @@ export interface DocumentoInformativo {
   uploadedAt: number;
 }
 
+export type Amparado = "Amparado" | "Excluido";
+
+export interface GmmCoberturas {
+  sumaAsegurada: string;
+  deducible: string;
+  coaseguro: string;
+  topeCoaseguro: string;
+  nivelHospitalario: string;
+  coberturaInternacional: Amparado;
+  emergenciaExtranjero: string;
+  asistenciaDental: Amparado;
+  asistenciaVision: Amparado;
+  asistenciaIntegral: Amparado;
+}
+
+export interface GmmServicio {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  restricciones: string;
+}
+
+export interface GmmPerfil {
+  id: string;
+  tipoEmpleado: string;
+  aseguradora: string;
+  seguro: string;
+  vigencia: string;
+  status: "Sin configurar" | "Configurado";
+  coberturas?: GmmCoberturas;
+  servicios?: GmmServicio[];
+}
+
+export interface GmmConfig {
+  vigenciaIni: string;
+  vigenciaFin: string;
+  tiposEmpleado: string[];
+  perfiles: GmmPerfil[];
+}
+
 export interface Poliza {
   id: string;
   tipo: string;
@@ -65,6 +105,7 @@ export interface Poliza {
   cargaFileName?: string;
   vigencia?: string;
   estatus?: "Vigente" | "Vencida";
+  gmm?: GmmConfig;
 }
 
 export interface Empresa {

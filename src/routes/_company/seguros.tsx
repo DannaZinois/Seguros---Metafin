@@ -9,7 +9,7 @@ import {
   type PopupState,
 } from "@/components/cotizador/shared";
 import { useCompanyEmpresa } from "@/lib/company-context";
-import type { Poliza } from "@/lib/empresa-store";
+import type { GmmConfig, Poliza } from "@/lib/empresa-store";
 import { useAseguradoras } from "@/lib/store";
 
 export const Route = createFileRoute("/_company/seguros")({
@@ -255,6 +255,7 @@ function SumaAseguradaTable() {
 }
 
 function PolizasSecciones() {
+  // Not used — replaced by DynamicPolizasSecciones below.
   return (
     <div className="mt-8 space-y-10">
       <section className="space-y-6">
@@ -301,6 +302,228 @@ function PolizasSecciones() {
           <SumaAseguradaTable />
         </Section>
       </section>
+    </div>
+  );
+}
+
+function DynamicCoberturasGmm({ gmm, aseguradora }: { gmm: GmmConfig; aseguradora: string }) {
+  const perfilesConf = gmm.perfiles.filter((p) => p.coberturas);
+  if (perfilesConf.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Aún no hay perfiles configurados para esta póliza.
+      </p>
+    );
+  }
+  const rows: Array<{ label: string; key: keyof NonNullable<typeof perfilesConf[0]["coberturas"]>; variant?: "amparado-excluido" }> = [
+    { label: "Suma asegurada", key: "sumaAsegurada" },
+    { label: "Deducible", key: "deducible" },
+    { label: "Coaseguro", key: "coaseguro" },
+    { label: "Tope de coaseguro", key: "topeCoaseguro" },
+    { label: "Nivel hospitalario", key: "nivelHospitalario" },
+    { label: "Cobertura internacional", key: "coberturaInternacional", variant: "amparado-excluido" },
+    { label: "Emergencia extranjero", key: "emergenciaExtranjero" },
+    { label: "Asistencia dental", key: "asistenciaDental", variant: "amparado-excluido" },
+    { label: "Asistencia visión", key: "asistenciaVision", variant: "amparado-excluido" },
+    { label: "Asistencia integral", key: "asistenciaIntegral", variant: "amparado-excluido" },
+  ];
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-border">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-[#0b1d3a] text-white">
+            <th className="p-3"></th>
+            <th className="p-3 text-center text-base font-bold" colSpan={perfilesConf.length}>
+              {aseguradora?.toUpperCase() || "ASEGURADORA"}
+            </th>
+          </tr>
+          <tr className="bg-muted/40 text-foreground">
+            <th className="p-3 text-left"></th>
+            {perfilesConf.map((p) => (
+              <th key={p.id} className="p-3 text-center font-semibold">
+                {p.tipoEmpleado}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.label} className="border-t border-border">
+              <td className="bg-[#0b1d3a] p-3 text-sm font-semibold text-white">
+                {r.label}
+              </td>
+              {perfilesConf.map((p) => (
+                <td key={p.id} className="p-3 text-center">
+                  <CoberturaCell value={String(p.coberturas![r.key] || "—")} variant={r.variant} />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function DynamicServiciosGmm({ gmm }: { gmm: GmmConfig }) {
+  const perfilesConServicios = gmm.perfiles.filter((p) => (p.servicios?.length ?? 0) > 0);
+  const [tipo, setTipo] = useState<string>(perfilesConServicios[0]?.tipoEmpleado ?? "");
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  if (perfilesConServicios.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Aún no hay servicios de asistencia configurados.
+      </p>
+    );
+  }
+  const selected = perfilesConServicios.find((p) => p.tipoEmpleado === tipo) ?? perfilesConServicios[0];
+  const servicios = selected.servicios ?? [];
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <label className="text-xs font-medium text-foreground">Tipo de empleado</label>
+        <div className="w-64">
+          <select
+            value={selected.tipoEmpleado}
+            onChange={(e) => {
+              setTipo(e.target.value);
+              setOpenIndex(null);
+            }}
+            className="w-full appearance-none rounded-full border border-border bg-white px-4 py-2 pr-9 text-sm outline-none focus:border-[color:var(--brand-blue)]"
+          >
+            {perfilesConServicios.map((p) => (
+              <option key={p.id} value={p.tipoEmpleado}>{p.tipoEmpleado}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-3">
+        {servicios.map((item, i) => {
+          const open = openIndex === i;
+          return (
+            <div
+              key={item.id}
+              className={`rounded-2xl border bg-muted/30 transition-colors ${open ? "border-sky-400" : "border-border"}`}
+            >
+              <button
+                type="button"
+                onClick={() => setOpenIndex(open ? null : i)}
+                className={`flex w-full items-center gap-4 rounded-2xl p-4 text-left transition-colors hover:bg-sky-50 ${open ? "bg-sky-50" : ""}`}
+              >
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#0b1d3a] text-sm font-bold text-white">
+                  {i + 1}
+                </div>
+                <p className={`text-sm transition-colors ${open ? "text-sky-700" : "text-foreground/85"}`}>
+                  {item.nombre}
+                </p>
+              </button>
+              {open && (
+                <div className="border-t border-sky-200 bg-sky-50/60 px-4 py-3 pl-[4.5rem] text-sm text-foreground/80 space-y-2">
+                  {item.descripcion && <p>{item.descripcion}</p>}
+                  {item.restricciones && (
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-medium">Restricciones:</span> {item.restricciones}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function DynamicPolizasSecciones({ polizas }: { polizas: Poliza[] }) {
+  const gmmPoliza = polizas.find(
+    (p) => p.tipo === "Gastos Médicos Mayores" || p.tipo === "GMM",
+  );
+  const vidaPoliza = polizas.find((p) => p.tipo === "Vida");
+
+  return (
+    <div className="mt-8 space-y-10">
+      {gmmPoliza ? (
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">
+            Gastos médicos
+          </h2>
+          <Section title="Datos generales">
+            <PolizaResumenTable
+              data={{
+                tipo: gmmPoliza.tipo,
+                aseguradora: gmmPoliza.aseguradora || "—",
+                contratante: gmmPoliza.contratante || "—",
+                numAsegurados: gmmPoliza.numAsegurados || String(gmmPoliza.asegurados.length),
+                vigencia: gmmPoliza.vigencia || "—",
+                estatus: gmmPoliza.estatus || "Vigente",
+              }}
+            />
+          </Section>
+          <Section title="Coberturas básicas">
+            {gmmPoliza.gmm ? (
+              <DynamicCoberturasGmm gmm={gmmPoliza.gmm} aseguradora={gmmPoliza.aseguradora} />
+            ) : (
+              <CoberturasBasicasBlock />
+            )}
+          </Section>
+          <Section title="Servicios de asistencia">
+            {gmmPoliza.gmm ? (
+              <DynamicServiciosGmm gmm={gmmPoliza.gmm} />
+            ) : (
+              <ServiciosAsistenciaCards />
+            )}
+          </Section>
+        </section>
+      ) : (
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">
+            Gastos médicos
+          </h2>
+          <Section title="Datos generales">
+            <PolizaResumenTable
+              data={{
+                tipo: "GMM",
+                aseguradora: "Zurich",
+                contratante: "Orion Innovation",
+                numAsegurados: "739",
+                vigencia: "06/06/2025",
+                estatus: "Vigente",
+              }}
+            />
+          </Section>
+          <Section title="Coberturas básicas">
+            <CoberturasBasicasBlock />
+          </Section>
+          <Section title="Servicios de asistencia">
+            <ServiciosAsistenciaCards />
+          </Section>
+        </section>
+      )}
+
+      {vidaPoliza && (
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">
+            Vida
+          </h2>
+          <Section title="Datos generales">
+            <PolizaResumenTable
+              data={{
+                tipo: vidaPoliza.tipo,
+                aseguradora: vidaPoliza.aseguradora || "—",
+                contratante: vidaPoliza.contratante || "—",
+                numAsegurados: vidaPoliza.numAsegurados || String(vidaPoliza.asegurados.length),
+                vigencia: vidaPoliza.vigencia || "—",
+                estatus: vidaPoliza.estatus || "Vigente",
+              }}
+            />
+          </Section>
+          <Section title="Suma asegurada">
+            <SumaAseguradaTable />
+          </Section>
+        </section>
+      )}
     </div>
   );
 }
@@ -444,7 +667,7 @@ function SegurosPage() {
         </p>
       </div>
 
-      <PolizasSecciones />
+      <DynamicPolizasSecciones polizas={empresa.polizas} />
 
 
       {detail && (
