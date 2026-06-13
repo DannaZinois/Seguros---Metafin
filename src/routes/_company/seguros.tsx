@@ -437,93 +437,73 @@ function DynamicServiciosGmm({ gmm }: { gmm: GmmConfig }) {
 }
 
 function DynamicPolizasSecciones({ polizas }: { polizas: Poliza[] }) {
-  const gmmPoliza = polizas.find(
-    (p) => p.tipo === "Gastos Médicos Mayores" || p.tipo === "GMM",
-  );
-  const vidaPoliza = polizas.find((p) => p.tipo === "Vida");
+  if (polizas.length === 0) {
+    return (
+      <div className="mt-8 rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+        Aún no hay pólizas asignadas. Cuando se registren pólizas para tu
+        empresa aparecerán aquí con su información configurada.
+      </div>
+    );
+  }
 
   return (
     <div className="mt-8 space-y-10">
-      {gmmPoliza ? (
-        <section className="space-y-6">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">
-            Gastos médicos
-          </h2>
-          <Section title="Datos generales">
-            <PolizaResumenTable
-              data={{
-                tipo: gmmPoliza.tipo,
-                aseguradora: gmmPoliza.aseguradora || "—",
-                contratante: gmmPoliza.contratante || "—",
-                numAsegurados: gmmPoliza.numAsegurados || String(gmmPoliza.asegurados.length),
-                vigencia: gmmPoliza.vigencia || "—",
-                estatus: gmmPoliza.estatus || "Vigente",
-              }}
-            />
-          </Section>
-          <Section title="Coberturas básicas">
-            {gmmPoliza.gmm ? (
-              <DynamicCoberturasGmm gmm={gmmPoliza.gmm} aseguradora={gmmPoliza.aseguradora} />
-            ) : (
-              <CoberturasBasicasBlock />
+      {polizas.map((p) => {
+        const isGmm =
+          p.tipo === "Gastos Médicos Mayores" || p.tipo === "GMM";
+        const isVida = p.tipo === "Vida";
+        return (
+          <section key={p.id} className="space-y-6">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">
+              {isGmm ? "Gastos médicos" : p.tipo || "Póliza"}
+            </h2>
+            <Section title="Datos generales">
+              <PolizaResumenTable
+                data={{
+                  tipo: p.tipo || "—",
+                  aseguradora: p.aseguradora || "—",
+                  contratante: p.contratante || "—",
+                  numAsegurados:
+                    p.numAsegurados || String(p.asegurados.length),
+                  vigencia: p.vigencia || "—",
+                  estatus: p.estatus || "Vigente",
+                }}
+              />
+            </Section>
+            {isGmm && (
+              <>
+                <Section title="Coberturas básicas">
+                  {p.gmm && p.gmm.perfiles.some((perf) => perf.coberturas) ? (
+                    <DynamicCoberturasGmm
+                      gmm={p.gmm}
+                      aseguradora={p.aseguradora}
+                    />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Aún no hay coberturas configuradas para esta póliza.
+                    </p>
+                  )}
+                </Section>
+                <Section title="Servicios de asistencia">
+                  {p.gmm &&
+                  p.gmm.perfiles.some((perf) => (perf.servicios?.length ?? 0) > 0) ? (
+                    <DynamicServiciosGmm gmm={p.gmm} />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Aún no hay servicios de asistencia configurados.
+                    </p>
+                  )}
+                </Section>
+              </>
             )}
-          </Section>
-          <Section title="Servicios de asistencia">
-            {gmmPoliza.gmm ? (
-              <DynamicServiciosGmm gmm={gmmPoliza.gmm} />
-            ) : (
-              <ServiciosAsistenciaCards />
+            {isVida && (
+              <Section title="Suma asegurada">
+                <SumaAseguradaTable />
+              </Section>
             )}
-          </Section>
-        </section>
-      ) : (
-        <section className="space-y-6">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">
-            Gastos médicos
-          </h2>
-          <Section title="Datos generales">
-            <PolizaResumenTable
-              data={{
-                tipo: "GMM",
-                aseguradora: "Zurich",
-                contratante: "Orion Innovation",
-                numAsegurados: "739",
-                vigencia: "06/06/2025",
-                estatus: "Vigente",
-              }}
-            />
-          </Section>
-          <Section title="Coberturas básicas">
-            <CoberturasBasicasBlock />
-          </Section>
-          <Section title="Servicios de asistencia">
-            <ServiciosAsistenciaCards />
-          </Section>
-        </section>
-      )}
-
-      {vidaPoliza && (
-        <section className="space-y-6">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">
-            Vida
-          </h2>
-          <Section title="Datos generales">
-            <PolizaResumenTable
-              data={{
-                tipo: vidaPoliza.tipo,
-                aseguradora: vidaPoliza.aseguradora || "—",
-                contratante: vidaPoliza.contratante || "—",
-                numAsegurados: vidaPoliza.numAsegurados || String(vidaPoliza.asegurados.length),
-                vigencia: vidaPoliza.vigencia || "—",
-                estatus: vidaPoliza.estatus || "Vigente",
-              }}
-            />
-          </Section>
-          <Section title="Suma asegurada">
-            <SumaAseguradaTable />
-          </Section>
-        </section>
-      )}
+          </section>
+        );
+      })}
     </div>
   );
 }
