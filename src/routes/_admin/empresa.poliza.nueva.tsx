@@ -24,6 +24,7 @@ import {
   AseguradosSection,
   ComprobantesSection,
 } from "@/components/empresa/poliza-sections";
+import { GmmFieldsSection } from "@/components/empresa/gmm-fields";
 import { downloadAseguradosTemplate } from "@/lib/asegurados-template";
 
 const searchSchema = z.object({
@@ -236,6 +237,8 @@ function NuevaPolizaPage() {
           </Field>
         </Grid>
       </Section>
+
+      {poliza.tipo === "GMM" && <GmmFieldsSection />}
 
       {/* Carga masiva */}
       <div className="mt-6">
