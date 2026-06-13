@@ -176,7 +176,7 @@ function NuevaPolizaPage() {
             <Select
               value={poliza.tipo}
               onChange={(v) => updatePoliza({ tipo: v })}
-              options={["Auto", "Gastos Médicos Mayores", "Vida", "Exceso GMM", "Casa", "GMM"]}
+              options={["Auto", "Gastos Médicos Mayores", "Vida", "Exceso GMM", "Casa"]}
               placeholder="Nombre aquí"
             />
           </Field>
@@ -238,7 +238,13 @@ function NuevaPolizaPage() {
         </Grid>
       </Section>
 
-      {poliza.tipo === "GMM" && <GmmFieldsSection />}
+      {poliza.tipo === "Gastos Médicos Mayores" && (
+        <GmmFieldsSection
+          aseguradora={poliza.aseguradora}
+          value={poliza.gmm}
+          onChange={(gmm) => updatePoliza({ gmm })}
+        />
+      )}
 
       {/* Carga masiva */}
       <div className="mt-6">
