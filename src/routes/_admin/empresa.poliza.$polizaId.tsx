@@ -219,6 +219,22 @@ function VerPolizaPage() {
         </Grid>
       </Section>
 
+      {(poliza.tipo === "Gastos Médicos Mayores" || poliza.tipo === "GMM") && (
+        <GmmFieldsSection
+          aseguradora={poliza.aseguradora}
+          value={poliza.gmm}
+          onChange={(gmm) => updatePoliza({ gmm })}
+        />
+      )}
+
+      {poliza.tipo === "Vida" && (
+        <VidaFieldsSection
+          aseguradora={poliza.aseguradora}
+          value={poliza.vida}
+          onChange={(vida) => updatePoliza({ vida })}
+        />
+      )}
+
       <div className="mt-6">
         <div className="rounded-3xl border border-border bg-white p-6 shadow-sm">
           <div className="flex items-start justify-between gap-4">
