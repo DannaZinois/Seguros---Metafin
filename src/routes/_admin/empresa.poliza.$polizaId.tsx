@@ -34,6 +34,8 @@ import {
   ComprobantesSection,
   DocumentosInformativosSection,
 } from "@/components/empresa/poliza-sections";
+import { GmmFieldsSection } from "@/components/empresa/gmm-fields";
+import { VidaFieldsSection } from "@/components/empresa/vida-fields";
 
 const searchSchema = z.object({
   empresaId: z.string().optional(),
