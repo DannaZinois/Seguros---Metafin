@@ -537,7 +537,11 @@ function DynamicPolizasSecciones({ polizas }: { polizas: Poliza[] }) {
             )}
             {isVida && (
               <Section title="Suma asegurada">
-                <SumaAseguradaTable />
+                {p.vida && p.vida.perfiles.some((perf) => perf.sumaAsegurada) ? (
+                  <DynamicSumaVida vida={p.vida} aseguradora={p.aseguradora} />
+                ) : (
+                  <SumaAseguradaTable />
+                )}
               </Section>
             )}
           </section>
