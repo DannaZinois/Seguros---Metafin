@@ -10,6 +10,7 @@ import {
 } from "@/components/cotizador/shared";
 import { useCompanyEmpresa } from "@/lib/company-context";
 import type { GmmConfig, Poliza } from "@/lib/empresa-store";
+import type { VidaConfig } from "@/lib/empresa-store";
 import { useAseguradoras } from "@/lib/store";
 
 export const Route = createFileRoute("/_company/seguros")({
@@ -247,6 +248,44 @@ function SumaAseguradaTable() {
             <td className="p-4 text-center text-base font-semibold text-foreground">
               $500,000 MXN
             </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function DynamicSumaVida({ vida, aseguradora }: { vida: VidaConfig; aseguradora: string }) {
+  const perfilesConf = vida.perfiles.filter((p) => p.sumaAsegurada);
+  if (perfilesConf.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Aún no hay sumas aseguradas configuradas para esta póliza.
+      </p>
+    );
+  }
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-border">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-[#0b1d3a] text-white">
+            <th className="p-3 text-left font-semibold" colSpan={perfilesConf.length}>
+              {aseguradora?.toUpperCase() || "ASEGURADORA"} — Suma asegurada
+            </th>
+          </tr>
+          <tr className="bg-muted/40 text-foreground">
+            {perfilesConf.map((p) => (
+              <th key={p.id} className="p-3 text-center font-semibold">{p.tipoEmpleado}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {perfilesConf.map((p) => (
+              <td key={p.id} className="p-4 text-center text-base font-semibold text-foreground">
+                {p.sumaAsegurada}
+              </td>
+            ))}
           </tr>
         </tbody>
       </table>
