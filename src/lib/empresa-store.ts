@@ -86,6 +86,23 @@ export interface GmmConfig {
   perfiles: GmmPerfil[];
 }
 
+export interface VidaPerfil {
+  id: string;
+  tipoEmpleado: string;
+  aseguradora: string;
+  seguro: string;
+  vigencia: string;
+  status: "Sin configurar" | "Configurado";
+  sumaAsegurada?: string;
+}
+
+export interface VidaConfig {
+  vigenciaIni: string;
+  vigenciaFin: string;
+  tiposEmpleado: string[];
+  perfiles: VidaPerfil[];
+}
+
 export interface Poliza {
   id: string;
   tipo: string;
@@ -106,6 +123,7 @@ export interface Poliza {
   vigencia?: string;
   estatus?: "Vigente" | "Vencida";
   gmm?: GmmConfig;
+  vida?: VidaConfig;
 }
 
 export interface Empresa {

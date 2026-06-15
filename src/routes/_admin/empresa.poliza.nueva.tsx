@@ -25,6 +25,7 @@ import {
   ComprobantesSection,
 } from "@/components/empresa/poliza-sections";
 import { GmmFieldsSection } from "@/components/empresa/gmm-fields";
+import { VidaFieldsSection } from "@/components/empresa/vida-fields";
 import { downloadAseguradosTemplate } from "@/lib/asegurados-template";
 
 const searchSchema = z.object({
@@ -243,6 +244,14 @@ function NuevaPolizaPage() {
           aseguradora={poliza.aseguradora}
           value={poliza.gmm}
           onChange={(gmm) => updatePoliza({ gmm })}
+        />
+      )}
+
+      {poliza.tipo === "Vida" && (
+        <VidaFieldsSection
+          aseguradora={poliza.aseguradora}
+          value={poliza.vida}
+          onChange={(vida) => updatePoliza({ vida })}
         />
       )}
 
