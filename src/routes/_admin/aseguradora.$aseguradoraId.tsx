@@ -98,6 +98,61 @@ function EditAseguradoraPage() {
     router.history.back();
   };
 
+  const focusedPoliza = focusPolizaId
+    ? (form.polizas ?? []).flatMap((p) => p.variantes.map((v) => ({ tipo: p.tipo, variante: v }))).find((p) => p.variante.id === focusPolizaId)
+    : null;
+
+  if (focusPolizaId) {
+    return (
+      <div className="pb-12">
+        <div className="flex items-start gap-3">
+          <button
+            onClick={() => router.history.back()}
+            className="mt-2 rounded-full p-2 hover:bg-muted"
+            aria-label="Volver"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Editar póliza</h1>
+            <p className="text-sm text-muted-foreground">
+              Actualiza únicamente los datos de la póliza seleccionada.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-8 rounded-3xl border border-border bg-white p-6 shadow-sm">
+          {focusedPoliza ? (
+            <VarianteEditor
+              tipo={focusedPoliza.tipo}
+              variante={focusedPoliza.variante}
+              onChange={(patch) => updateVariante(focusedPoliza.tipo, focusedPoliza.variante.id, patch)}
+              onDelete={() => removeVariante(focusedPoliza.tipo, focusedPoliza.variante.id)}
+            />
+          ) : (
+            <p className="text-sm text-muted-foreground">Póliza no encontrada.</p>
+          )}
+
+          <div className="mt-8 flex justify-end gap-3">
+            <button
+              onClick={() => router.history.back()}
+              className="rounded-full border border-border px-5 py-2 text-sm font-medium text-foreground hover:bg-muted"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={onSave}
+              disabled={!focusedPoliza}
+              className="rounded-full bg-[color:var(--brand-blue)] px-5 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Guardar cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pb-12">
       <div className="flex items-start gap-3">
