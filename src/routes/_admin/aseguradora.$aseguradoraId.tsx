@@ -29,7 +29,10 @@ function EditAseguradoraPage() {
   const { aseguradoraId } = Route.useParams();
   const { polizaId: focusPolizaId } = Route.useSearch();
   const [list, setList] = useAseguradoras();
-  const original = useMemo(() => list.find((a) => a.id === aseguradoraId) ?? null, [list, aseguradoraId]);
+  const original = useMemo(
+    () => list.find((a) => a.id === aseguradoraId) ?? null,
+    [list, aseguradoraId],
+  );
 
   const [form, setForm] = useState<Aseguradora | null>(original);
   const [adding, setAdding] = useState(false);
@@ -87,7 +90,9 @@ function EditAseguradoraPage() {
       return {
         ...p,
         polizas: (p.polizas ?? [])
-          .map((pp) => (pp.tipo === tipo ? { ...pp, variantes: pp.variantes.filter((v) => v.id !== vid) } : pp))
+          .map((pp) =>
+            pp.tipo === tipo ? { ...pp, variantes: pp.variantes.filter((v) => v.id !== vid) } : pp,
+          )
           .filter((pp) => pp.variantes.length > 0),
       };
     });
@@ -97,6 +102,64 @@ function EditAseguradoraPage() {
     setList(list.map((x) => (x.id === form.id ? form : x)));
     router.history.back();
   };
+
+  const focusedPoliza = focusPolizaId
+    ? (form.polizas ?? [])
+        .flatMap((p) => p.variantes.map((v) => ({ tipo: p.tipo, variante: v })))
+        .find((p) => p.variante.id === focusPolizaId)
+    : null;
+
+  if (focusPolizaId) {
+    return (
+      <div className="pb-12">
+        <div className="flex items-start gap-3">
+          <button
+            onClick={() => router.history.back()}
+            className="mt-2 rounded-full p-2 hover:bg-muted"
+            aria-label="Volver"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Editar póliza</h1>
+            <p className="text-sm text-muted-foreground">
+              Actualiza únicamente los datos de la póliza seleccionada.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-8 rounded-3xl border border-border bg-white p-6 shadow-sm">
+          {focusedPoliza ? (
+            <VarianteEditor
+              tipo={focusedPoliza.tipo}
+              variante={focusedPoliza.variante}
+              onChange={(patch) =>
+                updateVariante(focusedPoliza.tipo, focusedPoliza.variante.id, patch)
+              }
+              onDelete={() => removeVariante(focusedPoliza.tipo, focusedPoliza.variante.id)}
+            />
+          ) : (
+            <p className="text-sm text-muted-foreground">Póliza no encontrada.</p>
+          )}
+
+          <div className="mt-8 flex justify-end gap-3">
+            <button
+              onClick={() => router.history.back()}
+              className="rounded-full border border-border px-5 py-2 text-sm font-medium text-foreground hover:bg-muted"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={onSave}
+              className="rounded-full bg-[color:var(--brand-blue)] px-5 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Guardar cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pb-12">
@@ -138,22 +201,59 @@ function EditAseguradoraPage() {
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Nombre" value={form.name} onChange={(v) => set("name", v)} />
-          <Field label="Abreviación" value={form.abreviacion ?? ""} onChange={(v) => set("abreviacion", v)} />
+          <Field
+            label="Abreviación"
+            value={form.abreviacion ?? ""}
+            onChange={(v) => set("abreviacion", v)}
+          />
           <Field label="RFC" value={form.rfc ?? ""} onChange={(v) => set("rfc", v)} />
-          <Field label="Ejecutivo" value={form.ejecutivo ?? ""} onChange={(v) => set("ejecutivo", v)} />
-          <Field label="Número de contacto" value={form.contactoTel ?? ""} onChange={(v) => set("contactoTel", v)} />
-          <Field label="Correo de contacto" value={form.contactoEmail ?? ""} onChange={(v) => set("contactoEmail", v)} />
-          <Field label="Link a página web" value={form.webUrl ?? ""} onChange={(v) => set("webUrl", v)} />
-          <Field label="Link para pago" value={form.pagoUrl ?? ""} onChange={(v) => set("pagoUrl", v)} />
-          <Field label="Link para descargar aplicación" value={form.appUrl ?? ""} onChange={(v) => set("appUrl", v)} />
+          <Field
+            label="Ejecutivo"
+            value={form.ejecutivo ?? ""}
+            onChange={(v) => set("ejecutivo", v)}
+          />
+          <Field
+            label="Número de contacto"
+            value={form.contactoTel ?? ""}
+            onChange={(v) => set("contactoTel", v)}
+          />
+          <Field
+            label="Correo de contacto"
+            value={form.contactoEmail ?? ""}
+            onChange={(v) => set("contactoEmail", v)}
+          />
+          <Field
+            label="Link a página web"
+            value={form.webUrl ?? ""}
+            onChange={(v) => set("webUrl", v)}
+          />
+          <Field
+            label="Link para pago"
+            value={form.pagoUrl ?? ""}
+            onChange={(v) => set("pagoUrl", v)}
+          />
+          <Field
+            label="Link para descargar aplicación"
+            value={form.appUrl ?? ""}
+            onChange={(v) => set("appUrl", v)}
+          />
         </div>
 
         <div className="mt-8 border-t border-border pt-6">
           <h3 className="text-base font-semibold text-foreground">Datos personales</h3>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Field label="Usuario" value={form.usuario ?? ""} onChange={(v) => set("usuario", v)} />
-            <Field label="Contraseña" value={form.contrasena ?? ""} onChange={(v) => set("contrasena", v)} type="password" />
-            <Field label="Clave agente en la aseguradora" value={form.claveAgente ?? ""} onChange={(v) => set("claveAgente", v)} />
+            <Field
+              label="Contraseña"
+              value={form.contrasena ?? ""}
+              onChange={(v) => set("contrasena", v)}
+              type="password"
+            />
+            <Field
+              label="Clave agente en la aseguradora"
+              value={form.claveAgente ?? ""}
+              onChange={(v) => set("claveAgente", v)}
+            />
           </div>
         </div>
 
@@ -185,7 +285,8 @@ function EditAseguradoraPage() {
               return (
                 <div key={tipo} className="overflow-hidden rounded-2xl border border-border">
                   <div className="border-b border-border bg-muted/40 px-4 py-2 text-xs font-semibold text-foreground">
-                    {tipoLabel(tipo)} <span className="text-muted-foreground">({variantes.length})</span>
+                    {tipoLabel(tipo)}{" "}
+                    <span className="text-muted-foreground">({variantes.length})</span>
                   </div>
                   <div className="divide-y divide-border">
                     {variantes.map((v) => (
@@ -251,14 +352,10 @@ function VarianteEditor({
 
   const updateDoc = (id: string, patch: Partial<DocumentoPoliza>) =>
     onChange({ documentos: docs.map((d) => (d.id === id ? { ...d, ...patch } : d)) });
-  const removeDoc = (id: string) =>
-    onChange({ documentos: docs.filter((d) => d.id !== id) });
+  const removeDoc = (id: string) => onChange({ documentos: docs.filter((d) => d.id !== id) });
   const addDoc = () =>
     onChange({
-      documentos: [
-        ...docs,
-        { id: crypto.randomUUID(), nombre: "", audiencia: "Interno" },
-      ],
+      documentos: [...docs, { id: crypto.randomUUID(), nombre: "", audiencia: "Interno" }],
     });
 
   return (
@@ -306,12 +403,7 @@ function VarianteEditor({
             onChange={(nivelesHospitalarios) => onChange({ nivelesHospitalarios })}
           />
         )}
-        <DocumentosTabla
-          docs={docs}
-          onUpdate={updateDoc}
-          onRemove={removeDoc}
-          onAdd={addDoc}
-        />
+        <DocumentosTabla docs={docs} onUpdate={updateDoc} onRemove={removeDoc} onAdd={addDoc} />
       </div>
     </div>
   );
