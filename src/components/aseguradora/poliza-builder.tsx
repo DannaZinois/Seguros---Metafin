@@ -13,6 +13,120 @@ export function tipoLabel(t: TipoSeguro): string {
   return t === "Gastos médicos mayores" ? "GMM" : t;
 }
 
+/** Editor de niveles hospitalarios (solo aplica para pólizas GMM). */
+export function NivelesHospitalariosEditor({
+  niveles,
+  onChange,
+}: {
+  niveles: string[];
+  onChange: (next: string[]) => void;
+}) {
+  const [draft, setDraft] = useState("");
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [editingValue, setEditingValue] = useState("");
+
+  const add = () => {
+    const v = draft.trim();
+    if (!v) return;
+    onChange([...niveles, v]);
+    setDraft("");
+  };
+  const remove = (i: number) => onChange(niveles.filter((_, idx) => idx !== i));
+  const startEdit = (i: number) => {
+    setEditingIdx(i);
+    setEditingValue(niveles[i]);
+  };
+  const confirmEdit = () => {
+    if (editingIdx === null) return;
+    const v = editingValue.trim();
+    if (!v) return;
+    onChange(niveles.map((n, idx) => (idx === editingIdx ? v : n)));
+    setEditingIdx(null);
+    setEditingValue("");
+  };
+
+  return (
+    <div className="mb-3">
+      <span className="text-xs font-medium text-foreground">Niveles hospitalarios</span>
+      <div className="mt-1 flex gap-2">
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              add();
+            }
+          }}
+          placeholder="Ej. Hospital tipo A"
+          className="flex-1 rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-[color:var(--brand-blue)]"
+        />
+        <button
+          type="button"
+          onClick={add}
+          disabled={!draft.trim()}
+          className="inline-flex items-center gap-1 rounded-full bg-[color:var(--brand-blue)] px-3 py-1.5 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Plus className="h-3.5 w-3.5" /> Agregar
+        </button>
+      </div>
+      {niveles.length > 0 && (
+        <div className="mt-2 overflow-hidden rounded-xl border border-border bg-white">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 font-medium">Nivel hospitalario</th>
+                <th className="px-3 py-2 text-right font-medium">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {niveles.map((n, i) => (
+                <tr key={i} className="border-b border-border/60 last:border-0">
+                  <td className="px-3 py-2">
+                    {editingIdx === i ? (
+                      <input
+                        autoFocus
+                        value={editingValue}
+                        onChange={(e) => setEditingValue(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && confirmEdit()}
+                        className="w-full rounded-md border border-border px-2 py-1 text-sm outline-none focus:border-[color:var(--brand-blue)]"
+                      />
+                    ) : (
+                      <span className="text-foreground">{n}</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-2 text-right">
+                    <div className="inline-flex items-center gap-1">
+                      <button
+                        onClick={() => (editingIdx === i ? confirmEdit() : startEdit(i))}
+                        className="rounded-full p-1.5 text-foreground hover:bg-muted"
+                        aria-label={editingIdx === i ? "Confirmar" : "Editar"}
+                      >
+                        {editingIdx === i ? (
+                          <Check className="h-3.5 w-3.5" />
+                        ) : (
+                          <Pencil className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => remove(i)}
+                        className="rounded-full p-1.5 text-destructive hover:bg-destructive/10"
+                        aria-label="Borrar"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const AUDIENCIAS: AudienciaDocumento[] = ["Interno", "Cliente"];
 
 /** Tabla editable de documentos de una póliza */
@@ -205,6 +319,7 @@ export function PolizaBuilder({
   const [tipo, setTipo] = useState<TipoSeguro>("Auto");
   const [nombre, setNombre] = useState("");
   const [docs, setDocs] = useState<DocumentoPoliza[]>([]);
+  const [niveles, setNiveles] = useState<string[]>([]);
 
   const addDoc = () =>
     setDocs((d) => [
@@ -221,6 +336,9 @@ export function PolizaBuilder({
       id: crypto.randomUUID(),
       nombre: nombre.trim(),
       documentos: docs,
+      ...(tipo === "Gastos médicos mayores"
+        ? { nivelesHospitalarios: niveles }
+        : {}),
     });
   };
 
@@ -256,6 +374,9 @@ export function PolizaBuilder({
       <div className="mt-4">
         <span className="text-xs font-medium text-foreground">Documentos</span>
         <div className="mt-2">
+          {tipo === "Gastos médicos mayores" && (
+            <NivelesHospitalariosEditor niveles={niveles} onChange={setNiveles} />
+          )}
           <DocumentosTabla
             docs={docs}
             onUpdate={updateDoc}
