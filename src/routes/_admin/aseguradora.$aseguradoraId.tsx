@@ -201,22 +201,59 @@ function EditAseguradoraPage() {
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Nombre" value={form.name} onChange={(v) => set("name", v)} />
-          <Field label="Abreviación" value={form.abreviacion ?? ""} onChange={(v) => set("abreviacion", v)} />
+          <Field
+            label="Abreviación"
+            value={form.abreviacion ?? ""}
+            onChange={(v) => set("abreviacion", v)}
+          />
           <Field label="RFC" value={form.rfc ?? ""} onChange={(v) => set("rfc", v)} />
-          <Field label="Ejecutivo" value={form.ejecutivo ?? ""} onChange={(v) => set("ejecutivo", v)} />
-          <Field label="Número de contacto" value={form.contactoTel ?? ""} onChange={(v) => set("contactoTel", v)} />
-          <Field label="Correo de contacto" value={form.contactoEmail ?? ""} onChange={(v) => set("contactoEmail", v)} />
-          <Field label="Link a página web" value={form.webUrl ?? ""} onChange={(v) => set("webUrl", v)} />
-          <Field label="Link para pago" value={form.pagoUrl ?? ""} onChange={(v) => set("pagoUrl", v)} />
-          <Field label="Link para descargar aplicación" value={form.appUrl ?? ""} onChange={(v) => set("appUrl", v)} />
+          <Field
+            label="Ejecutivo"
+            value={form.ejecutivo ?? ""}
+            onChange={(v) => set("ejecutivo", v)}
+          />
+          <Field
+            label="Número de contacto"
+            value={form.contactoTel ?? ""}
+            onChange={(v) => set("contactoTel", v)}
+          />
+          <Field
+            label="Correo de contacto"
+            value={form.contactoEmail ?? ""}
+            onChange={(v) => set("contactoEmail", v)}
+          />
+          <Field
+            label="Link a página web"
+            value={form.webUrl ?? ""}
+            onChange={(v) => set("webUrl", v)}
+          />
+          <Field
+            label="Link para pago"
+            value={form.pagoUrl ?? ""}
+            onChange={(v) => set("pagoUrl", v)}
+          />
+          <Field
+            label="Link para descargar aplicación"
+            value={form.appUrl ?? ""}
+            onChange={(v) => set("appUrl", v)}
+          />
         </div>
 
         <div className="mt-8 border-t border-border pt-6">
           <h3 className="text-base font-semibold text-foreground">Datos personales</h3>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Field label="Usuario" value={form.usuario ?? ""} onChange={(v) => set("usuario", v)} />
-            <Field label="Contraseña" value={form.contrasena ?? ""} onChange={(v) => set("contrasena", v)} type="password" />
-            <Field label="Clave agente en la aseguradora" value={form.claveAgente ?? ""} onChange={(v) => set("claveAgente", v)} />
+            <Field
+              label="Contraseña"
+              value={form.contrasena ?? ""}
+              onChange={(v) => set("contrasena", v)}
+              type="password"
+            />
+            <Field
+              label="Clave agente en la aseguradora"
+              value={form.claveAgente ?? ""}
+              onChange={(v) => set("claveAgente", v)}
+            />
           </div>
         </div>
 
