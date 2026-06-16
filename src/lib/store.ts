@@ -38,6 +38,7 @@ export interface VariantePoliza {
   pdfName?: string;
   wordName?: string;
   documentos?: DocumentoPoliza[];
+  nivelesHospitalarios?: string[];
 }
 
 export interface PolizaTipo {

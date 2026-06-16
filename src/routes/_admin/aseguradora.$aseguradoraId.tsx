@@ -9,7 +9,13 @@ import {
   type VariantePoliza,
   type DocumentoPoliza,
 } from "@/lib/store";
-import { PolizaBuilder, DocumentosTabla, TIPOS_SEGURO, tipoLabel } from "@/components/aseguradora/poliza-builder";
+import {
+  PolizaBuilder,
+  DocumentosTabla,
+  NivelesHospitalariosEditor,
+  TIPOS_SEGURO,
+  tipoLabel,
+} from "@/components/aseguradora/poliza-builder";
 
 export const Route = createFileRoute("/_admin/aseguradora/$aseguradoraId")({
   component: EditAseguradoraPage,
@@ -182,6 +188,7 @@ function EditAseguradoraPage() {
                     {variantes.map((v) => (
                       <VarianteEditor
                         key={v.id}
+                        tipo={tipo}
                         variante={v}
                         onChange={(patch) => updateVariante(tipo, v.id, patch)}
                         onDelete={() => removeVariante(tipo, v.id)}
@@ -217,10 +224,12 @@ function EditAseguradoraPage() {
 }
 
 function VarianteEditor({
+  tipo,
   variante,
   onChange,
   onDelete,
 }: {
+  tipo: TipoSeguro;
   variante: VariantePoliza;
   onChange: (patch: Partial<VariantePoliza>) => void;
   onDelete: () => void;
@@ -273,6 +282,12 @@ function VarianteEditor({
         </button>
       </div>
       <div className="mt-3">
+        {tipo === "Gastos médicos mayores" && (
+          <NivelesHospitalariosEditor
+            niveles={variante.nivelesHospitalarios ?? []}
+            onChange={(nivelesHospitalarios) => onChange({ nivelesHospitalarios })}
+          />
+        )}
         <DocumentosTabla
           docs={docs}
           onUpdate={updateDoc}
