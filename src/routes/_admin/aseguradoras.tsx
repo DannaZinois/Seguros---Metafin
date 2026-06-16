@@ -344,7 +344,39 @@ function AseguradorasPage() {
               {expanded[a.id] && (
                 <tr className="border-b border-border/60 bg-muted/20">
                   <td colSpan={5} className="px-6 py-4">
-                    <PolizasResumen polizas={a.polizas ?? []} />
+                    <PolizasResumen
+                      polizas={a.polizas ?? []}
+                      onEdit={() =>
+                        router.navigate({
+                          to: "/aseguradora/$aseguradoraId",
+                          params: { aseguradoraId: a.id },
+                        })
+                      }
+                      onRemove={(tipo, vid) => {
+                        if (!confirm("¿Eliminar esta póliza?")) return;
+                        setList(
+                          list.map((x) =>
+                            x.id !== a.id
+                              ? x
+                              : {
+                                  ...x,
+                                  polizas: (x.polizas ?? [])
+                                    .map((pp) =>
+                                      pp.tipo === tipo
+                                        ? {
+                                            ...pp,
+                                            variantes: pp.variantes.filter(
+                                              (v) => v.id !== vid,
+                                            ),
+                                          }
+                                        : pp,
+                                    )
+                                    .filter((pp) => pp.variantes.length > 0),
+                                },
+                          ),
+                        );
+                      }}
+                    />
                   </td>
                 </tr>
               )}
@@ -363,7 +395,15 @@ function RowGroup({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-function PolizasResumen({ polizas }: { polizas: PolizaTipo[] }) {
+function PolizasResumen({
+  polizas,
+  onEdit,
+  onRemove,
+}: {
+  polizas: PolizaTipo[];
+  onEdit: () => void;
+  onRemove: (tipo: TipoSeguro, vid: string) => void;
+}) {
   if (polizas.length === 0) {
     return <p className="text-sm text-muted-foreground">Sin pólizas registradas.</p>;
   }
@@ -386,12 +426,21 @@ function PolizasResumen({ polizas }: { polizas: PolizaTipo[] }) {
                     <th className="px-4 py-2 font-medium">Nombre</th>
                     <th className="px-4 py-2 font-medium">PDF</th>
                     <th className="px-4 py-2 font-medium">Word</th>
+                    <th className="px-4 py-2 font-medium text-right">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {variantes.map((v, idx) => (
                     <tr key={v.id} className="border-b border-border/60 last:border-0">
-                      <td className="px-4 py-2 text-foreground">{v.nombre || `Variante ${idx + 1}`}</td>
+                      <td className="px-4 py-2 text-foreground">
+                        <button
+                          type="button"
+                          onClick={onEdit}
+                          className="text-left font-medium text-[color:var(--brand-blue)] hover:underline"
+                        >
+                          {v.nombre || `Variante ${idx + 1}`}
+                        </button>
+                      </td>
                       <td className="px-4 py-2 text-foreground/80">
                         {v.pdfName ? (
                           <span className="inline-flex items-center gap-1.5"><FileText className="h-3.5 w-3.5" />{v.pdfName}</span>
@@ -401,6 +450,26 @@ function PolizasResumen({ polizas }: { polizas: PolizaTipo[] }) {
                         {v.wordName ? (
                           <span className="inline-flex items-center gap-1.5"><FileSpreadsheet className="h-3.5 w-3.5" />{v.wordName}</span>
                         ) : "—"}
+                      </td>
+                      <td className="px-4 py-2 text-right">
+                        <div className="inline-flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={onEdit}
+                            className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted"
+                            aria-label="Editar póliza"
+                          >
+                            <Pencil className="h-3.5 w-3.5" /> Editar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onRemove(tipo, v.id)}
+                            className="rounded-full p-1.5 text-destructive hover:bg-destructive/10"
+                            aria-label="Eliminar póliza"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
