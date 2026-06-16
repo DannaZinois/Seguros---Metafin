@@ -285,7 +285,8 @@ function EditAseguradoraPage() {
               return (
                 <div key={tipo} className="overflow-hidden rounded-2xl border border-border">
                   <div className="border-b border-border bg-muted/40 px-4 py-2 text-xs font-semibold text-foreground">
-                    {tipoLabel(tipo)} <span className="text-muted-foreground">({variantes.length})</span>
+                    {tipoLabel(tipo)}{" "}
+                    <span className="text-muted-foreground">({variantes.length})</span>
                   </div>
                   <div className="divide-y divide-border">
                     {variantes.map((v) => (
@@ -351,14 +352,10 @@ function VarianteEditor({
 
   const updateDoc = (id: string, patch: Partial<DocumentoPoliza>) =>
     onChange({ documentos: docs.map((d) => (d.id === id ? { ...d, ...patch } : d)) });
-  const removeDoc = (id: string) =>
-    onChange({ documentos: docs.filter((d) => d.id !== id) });
+  const removeDoc = (id: string) => onChange({ documentos: docs.filter((d) => d.id !== id) });
   const addDoc = () =>
     onChange({
-      documentos: [
-        ...docs,
-        { id: crypto.randomUUID(), nombre: "", audiencia: "Interno" },
-      ],
+      documentos: [...docs, { id: crypto.randomUUID(), nombre: "", audiencia: "Interno" }],
     });
 
   return (
@@ -406,12 +403,7 @@ function VarianteEditor({
             onChange={(nivelesHospitalarios) => onChange({ nivelesHospitalarios })}
           />
         )}
-        <DocumentosTabla
-          docs={docs}
-          onUpdate={updateDoc}
-          onRemove={removeDoc}
-          onAdd={addDoc}
-        />
+        <DocumentosTabla docs={docs} onUpdate={updateDoc} onRemove={removeDoc} onAdd={addDoc} />
       </div>
     </div>
   );
