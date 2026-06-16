@@ -29,7 +29,10 @@ function EditAseguradoraPage() {
   const { aseguradoraId } = Route.useParams();
   const { polizaId: focusPolizaId } = Route.useSearch();
   const [list, setList] = useAseguradoras();
-  const original = useMemo(() => list.find((a) => a.id === aseguradoraId) ?? null, [list, aseguradoraId]);
+  const original = useMemo(
+    () => list.find((a) => a.id === aseguradoraId) ?? null,
+    [list, aseguradoraId],
+  );
 
   const [form, setForm] = useState<Aseguradora | null>(original);
   const [adding, setAdding] = useState(false);
@@ -87,7 +90,9 @@ function EditAseguradoraPage() {
       return {
         ...p,
         polizas: (p.polizas ?? [])
-          .map((pp) => (pp.tipo === tipo ? { ...pp, variantes: pp.variantes.filter((v) => v.id !== vid) } : pp))
+          .map((pp) =>
+            pp.tipo === tipo ? { ...pp, variantes: pp.variantes.filter((v) => v.id !== vid) } : pp,
+          )
           .filter((pp) => pp.variantes.length > 0),
       };
     });
@@ -99,7 +104,9 @@ function EditAseguradoraPage() {
   };
 
   const focusedPoliza = focusPolizaId
-    ? (form.polizas ?? []).flatMap((p) => p.variantes.map((v) => ({ tipo: p.tipo, variante: v }))).find((p) => p.variante.id === focusPolizaId)
+    ? (form.polizas ?? [])
+        .flatMap((p) => p.variantes.map((v) => ({ tipo: p.tipo, variante: v })))
+        .find((p) => p.variante.id === focusPolizaId)
     : null;
 
   if (focusPolizaId) {
@@ -126,7 +133,9 @@ function EditAseguradoraPage() {
             <VarianteEditor
               tipo={focusedPoliza.tipo}
               variante={focusedPoliza.variante}
-              onChange={(patch) => updateVariante(focusedPoliza.tipo, focusedPoliza.variante.id, patch)}
+              onChange={(patch) =>
+                updateVariante(focusedPoliza.tipo, focusedPoliza.variante.id, patch)
+              }
               onDelete={() => removeVariante(focusedPoliza.tipo, focusedPoliza.variante.id)}
             />
           ) : (
@@ -142,7 +151,6 @@ function EditAseguradoraPage() {
             </button>
             <button
               onClick={onSave}
-              disabled={!focusedPoliza}
               className="rounded-full bg-[color:var(--brand-blue)] px-5 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               Guardar cambios
