@@ -405,10 +405,12 @@ function RowGroup({ children }: { children: ReactNode }) {
 function PolizasResumen({
   polizas,
   onEdit,
+  onEditVariante,
   onRemove,
 }: {
   polizas: PolizaTipo[];
   onEdit: () => void;
+  onEditVariante: (vid: string) => void;
   onRemove: (tipo: TipoSeguro, vid: string) => void;
 }) {
   if (polizas.length === 0) {
@@ -442,7 +444,7 @@ function PolizasResumen({
                       <td className="px-4 py-2 text-foreground">
                         <button
                           type="button"
-                          onClick={onEdit}
+                          onClick={() => onEditVariante(v.id)}
                           className="text-left font-medium text-[color:var(--brand-blue)] hover:underline"
                         >
                           {v.nombre || `Variante ${idx + 1}`}
@@ -462,7 +464,7 @@ function PolizasResumen({
                         <div className="inline-flex items-center gap-1">
                           <button
                             type="button"
-                            onClick={onEdit}
+                            onClick={() => onEditVariante(v.id)}
                             className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted"
                             aria-label="Editar póliza"
                           >
