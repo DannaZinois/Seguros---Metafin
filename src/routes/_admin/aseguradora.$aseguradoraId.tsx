@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ImageIcon, Upload, Plus, Trash2, Pencil } from "lucide-react";
+import { z } from "zod";
 import {
   useAseguradoras,
   type Aseguradora,
@@ -20,11 +21,13 @@ import {
 export const Route = createFileRoute("/_admin/aseguradora/$aseguradoraId")({
   component: EditAseguradoraPage,
   head: () => ({ meta: [{ title: "Editar aseguradora" }] }),
+  validateSearch: z.object({ polizaId: z.string().optional() }),
 });
 
 function EditAseguradoraPage() {
   const router = useRouter();
   const { aseguradoraId } = Route.useParams();
+  const { polizaId: focusPolizaId } = Route.useSearch();
   const [list, setList] = useAseguradoras();
   const original = useMemo(() => list.find((a) => a.id === aseguradoraId) ?? null, [list, aseguradoraId]);
 
@@ -190,6 +193,7 @@ function EditAseguradoraPage() {
                         key={v.id}
                         tipo={tipo}
                         variante={v}
+                        highlight={focusPolizaId === v.id}
                         onChange={(patch) => updateVariante(tipo, v.id, patch)}
                         onDelete={() => removeVariante(tipo, v.id)}
                       />
@@ -226,15 +230,23 @@ function EditAseguradoraPage() {
 function VarianteEditor({
   tipo,
   variante,
+  highlight,
   onChange,
   onDelete,
 }: {
   tipo: TipoSeguro;
   variante: VariantePoliza;
+  highlight?: boolean;
   onChange: (patch: Partial<VariantePoliza>) => void;
   onDelete: () => void;
 }) {
   const [editingName, setEditingName] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (highlight && ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [highlight]);
   const docs = variante.documentos ?? [];
 
   const updateDoc = (id: string, patch: Partial<DocumentoPoliza>) =>
@@ -250,7 +262,13 @@ function VarianteEditor({
     });
 
   return (
-    <div className="p-4">
+    <div
+      ref={ref}
+      className={
+        "p-4 transition-colors " +
+        (highlight ? "bg-[color:var(--brand-blue)]/5 ring-2 ring-[color:var(--brand-blue)]/40" : "")
+      }
+    >
       <div className="flex items-center justify-between gap-3">
         {editingName ? (
           <input

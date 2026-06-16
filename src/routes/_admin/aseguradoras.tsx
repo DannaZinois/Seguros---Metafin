@@ -352,6 +352,13 @@ function AseguradorasPage() {
                           params: { aseguradoraId: a.id },
                         })
                       }
+                      onEditVariante={(vid) =>
+                        router.navigate({
+                          to: "/aseguradora/$aseguradoraId",
+                          params: { aseguradoraId: a.id },
+                          search: { polizaId: vid },
+                        })
+                      }
                       onRemove={(tipo, vid) => {
                         if (!confirm("¿Eliminar esta póliza?")) return;
                         setList(
