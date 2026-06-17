@@ -643,6 +643,242 @@ export function DocumentosInformativosSection({
   );
 }
 
+export function DocumentosPolizaSection({
+  poliza,
+  onChange,
+  readOnly,
+}: {
+  poliza: Poliza;
+  onChange: (d: DocumentoInformativo[]) => void;
+  readOnly?: boolean;
+}) {
+  const docs = poliza.documentosPoliza ?? [];
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [nombre, setNombre] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [fileName, setFileName] = useState("");
+
+  const reset = () => {
+    setNombre("");
+    setDescripcion("");
+    setFileName("");
+    setEditingId(null);
+  };
+
+  const open = (d?: DocumentoInformativo) => {
+    if (d) {
+      setEditingId(d.id);
+      setNombre(d.nombre);
+      setDescripcion(d.descripcion);
+      setFileName(d.fileName);
+    } else {
+      reset();
+    }
+    setUploadOpen(true);
+  };
+
+  const submit = () => {
+    if (!nombre.trim() || !fileName) {
+      alert("Captura el nombre y selecciona el archivo.");
+      return;
+    }
+    if (editingId) {
+      onChange(
+        docs.map((x) =>
+          x.id === editingId
+            ? { ...x, nombre: nombre.trim(), descripcion: descripcion.trim(), fileName }
+            : x,
+        ),
+      );
+    } else {
+      onChange([
+        ...docs,
+        {
+          id: crypto.randomUUID(),
+          nombre: nombre.trim(),
+          descripcion: descripcion.trim(),
+          fileName,
+          uploadedAt: Date.now(),
+        },
+      ]);
+    }
+    setUploadOpen(false);
+    reset();
+  };
+
+  const descargar = (d: DocumentoInformativo) => {
+    const contenido = `Documento de póliza: ${d.nombre}\n\n${d.descripcion}\n\nArchivo: ${d.fileName}`;
+    const blob = new Blob([contenido], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = d.fileName || `${d.nombre.replace(/\s+/g, "_")}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <Section
+      title="Documentos de la póliza"
+      subtitle="Carga documentos relacionados a esta póliza (carátula, condiciones generales, endosos, etc.)."
+      extra={
+        !readOnly && (
+          <button
+            onClick={() => open()}
+            className="inline-flex items-center gap-1 rounded-full bg-violet-500 px-4 py-2 text-sm font-medium text-white hover:bg-violet-600"
+          >
+            <Plus className="h-4 w-4" /> Subir documento
+          </button>
+        )
+      }
+    >
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-sm">
+          <thead className="text-xs text-muted-foreground">
+            <tr>
+              <th className="py-3 font-medium">Nombre</th>
+              <th className="py-3 font-medium">Descripción</th>
+              <th className="py-3 font-medium">Archivo</th>
+              <th className="py-3 font-medium text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {docs.length === 0 && (
+              <tr>
+                <td colSpan={4} className="py-6 text-center text-sm text-muted-foreground">
+                  Sin documentos de póliza.
+                </td>
+              </tr>
+            )}
+            {docs.map((d) => (
+              <tr key={d.id} className="border-t border-border/60">
+                <td className="py-3 text-foreground">{d.nombre}</td>
+                <td className="py-3 text-muted-foreground">{d.descripcion || "—"}</td>
+                <td className="py-3 text-foreground/80">{d.fileName}</td>
+                <td className="py-3 text-right">
+                  <div className="inline-flex items-center gap-1">
+                    <button
+                      onClick={() => descargar(d)}
+                      className="rounded-full p-1.5 text-foreground hover:bg-muted"
+                      title="Descargar"
+                    >
+                      <Download className="h-4 w-4" />
+                    </button>
+                    {!readOnly && (
+                      <>
+                        <button
+                          onClick={() => open(d)}
+                          className="rounded-full p-1.5 text-foreground hover:bg-muted"
+                          title="Reemplazar"
+                        >
+                          <Upload className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => onChange(docs.filter((x) => x.id !== d.id))}
+                          className="rounded-full p-1.5 text-destructive hover:bg-destructive/10"
+                          title="Borrar"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {uploadOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => {
+            setUploadOpen(false);
+            reset();
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">
+                {editingId ? "Reemplazar documento" : "Subir documento de póliza"}
+              </h3>
+              <button
+                onClick={() => {
+                  setUploadOpen(false);
+                  reset();
+                }}
+                className="rounded-full p-1 hover:bg-muted"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <label className="block">
+                <span className="text-xs font-medium text-foreground">Nombre</span>
+                <input
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  placeholder="Nombre del documento"
+                  className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[color:var(--brand-blue)]"
+                />
+              </label>
+              <label className="block">
+                <span className="text-xs font-medium text-foreground">Descripción breve</span>
+                <textarea
+                  value={descripcion}
+                  onChange={(e) => setDescripcion(e.target.value)}
+                  placeholder="Breve descripción"
+                  rows={3}
+                  className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-[color:var(--brand-blue)]"
+                />
+              </label>
+              <label className="block">
+                <span className="text-xs font-medium text-foreground">Archivo</span>
+                <label className="mt-1 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-muted/30 px-3 py-4 text-xs text-muted-foreground hover:bg-muted/60">
+                  <Upload className="h-4 w-4" />
+                  {fileName || "Selecciona un archivo (PDF, DOCX, imagen)"}
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx,image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) setFileName(f.name);
+                    }}
+                  />
+                </label>
+              </label>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setUploadOpen(false);
+                  reset();
+                }}
+                className="rounded-full border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={submit}
+                className="rounded-full bg-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+              >
+                {editingId ? "Guardar" : "Subir"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </Section>
+  );
+}
+
 export function ComprobantesSection({
   poliza,
   onChange,

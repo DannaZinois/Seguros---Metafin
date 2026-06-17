@@ -118,6 +118,7 @@ export interface Poliza {
   asegurados: Asegurado[];
   comprobantes: Comprobante[];
   documentosInformativos?: DocumentoInformativo[];
+  documentosPoliza?: DocumentoInformativo[];
   comentarios: string;
   cargaFileName?: string;
   vigencia?: string;
