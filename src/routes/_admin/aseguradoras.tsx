@@ -1,8 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Plus, Trash2, FileText, Upload, Pencil, ImageIcon, ChevronDown, ChevronUp, FileSpreadsheet } from "lucide-react";
-import { useAseguradoras, type Aseguradora, type PolizaTipo, type TipoSeguro, type VariantePoliza } from "@/lib/store";
-import { PolizaBuilder, TIPOS_SEGURO, tipoLabel } from "@/components/aseguradora/poliza-builder";
+import { useEffect, useRef, useState } from "react";
+import { Plus, Trash2, Upload, Pencil, ImageIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { useAseguradoras, type Aseguradora } from "@/lib/store";
 
 export const Route = createFileRoute("/_admin/aseguradoras")({
   component: AseguradorasPage,
@@ -113,8 +112,6 @@ function AseguradorasPage() {
   const empty: Aseguradora = { id: "", name: "" };
   const [draft, setDraft] = useState<Aseguradora>(empty);
   const [open, setOpen] = useState(false);
-  const [polizasMode, setPolizasMode] = useState(false);
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (list.length === 0) setList(SEED);
@@ -146,20 +143,6 @@ function AseguradorasPage() {
 
   const remove = (id: string) => setList(list.filter((a) => a.id !== id));
 
-  const addPolizaToDraft = (tipo: TipoSeguro, variante: VariantePoliza) => {
-    setDraft((p) => {
-      const polizas = [...(p.polizas ?? [])];
-      const i = polizas.findIndex((x) => x.tipo === tipo);
-      if (i >= 0) {
-        polizas[i] = { ...polizas[i], variantes: [...polizas[i].variantes, variante] };
-      } else {
-        polizas.push({ id: crypto.randomUUID(), tipo, variantes: [variante] });
-      }
-      return { ...p, polizas };
-    });
-    setPolizasMode(false);
-  };
-
   return (
     <div>
       <h1 className="text-3xl font-bold tracking-tight text-foreground">
@@ -185,87 +168,59 @@ function AseguradorasPage() {
           )}
         </button>
         {open && (
-        <div className="border-t border-border p-6">
-        {!polizasMode ? (
-        <>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-          <div className="flex flex-col items-center gap-2">
-            {draft.imageDataUrl ? (
-              <img src={draft.imageDataUrl} alt="" className="h-24 w-24 rounded-2xl object-cover" />
-            ) : (
-              <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-                <ImageIcon className="h-7 w-7" />
+          <div className="border-t border-border p-6">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+              <div className="flex flex-col items-center gap-2">
+                {draft.imageDataUrl ? (
+                  <img src={draft.imageDataUrl} alt="" className="h-24 w-24 rounded-2xl object-cover" />
+                ) : (
+                  <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+                    <ImageIcon className="h-7 w-7" />
+                  </div>
+                )}
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted/40">
+                  <Upload className="h-3.5 w-3.5" /> Imagen
+                  <input
+                    ref={imgRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => onImageFile(e.target.files?.[0])}
+                  />
+                </label>
               </div>
-            )}
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted/40">
-              <Upload className="h-3.5 w-3.5" /> Imagen
-              <input
-                ref={imgRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => onImageFile(e.target.files?.[0])}
-              />
-            </label>
+
+              <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <Field label="Nombre de aseguradora" value={draft.name} onChange={(v) => setField("name", v)} placeholder="Ej. AXA" />
+                <Field label="Abreviación" value={draft.abreviacion ?? ""} onChange={(v) => setField("abreviacion", v)} />
+                <Field label="RFC" value={draft.rfc ?? ""} onChange={(v) => setField("rfc", v)} />
+                <Field label="Ejecutivo" value={draft.ejecutivo ?? ""} onChange={(v) => setField("ejecutivo", v)} />
+                <Field label="Número de contacto" value={draft.contactoTel ?? ""} onChange={(v) => setField("contactoTel", v)} />
+                <Field label="Correo de contacto" value={draft.contactoEmail ?? ""} onChange={(v) => setField("contactoEmail", v)} />
+                <Field label="Link a página web" value={draft.webUrl ?? ""} onChange={(v) => setField("webUrl", v)} />
+                <Field label="Link para pago" value={draft.pagoUrl ?? ""} onChange={(v) => setField("pagoUrl", v)} />
+                <Field label="Link para descargar aplicación" value={draft.appUrl ?? ""} onChange={(v) => setField("appUrl", v)} />
+              </div>
+            </div>
+
+            <div className="mt-6 border-t border-border pt-6">
+              <h3 className="text-sm font-semibold text-foreground">Datos personales</h3>
+              <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <Field label="Usuario" value={draft.usuario ?? ""} onChange={(v) => setField("usuario", v)} />
+                <Field label="Contraseña" value={draft.contrasena ?? ""} onChange={(v) => setField("contrasena", v)} type="password" />
+                <Field label="Clave agente en la aseguradora" value={draft.claveAgente ?? ""} onChange={(v) => setField("claveAgente", v)} />
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={add}
+                className="inline-flex h-10 items-center gap-2 rounded-full bg-[color:var(--brand-blue)] px-5 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
+              >
+                <Plus className="h-4 w-4" /> Agregar
+              </button>
+            </div>
           </div>
-
-          <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Field label="Nombre de aseguradora" value={draft.name} onChange={(v) => setField("name", v)} placeholder="Ej. AXA" />
-            <Field label="Abreviación" value={draft.abreviacion ?? ""} onChange={(v) => setField("abreviacion", v)} />
-            <Field label="RFC" value={draft.rfc ?? ""} onChange={(v) => setField("rfc", v)} />
-            <Field label="Ejecutivo" value={draft.ejecutivo ?? ""} onChange={(v) => setField("ejecutivo", v)} />
-            <Field label="Número de contacto" value={draft.contactoTel ?? ""} onChange={(v) => setField("contactoTel", v)} />
-            <Field label="Correo de contacto" value={draft.contactoEmail ?? ""} onChange={(v) => setField("contactoEmail", v)} />
-            <Field label="Link a página web" value={draft.webUrl ?? ""} onChange={(v) => setField("webUrl", v)} />
-            <Field label="Link para pago" value={draft.pagoUrl ?? ""} onChange={(v) => setField("pagoUrl", v)} />
-            <Field label="Link para descargar aplicación" value={draft.appUrl ?? ""} onChange={(v) => setField("appUrl", v)} />
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <button
-            type="button"
-            onClick={() => setPolizasMode(true)}
-            className="inline-flex items-center gap-2 rounded-full border border-[color:var(--brand-blue)] px-4 py-2 text-sm font-medium text-[color:var(--brand-blue)] hover:bg-[color:var(--brand-blue)]/10"
-          >
-            <Plus className="h-4 w-4" /> Agregar póliza
-          </button>
-          {(draft.polizas?.length ?? 0) > 0 && (
-            <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
-              {draft.polizas!.map((p) => (
-                <li key={p.id}>
-                  • {tipoLabel(p.tipo)} — {p.variantes.length} póliza(s)
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="mt-6 border-t border-border pt-6">
-          <h3 className="text-sm font-semibold text-foreground">Datos personales</h3>
-          <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Field label="Usuario" value={draft.usuario ?? ""} onChange={(v) => setField("usuario", v)} />
-            <Field label="Contraseña" value={draft.contrasena ?? ""} onChange={(v) => setField("contrasena", v)} type="password" />
-            <Field label="Clave agente en la aseguradora" value={draft.claveAgente ?? ""} onChange={(v) => setField("claveAgente", v)} />
-          </div>
-        </div>
-
-        <div className="mt-6 flex justify-end">
-          <button
-            onClick={add}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-[color:var(--brand-blue)] px-5 text-sm font-medium text-white hover:bg-[color:var(--brand-blue-dark)]"
-          >
-            <Plus className="h-4 w-4" /> Agregar
-          </button>
-        </div>
-        </>
-        ) : (
-          <PolizaBuilder
-            onCancel={() => setPolizasMode(false)}
-            onSave={addPolizaToDraft}
-          />
-        )}
-        </div>
         )}
       </div>
 
@@ -276,32 +231,21 @@ function AseguradorasPage() {
               <th className="px-6 py-4 font-medium">Aseguradora</th>
               <th className="px-6 py-4 font-medium">Abreviación</th>
               <th className="px-6 py-4 font-medium">Ejecutivo</th>
-              <th className="px-6 py-4 font-medium">Pólizas</th>
               <th className="px-6 py-4 font-medium text-right">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {list.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-10 text-center text-muted-foreground">
+                <td colSpan={4} className="px-6 py-10 text-center text-muted-foreground">
                   Aún no hay aseguradoras registradas.
                 </td>
               </tr>
             )}
             {list.map((a) => (
-              <RowGroup key={a.id}>
-              <tr className="border-b border-border/60 last:border-0">
+              <tr key={a.id} className="border-b border-border/60 last:border-0">
                 <td className="px-6 py-4 font-medium text-foreground">
-                  <button
-                    type="button"
-                    onClick={() => setExpanded((e) => ({ ...e, [a.id]: !e[a.id] }))}
-                    className="inline-flex items-center gap-3 text-left hover:underline"
-                  >
-                    {expanded[a.id] ? (
-                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                    )}
+                  <div className="inline-flex items-center gap-3">
                     {a.imageDataUrl ? (
                       <img src={a.imageDataUrl} alt={a.name} className="h-9 w-9 rounded-full object-cover" />
                     ) : (
@@ -310,15 +254,10 @@ function AseguradorasPage() {
                       </span>
                     )}
                     {a.name}
-                  </button>
+                  </div>
                 </td>
                 <td className="px-6 py-4 text-foreground/80">{a.abreviacion || "—"}</td>
                 <td className="px-6 py-4 text-foreground/80">{a.ejecutivo || "—"}</td>
-                <td className="px-6 py-4 text-foreground/80">
-                  {a.polizas && a.polizas.length > 0
-                    ? a.polizas.map((p) => `${tipoLabel(p.tipo)} (${p.variantes.length})`).join(", ")
-                    : "—"}
-                </td>
                 <td className="px-6 py-4 text-right">
                   <div className="inline-flex items-center gap-1">
                     <button
@@ -341,53 +280,6 @@ function AseguradorasPage() {
                   </div>
                 </td>
               </tr>
-              {expanded[a.id] && (
-                <tr className="border-b border-border/60 bg-muted/20">
-                  <td colSpan={5} className="px-6 py-4">
-                    <PolizasResumen
-                      polizas={a.polizas ?? []}
-                      onEdit={() =>
-                        router.navigate({
-                          to: "/aseguradora/$aseguradoraId",
-                          params: { aseguradoraId: a.id },
-                        })
-                      }
-                      onEditVariante={(vid) =>
-                        router.navigate({
-                          to: "/aseguradora/$aseguradoraId",
-                          params: { aseguradoraId: a.id },
-                          search: { polizaId: vid },
-                        })
-                      }
-                      onRemove={(tipo, vid) => {
-                        if (!confirm("¿Eliminar esta póliza?")) return;
-                        setList(
-                          list.map((x) =>
-                            x.id !== a.id
-                              ? x
-                              : {
-                                  ...x,
-                                  polizas: (x.polizas ?? [])
-                                    .map((pp) =>
-                                      pp.tipo === tipo
-                                        ? {
-                                            ...pp,
-                                            variantes: pp.variantes.filter(
-                                              (v) => v.id !== vid,
-                                            ),
-                                          }
-                                        : pp,
-                                    )
-                                    .filter((pp) => pp.variantes.length > 0),
-                                },
-                          ),
-                        );
-                      }}
-                    />
-                  </td>
-                </tr>
-              )}
-              </RowGroup>
             ))}
           </tbody>
         </table>
@@ -395,104 +287,6 @@ function AseguradorasPage() {
     </div>
   );
 }
-
-
-
-function RowGroup({ children }: { children: ReactNode }) {
-  return <>{children}</>;
-}
-
-function PolizasResumen({
-  polizas,
-  onEdit,
-  onEditVariante,
-  onRemove,
-}: {
-  polizas: PolizaTipo[];
-  onEdit: () => void;
-  onEditVariante: (vid: string) => void;
-  onRemove: (tipo: TipoSeguro, vid: string) => void;
-}) {
-  if (polizas.length === 0) {
-    return <p className="text-sm text-muted-foreground">Sin pólizas registradas.</p>;
-  }
-  return (
-    <div className="space-y-4">
-      {TIPOS_SEGURO.map((tipo) => {
-        const grupo = polizas.find((p) => p.tipo === tipo);
-        const variantes = grupo?.variantes ?? [];
-        return (
-          <div key={tipo} className="overflow-hidden rounded-2xl border border-border bg-white">
-            <div className="border-b border-border bg-muted/40 px-4 py-2 text-xs font-semibold text-foreground">
-              {tipoLabel(tipo)} {variantes.length > 0 && <span className="text-muted-foreground">({variantes.length})</span>}
-            </div>
-            {variantes.length === 0 ? (
-              <div className="px-4 py-3 text-xs text-muted-foreground">Sin variantes registradas.</div>
-            ) : (
-              <table className="w-full text-left text-sm">
-                <thead className="border-b border-border text-xs text-muted-foreground">
-                  <tr>
-                    <th className="px-4 py-2 font-medium">Nombre</th>
-                    <th className="px-4 py-2 font-medium">PDF</th>
-                    <th className="px-4 py-2 font-medium">Word</th>
-                    <th className="px-4 py-2 font-medium text-right">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {variantes.map((v, idx) => (
-                    <tr key={v.id} className="border-b border-border/60 last:border-0">
-                      <td className="px-4 py-2 text-foreground">
-                        <button
-                          type="button"
-                          onClick={() => onEditVariante(v.id)}
-                          className="text-left font-medium text-[color:var(--brand-blue)] hover:underline"
-                        >
-                          {v.nombre || `Variante ${idx + 1}`}
-                        </button>
-                      </td>
-                      <td className="px-4 py-2 text-foreground/80">
-                        {v.pdfName ? (
-                          <span className="inline-flex items-center gap-1.5"><FileText className="h-3.5 w-3.5" />{v.pdfName}</span>
-                        ) : "—"}
-                      </td>
-                      <td className="px-4 py-2 text-foreground/80">
-                        {v.wordName ? (
-                          <span className="inline-flex items-center gap-1.5"><FileSpreadsheet className="h-3.5 w-3.5" />{v.wordName}</span>
-                        ) : "—"}
-                      </td>
-                      <td className="px-4 py-2 text-right">
-                        <div className="inline-flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => onEditVariante(v.id)}
-                            className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted"
-                            aria-label="Editar póliza"
-                          >
-                            <Pencil className="h-3.5 w-3.5" /> Editar
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onRemove(tipo, v.id)}
-                            className="rounded-full p-1.5 text-destructive hover:bg-destructive/10"
-                            aria-label="Eliminar póliza"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-
 
 function Field({
   label,
