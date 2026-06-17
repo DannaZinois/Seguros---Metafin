@@ -33,6 +33,7 @@ import {
   AseguradosSection,
   ComprobantesSection,
   DocumentosInformativosSection,
+  DocumentosPolizaSection,
 } from "@/components/empresa/poliza-sections";
 import { GmmFieldsSection } from "@/components/empresa/gmm-fields";
 import { VidaFieldsSection } from "@/components/empresa/vida-fields";
@@ -272,6 +273,11 @@ function VerPolizaPage() {
       <ComprobantesSection
         poliza={poliza}
         onChange={(comprobantes) => updatePoliza({ comprobantes })}
+      />
+
+      <DocumentosPolizaSection
+        poliza={poliza}
+        onChange={(documentosPoliza) => updatePoliza({ documentosPoliza })}
       />
 
       <DocumentosInformativosSection
