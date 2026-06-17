@@ -643,10 +643,6 @@ export function DocumentosInformativosSection({
   );
 }
 
-export function ComprobantesSection({
-  // placeholder anchor
-}
-
 export function DocumentosPolizaSection({
   poliza,
   onChange,
