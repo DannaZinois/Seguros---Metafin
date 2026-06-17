@@ -112,8 +112,6 @@ function AseguradorasPage() {
   const empty: Aseguradora = { id: "", name: "" };
   const [draft, setDraft] = useState<Aseguradora>(empty);
   const [open, setOpen] = useState(false);
-  const [polizasMode, setPolizasMode] = useState(false);
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (list.length === 0) setList(SEED);
@@ -144,20 +142,6 @@ function AseguradorasPage() {
   };
 
   const remove = (id: string) => setList(list.filter((a) => a.id !== id));
-
-  const addPolizaToDraft = (tipo: TipoSeguro, variante: VariantePoliza) => {
-    setDraft((p) => {
-      const polizas = [...(p.polizas ?? [])];
-      const i = polizas.findIndex((x) => x.tipo === tipo);
-      if (i >= 0) {
-        polizas[i] = { ...polizas[i], variantes: [...polizas[i].variantes, variante] };
-      } else {
-        polizas.push({ id: crypto.randomUUID(), tipo, variantes: [variante] });
-      }
-      return { ...p, polizas };
-    });
-    setPolizasMode(false);
-  };
 
   return (
     <div>
