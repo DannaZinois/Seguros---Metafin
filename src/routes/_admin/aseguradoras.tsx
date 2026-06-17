@@ -1,8 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Plus, Trash2, FileText, Upload, Pencil, ImageIcon, ChevronDown, ChevronUp, FileSpreadsheet } from "lucide-react";
-import { useAseguradoras, type Aseguradora, type PolizaTipo, type TipoSeguro, type VariantePoliza } from "@/lib/store";
-import { PolizaBuilder, TIPOS_SEGURO, tipoLabel } from "@/components/aseguradora/poliza-builder";
+import { useEffect, useRef, useState } from "react";
+import { Plus, Trash2, Upload, Pencil, ImageIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { useAseguradoras, type Aseguradora } from "@/lib/store";
 
 export const Route = createFileRoute("/_admin/aseguradoras")({
   component: AseguradorasPage,
